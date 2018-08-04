@@ -8,5 +8,5 @@
 
 localization/Loc.Core.lua
 SwitchSwitch.lua
-Init.lua
 Commands.lua
+Init.lua

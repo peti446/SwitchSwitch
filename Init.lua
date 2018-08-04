@@ -19,7 +19,7 @@ end
 -- Event handling frame
 addon.event_frame = CreateFrame("Frame")
 -- Set Scripts
-addon.main_frame:SetScript("OnEvent", addon.eventHandling)
+addon.event_frame:SetScript("OnEvent", addon.eventHandling)
 -- Register events
-addon.main_frame:RegisterEvent("ADDON_LOADED")
-addon.main_frame:RegisterEvent("PLAYER_LOGIN")
+addon.event_frame:RegisterEvent("ADDON_LOADED")
+addon.event_frame:RegisterEvent("PLAYER_LOGIN")
