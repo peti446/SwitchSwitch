@@ -7,3 +7,5 @@
 ## SavedVariablesPerCharacter: SwitchSwitchTalents
 
 SwitchSwitch.lua
+Init.lua
+Commands.lua
