@@ -6,6 +6,7 @@
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: SwitchSwitchTalents
 
+localization/Loc.Core.lua
 SwitchSwitch.lua
 Init.lua
 Commands.lua
