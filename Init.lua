@@ -1,18 +1,30 @@
 --############################################
 -- Namespace
 --############################################
-local _, addon = ...
+local addonName, addon = ...
 
 --##########################################################################################################################
 --                                  Event handling
 --##########################################################################################################################
 function addon:eventHandling(event, arg1)
     if (event == "ADDON_LOADED") then
+        if(arg1 ~= addonName) then
+            return 
+        end
 
+        if(SwitchSwitchTalents == nil) then
+            --Default talents table
+            SwitchSwitchTalents = {};
+        end
+        --Unregister current event
+        self:UnregisterEvent(event);
     elseif(event == "PLAYER_LOGIN") then
 
         --Load Commands
         addon.Commands:Init();
+
+        --Unregister current event
+        self:UnregisterEvent(event);
     end
 end
 
