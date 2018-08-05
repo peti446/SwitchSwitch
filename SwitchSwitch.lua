@@ -10,7 +10,7 @@ local _, addon = ...
 --##########################################################################################################################
 -- Function to print a debug message
 function addon:Debug(...)
-    if(addon.DataToSave.options.debug) then
+    if(addon.sv.config.debug) then
         addon:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
     end
 end
@@ -19,6 +19,19 @@ end
 function addon:Print(...)
     local msg = string.join(" ","|cFF029CFC[SwitchSwitch]|r", tostringall(... or "nil"));
     DEFAULT_CHAT_FRAME:AddMessage(msg);
+end
+
+function addon:PrintTable(t)
+    if type(t) == 'table' then
+        local s = '{ '
+        for k,v in pairs(t) do
+           if type(k) ~= 'number' then k = '"'..k..'"' end
+           s = s .. '['..k..'] = ' .. dump(v) .. ','
+        end
+        return s .. '} '
+     else
+        return tostring(t)
+     end
 end
 
 --Get the talent from the current active spec
