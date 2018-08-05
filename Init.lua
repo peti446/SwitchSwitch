@@ -4,6 +4,18 @@
 local addonName, addon = ...
 
 --##########################################################################################################################
+--                                  Default configurations
+--##########################################################################################################################
+local function GetDefaultConfig()
+    return {
+        ["config"] =
+        {
+            ["debug"] = false
+        }
+    }
+end
+
+--##########################################################################################################################
 --                                  Event handling
 --##########################################################################################################################
 function addon:eventHandling(event, arg1)
@@ -12,10 +24,22 @@ function addon:eventHandling(event, arg1)
             return 
         end
 
+        --Talents table
         if(SwitchSwitchTalents == nil) then
             --Default talents table
-            SwitchSwitchTalents = {};
+            SwitchSwitchTalents = {}
         end
+
+        if(SwitchSwitchConfig == nil) then
+            --Default config
+            SwitchSwitchConfig = GetDefaultConfig()
+        end
+
+        --Add the global variables to the addon global
+        addon.sv = {}
+        addon.sv.Talents = SwitchSwitchTalents
+        addon.sv.config = SwitchSwitchConfig
+
         --Unregister current event
         self:UnregisterEvent(event);
     elseif(event == "PLAYER_LOGIN") then
