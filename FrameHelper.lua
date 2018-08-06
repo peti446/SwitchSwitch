@@ -38,6 +38,8 @@ function FrameHelper:CreateTalentFrameUI()
     UpperTalentsUI.DropDownTalents:SetPoint("LEFT", UpperTalentsUI.CurrentPorfie, "RIGHT", 0, -3)
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, FrameHelper.Initialize_Talents_List)
+    UIDropDownMenu_SetText(UpperTalentsUI.DropDownTalents,  "test");
+    UIDropDownMenu_SetSelectedID(UpperTalentsUI.DropDownTalents, 1)
 end
 
 --Creates the Configuration frame UI
@@ -52,33 +54,35 @@ function FrameHelper.Initialize_Talents_List(dropDownFrame ,level, menuList)
     menuList = 
     {
         { 
-            text = "test",
-            checked = true,
+            text = "test555",
         },
         { 
             text = "test4",
-            checked = false,
         },
         { 
             text = "test5",
-            checked = false,
         }
     }
+    if(not level) then
+        level = 1
+    end
 	for index = 1, #menuList do
-        local value = menuList[index]
-		if (value.text) then
-            value.index = index
-            value.value = value.text
-            value.arg1 = value.text
-            value.func = UpperTalentsUI.DropDownTalents.SetDropDownValue
-			UIDropDownMenu_AddButton( value, level )
+        local info = menuList[index]
+		if (info.text) then
+            info.index = index
+            info.value = info.text
+            info.arg1 = dropDownFrame
+            info.func = FrameHelper.SetDropDownValue
+			UIDropDownMenu_AddButton( info, level )
 		end
 	end
 end
 
-function UpperTalentsUI.DropDownTalents:SetDropDownValue(TalentName)
-    addon:Print(dropDownFrame)
-    addon:Print(TalentName)
+function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
+    if (not checked) then
+		-- set selected value as selected
+        UIDropDownMenu_SetSelectedValue(arg1, self.value)
+    end
 end
 
 

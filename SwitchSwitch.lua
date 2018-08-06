@@ -21,17 +21,19 @@ function addon:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(msg);
 end
 
-function addon:PrintTable(t)
-    if type(t) == 'table' then
-        local s = '{ '
-        for k,v in pairs(t) do
-           if type(k) ~= 'number' then k = '"'..k..'"' end
-           s = s .. '['..k..'] = ' .. dump(v) .. ','
+function addon:PrintTable(tbl, indent)
+    if not indent then indent = 0 end
+    if type(tbl) == 'table' then
+        for k, v in pairs(tbl) do
+            formatting = string.rep("  ", indent) .. k .. ": "
+            if type(v) == "table" then
+              addon:Print(formatting)
+              addon:PrintTable(v, indent+1)
+            else
+                addon:Print(formatting .. tostring(v))
+            end
         end
-        return s .. '} '
-     else
-        return tostring(t)
-     end
+    end
 end
 
 --Get the talent from the current active spec
