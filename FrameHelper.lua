@@ -13,7 +13,7 @@ local FrameHelper = addon.FrameHelper
 --Creates the Frame inside the talent frame
 function FrameHelper:CreateTalentFrameUI()
     --Check if we already created the frame, as WOW does not delete frames unless you reload, so we dont need to recreate it
-    if(FrameHelper.TalentsUI ~= nil) then
+    if(FrameHelper.UpperTalentsUI ~= nil) then
         --Update the frame and add/remove porfiles as needed (using garbage collection for memory otimisation)
         --FrameHelper:UpdateTalentFrameUIComponents()
         return
@@ -23,7 +23,7 @@ function FrameHelper:CreateTalentFrameUI()
     local UpperTalentsUI = FrameHelper.UpperTalentsUI
     UpperTalentsUI:SetPoint("TOPLEFT", PlayerTalentFrameTalents, "TOPLEFT", 60, 30)
     UpperTalentsUI:SetPoint("BOTTOMRIGHT", PlayerTalentFrameTalents, "TOPRIGHT", -110, 2)
-    --talentsUI:Hide()
+
     --Create the new and save buttons
     UpperTalentsUI.SaveButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Save"], 80, nil, -10, -2)
     UpperTalentsUI.NewButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI.SaveButton, UpperTalentsUI.SaveButton, "TOPLEFT", addon.L["New"], 80, nil, -5, 0) 
@@ -38,8 +38,30 @@ function FrameHelper:CreateTalentFrameUI()
     UpperTalentsUI.DropDownTalents:SetPoint("LEFT", UpperTalentsUI.CurrentPorfie, "RIGHT", 0, -3)
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, FrameHelper.Initialize_Talents_List)
-    UIDropDownMenu_SetText(UpperTalentsUI.DropDownTalents,  "test");
     UIDropDownMenu_SetSelectedID(UpperTalentsUI.DropDownTalents, 1)
+
+    --Create new Static popup dialog
+    StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
+    {
+        text = "Create a new profile:",
+        button1 = addon.L["Ok"],
+        button2 = addon.L["Cancel"],
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+        hasEditBox = true,
+        exclusive = true,
+        OnAccept = FrameHelper.OnAceptNewPorfile,
+        EditBoxOnTextChanged = function (self, data) 
+            if(data ~= nil or data ~= '') then
+                self:GetParent().button1:Enable()
+            end
+        end,
+        onShow = function(self) 
+            self.button1:Disable()
+        end
+    }
 end
 
 --Creates the Configuration frame UI
@@ -85,6 +107,9 @@ function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
     end
 end
 
+function FrameHelper.OnAceptNewPorfile(slef)
+    addon:PrintTable(self)
+end
 
 --##########################################################################################################################
 --                                  Helper Functions
