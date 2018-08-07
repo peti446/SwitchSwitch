@@ -27,7 +27,7 @@ function FrameHelper:CreateTalentFrameUI()
     --Create the new and save buttons
     UpperTalentsUI.SaveButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Save"], 80, nil, -10, -2)
     UpperTalentsUI.NewButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI.SaveButton, UpperTalentsUI.SaveButton, "TOPLEFT", addon.L["New"], 80, nil, -5, 0) 
-    
+    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", "")end)
     --Create Talent string
     UpperTalentsUI.CurrentPorfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
     UpperTalentsUI.CurrentPorfie:SetText(addon.L["Talents"] .. ":")
@@ -43,7 +43,7 @@ function FrameHelper:CreateTalentFrameUI()
     --Create new Static popup dialog
     StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
     {
-        text = "Create a new profile:",
+        text = addon.L["Create a new profile:"] .. "%s",
         button1 = addon.L["Ok"],
         button2 = addon.L["Cancel"],
         timeout = 0,
@@ -52,14 +52,22 @@ function FrameHelper:CreateTalentFrameUI()
         preferredIndex = 3,
         hasEditBox = true,
         exclusive = true,
-        OnAccept = FrameHelper.OnAceptNewPorfile,
-        EditBoxOnTextChanged = function (self, data) 
-            if(data ~= nil or data ~= '') then
+        OnAccept = function(self)
+            FrameHelper:OnAceptNewPorfile(self)
+        end,
+        EditBoxOnTextChanged = function (self) 
+            local data = self:GetParent().editBox:GetText()
+            if(data ~= nil and data ~= '') then
                 self:GetParent().button1:Enable()
+            else
+                self:GetParent().button1:Disable()
             end
         end,
-        onShow = function(self) 
+        OnShow = function(self)
             self.button1:Disable()
+        end,
+        OnCancel = function()
+            StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"].text = addon.L["Create a new profile:"]
         end
     }
 end
@@ -72,7 +80,7 @@ end
 --##########################################################################################################################
 --                                  Frames Component handler
 --##########################################################################################################################
-function FrameHelper.Initialize_Talents_List(dropDownFrame ,level, menuList)
+function FrameHelper.Initialize_Talents_List(self, level, menuList)
     menuList = 
     {
         { 
@@ -93,7 +101,7 @@ function FrameHelper.Initialize_Talents_List(dropDownFrame ,level, menuList)
 		if (info.text) then
             info.index = index
             info.value = info.text
-            info.arg1 = dropDownFrame
+            info.arg1 = self
             info.func = FrameHelper.SetDropDownValue
 			UIDropDownMenu_AddButton( info, level )
 		end
@@ -107,8 +115,22 @@ function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
     end
 end
 
-function FrameHelper.OnAceptNewPorfile(slef)
-    addon:PrintTable(self)
+function FrameHelper:OnAceptNewPorfile(frame)
+    local profileName = frame.editBox:GetText()
+    --Check if the porfile exits if so, change the text
+    if(addon:DoesTalentPorfileExist(profileName)) then
+        frame.button1:Disable()
+        C_Timer.After(0.01,function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", "\n\n |cFFFF0000" .. addon.L["Talent Group name is already in use"]) end)
+        return
+    end
+
+    --Porfile name does not exist so create it
+    addon.sv.Talents[profileName] =
+    {
+        options = {},
+        talents = addon:GetCurrentTalents()
+    }
+    addon:Print(addon.L["Talent Porfile %s created!"]:format(profileName))
 end
 
 --##########################################################################################################################

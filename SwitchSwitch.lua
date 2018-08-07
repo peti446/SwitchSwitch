@@ -36,6 +36,15 @@ function addon:PrintTable(tbl, indent)
     end
 end
 
+function addon:DoesTalentPorfileExist(porfile)
+    for k,v in pairs(addon.sv.Talents) do
+        if(k == porfile) then
+            return true
+        end
+    end
+    return false
+end
+
 --Get the talent from the current active spec
 function addon:GetCurrentTalents()
     local ChosenTalents = {};
