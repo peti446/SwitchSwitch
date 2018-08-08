@@ -27,7 +27,7 @@ function FrameHelper:CreateTalentFrameUI()
     --Create the new and save buttons
     UpperTalentsUI.DeleteButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
     UpperTalentsUI.NewButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI.DeleteButton, UpperTalentsUI.DeleteButton, "TOPLEFT", addon.L["New"], 80, nil, -5, 0) 
-    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", "")end)
+    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")end)
     --Create Talent string
     UpperTalentsUI.CurrentPorfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
     UpperTalentsUI.CurrentPorfie:SetText(addon.L["Talents"] .. ":")
@@ -43,7 +43,7 @@ function FrameHelper:CreateTalentFrameUI()
     --Create new Static popup dialog
     StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
     {
-        text = addon.L["Create/Ovewrite a profile"] .. ": %s",
+        text = addon.L["Create/Ovewrite a profile"],
         button1 = addon.L["Save"],
         button2 = addon.L["Cancel"],
         timeout = 0,
@@ -65,9 +65,6 @@ function FrameHelper:CreateTalentFrameUI()
         end,
         OnShow = function(self)
             self.button1:Disable()
-        end,
-        OnCancel = function()
-            StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"].text = addon.L["Create a new profile:"]
         end
     }
     --Create the confirim save popup
@@ -80,12 +77,17 @@ function FrameHelper:CreateTalentFrameUI()
         whileDead = true,
         hideOnEscape = true,
         preferredIndex = 3,
-        hasEditBox = true,
         exclusive = true,
         OnAccept = function(self, porfileName)
             addon.sv.Talents.TalentsPorfiles[porfileName].talents = addon:GetCurrentTalents()
             addon:Print(addon.L["Profile %s overwritten!"]:format(porfileName))
         end,
+        OnCancel = function(self, porfileName)
+            local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
+            if(dialog) then
+                dialog.editBox:SetText(porfileName)
+            end
+        end
     }
 end
 
