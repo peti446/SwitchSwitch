@@ -2,7 +2,6 @@
 -- Namespace
 --############################################
 local _, addon = ...
---https://wow.gamepedia.com/Patch_5.0.4/API_changes
 
 --##########################################################################################################################
 --                                  Helper Functions
@@ -36,8 +35,8 @@ function addon:PrintTable(tbl, indent)
 end
 
 --Checks if the talents porfile database contains the given porfile
-function addon:DoesTalentPorfileExist(porfile)
-    for k,v in pairs(addon.sv.Talents.TalentsPorfiles) do
+function addon:DoesTalentProfileExist(porfile)
+    for k,v in pairs(addon.sv.Talents.TalentsProfiles) do
         if(k == porfile) then
             return true
         end

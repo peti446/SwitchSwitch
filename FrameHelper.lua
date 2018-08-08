@@ -14,7 +14,7 @@ local FrameHelper = addon.FrameHelper
 function FrameHelper:CreateTalentFrameUI()
     --Check if we already created the frame, as WOW does not delete frames unless you reload, so we dont need to recreate it
     if(FrameHelper.UpperTalentsUI ~= nil) then
-        --Update the frame and add/remove porfiles as needed (using garbage collection for memory otimisation)
+        --Update the frame and add/remove profiles as needed (using garbage collection for memory otimisation)
         --FrameHelper:UpdateTalentFrameUIComponents()
         return
     end
@@ -26,6 +26,12 @@ function FrameHelper:CreateTalentFrameUI()
 
     --Create the new and save buttons
     UpperTalentsUI.DeleteButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
+    UpperTalentsUI.DeleteButton:SetScript("OnClick", function()
+        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.sv.Talents.SelectedTalentsProfile)
+        if(dialog) then
+            dialog.data = addon.sv.Talents.SelectedTalentsProfile
+        end 
+    end)
     UpperTalentsUI.NewButton = FrameHelper:CreateButton("TOPRIGHT", UpperTalentsUI.DeleteButton, UpperTalentsUI.DeleteButton, "TOPLEFT", addon.L["New"], 80, nil, -5, 0) 
     UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")end)
     --Create Talent string
@@ -53,7 +59,7 @@ function FrameHelper:CreateTalentFrameUI()
         hasEditBox = true,
         exclusive = true,
         OnAccept = function(self)
-            FrameHelper:OnAceptNewPorfile(self)
+            FrameHelper:OnAceptNewprofile(self)
         end,
         EditBoxOnTextChanged = function (self) 
             local data = self:GetParent().editBox:GetText()
@@ -78,16 +84,32 @@ function FrameHelper:CreateTalentFrameUI()
         hideOnEscape = true,
         preferredIndex = 3,
         exclusive = true,
-        OnAccept = function(self, porfileName)
-            addon.sv.Talents.TalentsPorfiles[porfileName].talents = addon:GetCurrentTalents()
-            addon:Print(addon.L["Profile %s overwritten!"]:format(porfileName))
+        OnAccept = function(self, profileName)
+            addon.sv.Talents.TalentsProfiles[profileName].talents = addon:GetCurrentTalents()
+            addon:Print(addon.L["Profile %s overwritten!"]:format(profileName))
         end,
-        OnCancel = function(self, porfileName)
+        OnCancel = function(self, profileName)
             local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
             if(dialog) then
-                dialog.editBox:SetText(porfileName)
+                dialog.editBox:SetText(profileName)
             end
         end
+    }
+
+     --Create the confirim save popup
+    StaticPopupDialogs["SwitchSwitch_ConfirmDeleteprofile"] =
+    {
+         text = addon.L["You want to delete the profile '%s'?"],
+         button1 = addon.L["Delete"],
+         button2 = addon.L["Cancel"],
+         timeout = 0,
+         whileDead = true,
+         hideOnEscape = true,
+         preferredIndex = 3,
+         exclusive = true,
+         OnAccept = function(self, data)
+            FrameHelper:OnAcceptDeleteprofile(self, data)
+         end,
     }
 end
 
@@ -101,8 +123,8 @@ end
 --##########################################################################################################################
 function FrameHelper.Initialize_Talents_List(self, level, menuList)
     local menuList = {}
-    --Get all porfile names and create the list for the dropdown menu
-    for TalentProfileName, data in pairs(addon.sv.Talents.TalentsPorfiles) do
+    --Get all profile names and create the list for the dropdown menu
+    for TalentProfileName, data in pairs(addon.sv.Talents.TalentsProfiles) do
         table.insert(menuList, {
             text = TalentProfileName
         })
@@ -125,23 +147,22 @@ end
 
 function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
     if (not checked) then
-        --Temp porfile to check in case we cannot change talents
-        local tempOldSelected = addon.sv.Talents.SelectedTalentsPorfile
+        --Temp profile to check in case we cannot change talents
+        local tempOldSelected = addon.sv.Talents.SelectedTalentsprofile
 		-- set selected value as selected
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         --Set the global value so we remember when we log back in
-        addon.sv.Talents.SelectedTalentsPorfile = self.value
+        addon.sv.Talents.SelectedTalentsprofile = self.value
         
         
     end
 end
 
-function FrameHelper:OnAceptNewPorfile(frame)
+function FrameHelper:OnAceptNewprofile(frame)
     local profileName = frame.editBox:GetText()
-    --Check if the porfile exits if so, change the text
-    if(addon:DoesTalentPorfileExist(profileName)) then
+    --Check if the profile exits if so, change the text
+    if(addon:DoesTalentProfileExist(profileName)) then
         frame.button1:Disable()
-        --C_Timer.After(0.01,function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", "\n\n |cFFFF0000" .. addon.L["Talent Group name is already in use"]) end)
         local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTalemtsSavePopUp", profileName)
         if(dialog) then
             dialog.data = profileName
@@ -149,15 +170,21 @@ function FrameHelper:OnAceptNewPorfile(frame)
         return
     end
 
-    --Porfile name does not exist so create it
-    addon.sv.Talents.TalentsPorfiles[profileName] =
+    --profile name does not exist so create it
+    addon.sv.Talents.TalentsProfiles[profileName] =
     {
         options = {},
         talents = addon:GetCurrentTalents()
     }
-    addon.sv.Talents.SelectedTalentsPorfile = profileName
-    --Let the user know that the porfile has been created
-    addon:Print(addon.L["Talent Porfile %s created!"]:format(profileName))
+    addon.sv.Talents.SelectedTalentsProfile = profileName
+    --Select the new porfile
+    UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, profileName)
+    --Let the user know that the profile has been created
+    addon:Print(addon.L["Talent profile %s created!"]:format(profileName))
+end
+
+function FrameHelper:OnAcceptDeleteprofile(frame, profile)
+
 end
 
 --##########################################################################################################################

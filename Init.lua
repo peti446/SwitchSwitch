@@ -30,8 +30,8 @@ function addon:eventHandler(event, arg1)
             --Default talents table
             SwitchSwitchTalents =
             {
-                SelectedTalentsPorfile = "",
-                TalentsPorfiles = {}
+                SelectedTalentsProfile = "",
+                TalentsProfiles = {}
             }
         end
 
