@@ -28,7 +28,11 @@ function addon:eventHandler(event, arg1)
         --Talents table
         if(SwitchSwitchTalents == nil) then
             --Default talents table
-            SwitchSwitchTalents = {}
+            SwitchSwitchTalents =
+            {
+                SelectedTalentsPorfile = "",
+                TalentsPorfiles = {}
+            }
         end
 
         if(SwitchSwitchConfig == nil) then
