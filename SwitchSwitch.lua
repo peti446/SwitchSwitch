@@ -119,7 +119,7 @@ function addon:ActivateTalentProfile(profileName)
 
     --Check  if table exits
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
-        addon:Debug(addon.L["Could not change talents to Profile %s as it does not exits in the database"]:format(profileName))
+        addon:Debug(addon.L["Could not change talents to Profile '%s' as it does not exits in the database"]:format(profileName))
         return false
     end
 
@@ -134,12 +134,12 @@ function addon:ActivateTalentProfile(profileName)
             LearnTalents(talent)
             --If talent id changed let the user know that the talents might be wrong
             if(select(1, talent) ~= talentTbl.id) then
-                addon:Print(addon.L["It seems like the talent from tier: %s and column: %s have been moved or changed, check you talents!"]:format(tostring(talentTbl.tier), tostring(talentTbl.column)))
+                addon:Print(addon.L["It seems like the talent from tier: '%s' and column: '%s' have been moved or changed, check you talents!"]:format(tostring(talentTbl.tier), tostring(talentTbl.column)))
             end
         end
     end
     --Print and return
-    addon:Print(addon.L["Changed talents to %s"]:format(profileName))
+    addon:Print(addon.L["Changed talents to '%s'"]:format(profileName))
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
     C_Timer.After(0.3,function() addon.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later

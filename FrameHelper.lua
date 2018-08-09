@@ -94,7 +94,7 @@ function FrameHelper:CreateTalentFrameUI()
         exclusive = true,
         OnAccept = function(self, profileName)
             addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
-            addon:Print(addon.L["Profile %s overwritten!"]:format(profileName))
+            addon:Print(addon.L["Profile '%s' overwritten!"]:format(profileName))
         end,
         OnCancel = function(self, profileName)
             local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
