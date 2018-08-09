@@ -153,8 +153,15 @@ function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         --Set the global value so we remember when we log back in
         addon.sv.Talents.SelectedTalentsprofile = self.value
-        
-        
+
+        --Try to change talents
+        if(not addon:ActivateTalentPorfile(self.value)) then
+            if(tempOldSelected == "") then
+                tempOldSelected = "Custom"
+            end
+            UIDropDownMenu_SetSelectedValue(arg1, tempOldSelected)
+            addon.sv.Talents.SelectedTalentsprofile = tempOldSelected
+        end
     end
 end
 
@@ -179,12 +186,25 @@ function FrameHelper:OnAceptNewprofile(frame)
     addon.sv.Talents.SelectedTalentsProfile = profileName
     --Select the new porfile
     UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, profileName)
+    UIDropDownMenu_SetText(FrameHelper.UpperTalentsUI.DropDownTalents, profileName)
     --Let the user know that the profile has been created
     addon:Print(addon.L["Talent profile %s created!"]:format(profileName))
 end
 
 function FrameHelper:OnAcceptDeleteprofile(frame, profile)
+    --Check if the porfile exists
+    if(addon.sv.Talents.TalentsProfiles[profile] == nil or type(addon.sv.Talents.TalentsProfiles[profile]) ~= "table") then
+        return
+    end
 
+    --Delete the porfile
+    addon.sv.Talents.TalentsProfiles[profile] = nil
+
+    --If it is the current selected porfile change the selected vlaue to custom
+    if(profile == addon.sv.Talents.SelectedTalentsProfile) then
+        UIDropDownMenu_SetText(FrameHelper.UpperTalentsUI.DropDownTalents, "Custom")
+        addon.sv.Talents.SelectedTalentsProfile = ""
+    end
 end
 
 --##########################################################################################################################

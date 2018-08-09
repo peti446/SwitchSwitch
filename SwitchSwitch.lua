@@ -63,3 +63,51 @@ function addon:GetCurrentTalents()
     end
     return ChosenTalents;
 end
+
+--Check if we can switch talents
+function addon:CanChangeTalents()
+    --Quick return if resting for better performance
+    if(IsResting()) then
+        return true
+    end
+    local buffLookingFor = 
+    {
+        226234,
+        227041,
+        227563,
+        227565,
+        227569,
+        256231,
+        256229
+    }
+    for i = 1, 40 do
+        local spellID = select(10, UnitBuff("player"), i)
+        for index, id in ipairs(buffLookingFor) do
+            if(spellID == id) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+function addon:ActivateTalentPorfile(profileName)
+    --If we cannot change talents why even try?
+    if(addon:CanChangeTalents()) then
+        return false
+    end
+
+    --Learn talents
+    for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[profileName]) do
+        --Get the current talent info to see if the talent id changed
+        local talent = GetTalentInfo(talentTbl.tier, talentTbl.column, 1)
+        if talentTbl.tier > 0 and talentTbl.column > 0  then
+            LearnTalents(talent)
+            --If talent id changed let the user know that the talents might be wrong
+            if(select(1, talent) ~= talentTbl.id) then
+                addon:Print(addon.L["It seems like the talent from tier: %s and column: %s have been moved or changed, check you talents!"])
+            end
+        end
+    end
+    return true
+end
