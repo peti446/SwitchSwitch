@@ -41,11 +41,11 @@ end
 --Checks if the talents porfile database contains the given porfile
 function addon:DoesTalentProfileExist(porfile)
     --If talent spec table does not exist create one
-    if(addon.sv.Talents.TalentsProfiles[GetSpecialization()] == nil) then
-        addon.sv.Talents.TalentsProfiles[GetSpecialization()] = {}
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
+        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
     end
     --Iterate 
-    for k,v in pairs(addon.sv.Talents.TalentsProfiles[GetSpecialization()]) do
+    for k,v in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
         if(k:lower() == porfile:lower()) then
             return true
         end
@@ -117,7 +117,7 @@ function addon:ActivateTalentPorfile(profileName)
     end
 
     --Check  if table exits
-    if(addon.sv.Talents.TalentsProfiles[GetSpecialization()] == nil or addon.sv.Talents.TalentsProfiles[GetSpecialization()][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[GetSpecialization()][profileName]) ~= "table") then
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
         addon:Debug(addon.L["Could not change talents to porfile %s as it does not exits in the database"]:format(profileName))
         return false
     end
@@ -126,7 +126,7 @@ function addon:ActivateTalentPorfile(profileName)
     addon.G.SwitchingTalents = true
 
     --Learn talents
-    for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[GetSpecialization()][profileName]) do
+    for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) do
         --Get the current talent info to see if the talent id changed
         local talent = GetTalentInfo(talentTbl.tier, talentTbl.column, 1)
         if talentTbl.tier > 0 and talentTbl.column > 0  then

@@ -92,7 +92,7 @@ function FrameHelper:CreateTalentFrameUI()
         preferredIndex = 3,
         exclusive = true,
         OnAccept = function(self, profileName)
-            addon.sv.Talents.TalentsProfiles[GetSpecialization()][profileName] = addon:GetCurrentTalents()
+            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
             addon:Print(addon.L["Profile %s overwritten!"]:format(profileName))
         end,
         OnCancel = function(self, profileName)
@@ -131,8 +131,8 @@ end
 function FrameHelper.Initialize_Talents_List(self, level, menuList)
     local menuList = {}
     --Get all profile names and create the list for the dropdown menu
-    if(addon.sv.Talents.TalentsProfiles[GetSpecialization()] ~= nil) then
-        for TalentProfileName, data in pairs(addon.sv.Talents.TalentsProfiles[GetSpecialization()]) do
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
+        for TalentProfileName, data in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
             table.insert(menuList, {
                 text = TalentProfileName
             })
@@ -195,12 +195,12 @@ function FrameHelper:OnAceptNewprofile(frame)
     end
 
     --If talent spec table does not exist create one
-    if(addon.sv.Talents.TalentsProfiles[GetSpecialization()] == nil) then
-        addon.sv.Talents.TalentsProfiles[GetSpecialization()] = {}
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
+        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
     end
 
     --profile name does not exist so create it
-    addon.sv.Talents.TalentsProfiles[GetSpecialization()][profileName] = addon:GetCurrentTalents()
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
     addon.sv.Talents.SelectedTalentsProfile = profileName
     --Select the new porfile
     UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, profileName)
@@ -211,12 +211,12 @@ end
 
 function FrameHelper:OnAcceptDeleteprofile(frame, profile)
     --Check if the porfile exists
-    if(addon.sv.Talents.TalentsProfiles[GetSpecialization()] == nil or addon.sv.Talents.TalentsProfiles[GetSpecialization()][profile] == nil or type(addon.sv.Talents.TalentsProfiles[GetSpecialization()][profile]) ~= "table") then
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile]) ~= "table") then
         return
     end
 
     --Delete the porfile
-    addon.sv.Talents.TalentsProfiles[GetSpecialization()][profile] = nil
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = nil
 
     --If it is the current selected porfile change the selected vlaue to custom
     if(profile == addon.sv.Talents.SelectedTalentsProfile) then
