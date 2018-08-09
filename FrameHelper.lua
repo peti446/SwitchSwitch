@@ -45,6 +45,8 @@ function FrameHelper:CreateTalentFrameUI()
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, FrameHelper.Initialize_Talents_List)
     UIDropDownMenu_SetSelectedID(UpperTalentsUI.DropDownTalents, 1)
+    addon.sv.Talents.SelectedTalentsprofile = UIDropDownMenu_GetSelectedName(UpperTalentsUI.DropDownTalents)
+
 
     --Create new Static popup dialog
     StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
@@ -64,6 +66,10 @@ function FrameHelper:CreateTalentFrameUI()
         EditBoxOnTextChanged = function (self) 
             local data = self:GetParent().editBox:GetText()
             if(data ~= nil and data ~= '') then
+                if(data:lower() == "custom") then
+                    self:GetParent().button1:Disable()
+                    return
+                end
                 self:GetParent().button1:Enable()
             else
                 self:GetParent().button1:Disable()
@@ -76,7 +82,7 @@ function FrameHelper:CreateTalentFrameUI()
     --Create the confirim save popup
     StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
     {
-        text = addon.L["Saving will override '%s' configuration"] .. ":",
+        text = addon.L["Saving will override '%s' configuration"],
         button1 = addon.L["Save"],
         button2 = addon.L["Cancel"],
         timeout = 0,
@@ -137,7 +143,6 @@ function FrameHelper.Initialize_Talents_List(self, level, menuList)
         local info = menuList[index]
 		if (info.text) then
             info.index = index
-            info.value = info.text
             info.arg1 = self
             info.func = FrameHelper.SetDropDownValue
 			UIDropDownMenu_AddButton( info, level )
@@ -153,7 +158,6 @@ function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         --Set the global value so we remember when we log back in
         addon.sv.Talents.SelectedTalentsprofile = self.value
-
         --Try to change talents
         if(not addon:ActivateTalentPorfile(self.value)) then
             if(tempOldSelected == "") then
@@ -203,7 +207,7 @@ function FrameHelper:OnAcceptDeleteprofile(frame, profile)
     --If it is the current selected porfile change the selected vlaue to custom
     if(profile == addon.sv.Talents.SelectedTalentsProfile) then
         UIDropDownMenu_SetText(FrameHelper.UpperTalentsUI.DropDownTalents, "Custom")
-        addon.sv.Talents.SelectedTalentsProfile = ""
+        addon.sv.Talents.SelectedTalentsProfile = "Custom"
     end
 end
 
