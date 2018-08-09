@@ -12,12 +12,6 @@ local FrameHelper = addon.FrameHelper
 --##########################################################################################################################
 --Creates the Frame inside the talent frame
 function FrameHelper:CreateTalentFrameUI()
-    --Check if we already created the frame, as WOW does not delete frames unless you reload, so we dont need to recreate it
-    if(FrameHelper.UpperTalentsUI ~= nil) then
-        --Update the frame and add/remove profiles as needed (using garbage collection for memory otimisation)
-        --FrameHelper:UpdateTalentFrameUIComponents()
-        return
-    end
     --Create frame and hide it by default
     FrameHelper.UpperTalentsUI = CreateFrame("Frame", "SwitchSwitch_UpperTalentsUI", PlayerTalentFrameTalents)
     local UpperTalentsUI = FrameHelper.UpperTalentsUI
@@ -44,9 +38,8 @@ function FrameHelper:CreateTalentFrameUI()
     UpperTalentsUI.DropDownTalents:SetPoint("LEFT", UpperTalentsUI.CurrentPorfie, "RIGHT", 0, -3)
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, FrameHelper.Initialize_Talents_List)
-    UIDropDownMenu_SetSelectedID(UpperTalentsUI.DropDownTalents, 1)
-    addon.sv.Talents.SelectedTalentsprofile = UIDropDownMenu_GetSelectedName(UpperTalentsUI.DropDownTalents)
-
+    UIDropDownMenu_SetSelectedID(UpperTalentsUI.DropDownTalents, 1, true)
+    addon.sv.Talents.SelectedTalentsProfile = UIDropDownMenu_GetText(UpperTalentsUI.DropDownTalents)
 
     --Create new Static popup dialog
     StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
@@ -153,18 +146,22 @@ end
 function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
     if (not checked) then
         --Temp profile to check in case we cannot change talents
-        local tempOldSelected = addon.sv.Talents.SelectedTalentsprofile
+        local tempOldSelected = addon.sv.Talents.SelectedTalentsProfile
 		-- set selected value as selected
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         --Set the global value so we remember when we log back in
-        addon.sv.Talents.SelectedTalentsprofile = self.value
+        addon.sv.Talents.SelectedTalentsProfile = self.value
+        --Enable the delete button
+        addon.FrameHelper.UpperTalentsUI.DeleteButton:Enable()
         --Try to change talents
         if(not addon:ActivateTalentPorfile(self.value)) then
             if(tempOldSelected == "") then
                 tempOldSelected = "Custom"
+                addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
             end
+            --Set to custom as we could not active the porfile
             UIDropDownMenu_SetSelectedValue(arg1, tempOldSelected)
-            addon.sv.Talents.SelectedTalentsprofile = tempOldSelected
+            addon.sv.Talents.SelectedTalentsProfile = tempOldSelected
         end
     end
 end
@@ -206,8 +203,9 @@ function FrameHelper:OnAcceptDeleteprofile(frame, profile)
 
     --If it is the current selected porfile change the selected vlaue to custom
     if(profile == addon.sv.Talents.SelectedTalentsProfile) then
-        UIDropDownMenu_SetText(FrameHelper.UpperTalentsUI.DropDownTalents, "Custom")
+        UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, "Custom")
         addon.sv.Talents.SelectedTalentsProfile = "Custom"
+        addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
     end
 end
 

@@ -3,6 +3,9 @@
 --############################################
 local _, addon = ...
 
+addon.G = {}
+addon.G.SwitchingTalents = false
+
 --##########################################################################################################################
 --                                  Helper Functions
 --##########################################################################################################################
@@ -113,6 +116,9 @@ function addon:ActivateTalentPorfile(profileName)
         return false
     end
 
+    --Make sure our event talent change does not detect this as custom switch
+    addon.G.SwitchingTalents = true
+
     --Learn talents
     for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[profileName].talents) do
         --Get the current talent info to see if the talent id changed
@@ -127,5 +133,9 @@ function addon:ActivateTalentPorfile(profileName)
     end
     --Print and return
     addon:Print(addon.L["Changed talents to %s"]:format(profileName))
+    --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
+    C_Timer.After(0.3,function() addon.G.SwitchingTalents = false end)
+    --Set the global value of the current porfile so we can remember it later
+    addon.sv.Talents.SelectedTalentsProfile = profileName
     return true
 end
