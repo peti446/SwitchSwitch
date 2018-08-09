@@ -8,6 +8,7 @@ local addonName, addon = ...
 --##########################################################################################################################
 local function GetDefaultConfig()
     return {
+        ["Version"] = addon.version,
         ["debug"] = false
     }
 end
@@ -31,6 +32,7 @@ function addon:eventHandler(event, arg1)
             SwitchSwitchTalents =
             {
                 SelectedTalentsProfile = "",
+                Version = addon.version,
                 TalentsProfiles = {}
             }
         end
