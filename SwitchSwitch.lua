@@ -6,6 +6,7 @@ local _, addon = ...
 addon.G = {}
 addon.G.SwitchingTalents = false
 addon.version = "1.0"
+addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
 --                                  Helper Functions
@@ -38,15 +39,15 @@ function addon:PrintTable(tbl, indent)
     end
 end
 
---Checks if the talents porfile database contains the given porfile
-function addon:DoesTalentProfileExist(porfile)
+--Checks if the talents Profile database contains the given Profile
+function addon:DoesTalentProfileExist(Profile)
     --If talent spec table does not exist create one
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
         addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
     end
     --Iterate 
     for k,v in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
-        if(k:lower() == porfile:lower()) then
+        if(k:lower() == Profile:lower()) then
             return true
         end
     end
@@ -103,7 +104,7 @@ function addon:CanChangeTalents()
     return false
 end
 
-function addon:ActivateTalentPorfile(profileName)
+function addon:ActivateTalentProfile(profileName)
     --If we cannot change talents why even try?
     if(not addon:CanChangeTalents()) then
         addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
@@ -118,7 +119,7 @@ function addon:ActivateTalentPorfile(profileName)
 
     --Check  if table exits
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
-        addon:Debug(addon.L["Could not change talents to porfile %s as it does not exits in the database"]:format(profileName))
+        addon:Debug(addon.L["Could not change talents to Profile %s as it does not exits in the database"]:format(profileName))
         return false
     end
 
@@ -141,7 +142,50 @@ function addon:ActivateTalentPorfile(profileName)
     addon:Print(addon.L["Changed talents to %s"]:format(profileName))
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
     C_Timer.After(0.3,function() addon.G.SwitchingTalents = false end)
-    --Set the global value of the current porfile so we can remember it later
+    --Set the global value of the current Profile so we can remember it later
     addon.sv.Talents.SelectedTalentsProfile = profileName
     return true
+end
+
+function addon:IsCurrentTalentProfile(profileName)
+    --Check if null or not existing
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table"
+        or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
+        return false
+    end
+    --Get current tier
+    local currentTalents = addon:GetCurrentTalents()
+    for i, talentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) do
+        if(currentTalents[talentInfo.tier].tier ~= talentInfo.tier) then
+            --Not in current tier iterate to find tier
+            for i2, currentTalentInfo in ipairs(currentTalentInfo) do
+                if(currentTalentInfo.tier == talentInfo.tier) then
+                    --In correct tier, check columns to see if equals, if not retun false
+                    if(currentTalents[talentInfo.tier].column ~= talentInfo.column) then
+                        return false
+                    end
+                end
+            end
+        else
+            --In correct tier, check columns to see if equals, if not retun false
+            if(currentTalents[talentInfo.tier].column ~= talentInfo.column) then
+                return false
+            end
+        end
+    end
+    return true
+end
+
+function addon:GetCurrentProfileFromSaved()
+    --Check if null or not existing
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table") then
+        return addon.CustomProfileName
+    end
+    --Iterate trough every talent profile
+    for name, TalentArray in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+        if(addon:IsCurrentTalentProfile(name)) then
+            return name
+        end
+    end
+    return addon.CustomProfileName
 end

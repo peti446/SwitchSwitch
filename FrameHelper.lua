@@ -39,14 +39,15 @@ function FrameHelper:CreateTalentFrameUI()
     --Setup the UIDropDownMenu and set the SelectedProgile vatiable
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, FrameHelper.Initialize_Talents_List)
-    UIDropDownMenu_SetSelectedID(UpperTalentsUI.DropDownTalents, 1, true)
-    addon.sv.Talents.SelectedTalentsProfile = UIDropDownMenu_GetText(UpperTalentsUI.DropDownTalents)
 
     --If the selected profile is null or custom or empty select custom and make selected talent custom
-    if(addon.sv.Talents.SelectedTalentsProfile == nil or addon.sv.Talents.SelectedTalentsProfile == "Custom" or  addon.sv.Talents.SelectedTalentsProfile == "") then
+    if(addon.sv.Talents.SelectedTalentsProfile == nil or addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName or  addon.sv.Talents.SelectedTalentsProfile == "") then
         UpperTalentsUI.DeleteButton:Disable()
-        addon.sv.Talents.SelectedTalentsProfile = "Custom"
-        UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, "Custom")
+        addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
+        UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, addon.CustomProfileName)
+    else
+        UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+        UpperTalentsUI.DeleteButton:Enable()
     end
 
     --Create new Static popup dialog
@@ -67,7 +68,7 @@ function FrameHelper:CreateTalentFrameUI()
         EditBoxOnTextChanged = function (self) 
             local data = self:GetParent().editBox:GetText()
             if(data ~= nil and data ~= '') then
-                if(data:lower() == "custom") then
+                if(data:lower() == addon.CustomProfileName) then
                     self:GetParent().button1:Disable()
                     return
                 end
@@ -167,12 +168,12 @@ function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
         --Enable the delete button
         addon.FrameHelper.UpperTalentsUI.DeleteButton:Enable()
         --Try to change talents
-        if(not addon:ActivateTalentPorfile(self.value)) then
+        if(not addon:ActivateTalentProfile(self.value)) then
             if(tempOldSelected == "") then
-                tempOldSelected = "Custom"
+                tempOldSelected = addon.CustomProfileName
                 addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
             end
-            --Set to custom as we could not active the porfile
+            --Set to custom as we could not active the Profile
             UIDropDownMenu_SetSelectedValue(arg1, tempOldSelected)
             addon.sv.Talents.SelectedTalentsProfile = tempOldSelected
             return
@@ -202,7 +203,7 @@ function FrameHelper:OnAceptNewprofile(frame)
     --profile name does not exist so create it
     addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
     addon.sv.Talents.SelectedTalentsProfile = profileName
-    --Select the new porfile
+    --Select the new Profile
     UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, profileName)
     UIDropDownMenu_SetText(FrameHelper.UpperTalentsUI.DropDownTalents, profileName)
     --Let the user know that the profile has been created
@@ -210,18 +211,18 @@ function FrameHelper:OnAceptNewprofile(frame)
 end
 
 function FrameHelper:OnAcceptDeleteprofile(frame, profile)
-    --Check if the porfile exists
+    --Check if the Profile exists
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile]) ~= "table") then
         return
     end
 
-    --Delete the porfile
+    --Delete the Profile
     addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = nil
 
-    --If it is the current selected porfile change the selected vlaue to custom
+    --If it is the current selected Profile change the selected vlaue to custom
     if(profile == addon.sv.Talents.SelectedTalentsProfile) then
-        UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, "Custom")
-        addon.sv.Talents.SelectedTalentsProfile = "Custom"
+        UIDropDownMenu_SetSelectedValue(FrameHelper.UpperTalentsUI.DropDownTalents, addon.CustomProfileName)
+        addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
         addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
     end
 end

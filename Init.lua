@@ -50,13 +50,18 @@ function addon:eventHandler(event, arg1)
         --Load Commands
         addon.Commands:Init()
 
+        --Check if talents is a Profile
+        addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
+
         --Unregister current event
         self:UnregisterEvent(event)
     elseif(event == "PLAYER_TALENT_UPDATE") then
         if(IsAddOnLoaded("Blizzard_TalentUI") and not addon.G.SwitchingTalents) then
-            UIDropDownMenu_SetSelectedValue(addon.FrameHelper.UpperTalentsUI.DropDownTalents, "Custom")
-            addon.sv.Talents.SelectedTalentsProfile = "Custom"
-            addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
+            addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
+            UIDropDownMenu_SetSelectedValue(addon.FrameHelper.UpperTalentsUI.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+            if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
+                addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
+            end
         end
     end
 end
