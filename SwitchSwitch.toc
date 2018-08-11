@@ -8,7 +8,7 @@
 
 localization/Loc.Core.lua
 SwitchSwitch.lua
-FrameHelper.lua
+TalentUIFrame.lua
 GlobalFrames.lua
 Commands.lua
 Init.lua

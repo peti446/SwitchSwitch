@@ -22,7 +22,7 @@ function addon:eventHandler(event, arg1)
         if(arg1 ~= addonName) then
             --Check if talents have been loaded to create our frame in top of it.
             if(arg1 == "Blizzard_TalentUI") then
-                addon.FrameHelper:CreateTalentFrameUI()
+                addon.TalentUIFrame:CreateTalentFrameUI()
             end
             return 
         end
@@ -61,9 +61,9 @@ function addon:eventHandler(event, arg1)
     elseif(event == "PLAYER_TALENT_UPDATE") then
         if(IsAddOnLoaded("Blizzard_TalentUI") and not addon.G.SwitchingTalents) then
             addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
-            UIDropDownMenu_SetSelectedValue(addon.FrameHelper.UpperTalentsUI.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+            UIDropDownMenu_SetSelectedValue(addon.TalentUIFrame.UpperTalentsUI.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
             if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
-                addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
+                addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Disable()
             end
         end
     end
