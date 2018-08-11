@@ -52,7 +52,35 @@ function GlobalFrames:Init()
             data.callback(false)
             self.insertedFrame:Hide()
         end
-
-        --
     }
+    --Frame for auto porfile sugestor in instance
+    GlobalFrames.ProfileSuggestion = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
+    GlobalFrames.ProfileSuggestion:SetPoint("CENTER")
+    GlobalFrames.ProfileSuggestion:SetSize(300, 100)
+    --Add the first text tp notify the user what talent we ar about to change
+    GlobalFrames.ProfileSuggestion.InfoText = GlobalFrames.ProfileSuggestion:CreateFontString(nil, "ARTWORK", "GameFontWhite") 
+    GlobalFrames.ProfileSuggestion.InfoText:SetPoint("TOPLEFT", GlobalFrames.ProfileSuggestion, "TOPLEFT", 10, -10)
+    GlobalFrames.ProfileSuggestion.InfoText:SetPoint("TOPRIGHT", GlobalFrames.ProfileSuggestion, "TOPRIGHT", -10, -10)
+    GlobalFrames.ProfileSuggestion.InfoText:SetText(addon.L["Would you like to change you talents to %s?"])
+    --Add the text to let the user know how long until auto closo of the frame
+    GlobalFrames.ProfileSuggestion.RemainingText = GlobalFrames.ProfileSuggestion:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    GlobalFrames.ProfileSuggestion.RemainingText:SetPoint("BOTTOMLEFT", GlobalFrames.ProfileSuggestion, "BOTTOMLEFT", 10, 10)
+    GlobalFrames.ProfileSuggestion.RemainingText:SetPoint("BOTTOMRIGHT", GlobalFrames.ProfileSuggestion, "BOTTOMRIGHT", -10, 10)
+    GlobalFrames.ProfileSuggestion.RemainingText:SetText(addon.L["Frame will close after %s seconds..."])
+    --Add Buttons for the frame
+    --Change button
+    GlobalFrames.ProfileSuggestion.ChangePorfileButton = CreateFrame("BUTTON", "SS_SuggestionFrameChangeButton", GlobalFrames.ProfileSuggestion, "UIPanelButtonTemplate")
+    GlobalFrames.ProfileSuggestion.ChangePorfileButton:SetPoint("LEFT", GlobalFrames.ProfileSuggestion, "LEFT", 10, -5)
+    GlobalFrames.ProfileSuggestion.ChangePorfileButton:SetSize(125, 40)
+    GlobalFrames.ProfileSuggestion.ChangePorfileButton:SetText(addon.L["Change!"])
+    --Cancel button to close the frame up
+    GlobalFrames.ProfileSuggestion.CancelButton = CreateFrame("BUTTON", "SS_SuggestionCancelButton", GlobalFrames.ProfileSuggestion, "UIPanelButtonTemplate")
+    GlobalFrames.ProfileSuggestion.CancelButton:SetPoint("RIGHT", GlobalFrames.ProfileSuggestion, "RIGHT", -10, -5)
+    GlobalFrames.ProfileSuggestion.CancelButton:SetSize(125, 40)
+    GlobalFrames.ProfileSuggestion.CancelButton:SetText(addon.L["Cancel"])
+
+    --Set the buttons functions
+    --Cancel button
+    GlobalFrames.ProfileSuggestion.CancelButton:SetScript("OnClick", function()  GlobalFrames.ProfileSuggestion:Hide() end)
+    GlobalFrames.ProfileSuggestion:Show()
 end

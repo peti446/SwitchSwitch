@@ -69,18 +69,25 @@ function TalentUIFrame:CreateTalentFrameUI()
         EditBoxOnTextChanged = function (self) 
             local data = self:GetParent().editBox:GetText()
             if(data ~= nil and data ~= '') then
-                if(data:lower() == addon.CustomProfileName) then
+                if(data:lower() == addon.CustomProfileName:lower()) then
+                    self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
                     self:GetParent().button1:Disable()
-                    return
+                elseif(data:len() > 20) then
+                    self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
+                    self:GetParent().button1:Disable()
+                else
+                    self:GetParent().button1:Enable()
+                    self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
                 end
-                self:GetParent().button1:Enable()
             else
                 self:GetParent().button1:Disable()
+                self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
             end
+            StaticPopup_Resize(self:GetParent(), self:GetParent().which)
         end,
         OnShow = function(self)
             self.button1:Disable()
-        end
+        end,
     }
     --Create the confirim save popup
     StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
@@ -94,6 +101,7 @@ function TalentUIFrame:CreateTalentFrameUI()
         preferredIndex = 3,
         exclusive = true,
         enterClicksFirstButton = true,
+        showAlert = true,
         OnAccept = function(self, profileName)
             addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
             addon:Print(addon.L["Profile '%s' overwritten!"]:format(profileName))
@@ -118,6 +126,7 @@ function TalentUIFrame:CreateTalentFrameUI()
          preferredIndex = 3,
          exclusive = true,
          enterClicksFirstButton = true,
+         showAlert = true,
          OnAccept = function(self, data)
             TalentUIFrame:OnAcceptDeleteprofile(self, data)
          end,
