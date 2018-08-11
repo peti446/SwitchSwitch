@@ -9,5 +9,6 @@
 localization/Loc.Core.lua
 SwitchSwitch.lua
 FrameHelper.lua
+GlobalFrames.lua
 Commands.lua
 Init.lua

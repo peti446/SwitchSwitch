@@ -42,7 +42,7 @@ function FrameHelper:CreateTalentFrameUI()
 
     --If the selected profile is null or custom or empty select custom and make selected talent custom
     if(addon.sv.Talents.SelectedTalentsProfile == nil or addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName or  addon.sv.Talents.SelectedTalentsProfile == "") then
-        UpperTalentsUI.DeleteButton:Disable()
+        UpperTalentsUI.DeleteButtoActivateTalentProfilen:Disable()
         addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
         UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, addon.CustomProfileName)
     else
@@ -62,6 +62,7 @@ function FrameHelper:CreateTalentFrameUI()
         preferredIndex = 3,
         hasEditBox = true,
         exclusive = true,
+        enterClicksFirstButton = true,
         OnAccept = function(self)
             FrameHelper:OnAceptNewprofile(self)
         end,
@@ -92,6 +93,7 @@ function FrameHelper:CreateTalentFrameUI()
         hideOnEscape = true,
         preferredIndex = 3,
         exclusive = true,
+        enterClicksFirstButton = true,
         OnAccept = function(self, profileName)
             addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
             addon:Print(addon.L["Profile '%s' overwritten!"]:format(profileName))
@@ -115,6 +117,7 @@ function FrameHelper:CreateTalentFrameUI()
          hideOnEscape = true,
          preferredIndex = 3,
          exclusive = true,
+         enterClicksFirstButton = true,
          OnAccept = function(self, data)
             FrameHelper:OnAcceptDeleteprofile(self, data)
          end,
@@ -168,18 +171,20 @@ function FrameHelper.SetDropDownValue(self, arg1, arg2, checked)
         --Enable the delete button
         addon.FrameHelper.UpperTalentsUI.DeleteButton:Enable()
         --Try to change talents
-        if(not addon:ActivateTalentProfile(self.value)) then
-            if(tempOldSelected == "") then
-                tempOldSelected = addon.CustomProfileName
-                addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
+        addon:ActivateTalentProfileCallback(self.value, function(changed)
+            if(not changed) then
+                if(tempOldSelected == "") then
+                    tempOldSelected = addon.CustomProfileName
+                    addon.FrameHelper.UpperTalentsUI.DeleteButton:Disable()
+                end
+                --Set to custom as we could not active the Profile
+                UIDropDownMenu_SetSelectedValue(arg1, tempOldSelected)
+                addon.sv.Talents.SelectedTalentsProfile = tempOldSelected
+                return
             end
-            --Set to custom as we could not active the Profile
-            UIDropDownMenu_SetSelectedValue(arg1, tempOldSelected)
-            addon.sv.Talents.SelectedTalentsProfile = tempOldSelected
-            return
-        end
-        --Enable the button
-        addon.FrameHelper.UpperTalentsUI.DeleteButton:Enable()
+            --Enable the button
+            addon.FrameHelper.UpperTalentsUI.DeleteButton:Enable()
+        end)
     end
 end
 

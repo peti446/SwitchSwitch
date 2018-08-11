@@ -9,7 +9,8 @@ local addonName, addon = ...
 local function GetDefaultConfig()
     return {
         ["Version"] = addon.version,
-        ["debug"] = false
+        ["debug"] = false,
+        ["autoUseItems"] = false,
     }
 end
 
@@ -49,6 +50,8 @@ function addon:eventHandler(event, arg1)
     elseif(event == "PLAYER_LOGIN") then
         --Load Commands
         addon.Commands:Init()
+        --Load global frame
+        addon.GlobalFrames:Init()
 
         --Check if talents is a Profile
         addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()

@@ -94,7 +94,7 @@ function addon:CanChangeTalents()
         256229
     }
     for i = 1, 40 do
-        local spellID = select(10, UnitBuff("player"), i)
+        local spellID = select(10, UnitBuff("player", i))
         for index, id in ipairs(buffLookingFor) do
             if(spellID == id) then
                 return true
@@ -105,12 +105,6 @@ function addon:CanChangeTalents()
 end
 
 function addon:ActivateTalentProfile(profileName)
-    --If we cannot change talents why even try?
-    if(not addon:CanChangeTalents()) then
-        addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
-        return false
-    end
-
     --Check if profileName is not null
     if(not profileName or type(profileName) ~= "string") then
         addon:Debug(addon.L["Givine profile name is null"])
@@ -123,6 +117,104 @@ function addon:ActivateTalentProfile(profileName)
         return false
     end
 
+    --If we cannot change talents why even try?
+    if(not addon:CanChangeTalents()) then
+        addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
+        return false
+    end
+
+    --Function to set talents
+    addon:SetTalents(profileName)
+
+    return true
+end
+
+function addon:ActivateTalentProfileCallback(profileName, callback)
+    --Check if callbar is valid if not assign it a simple funciton
+    if(not callback) then
+        callback = function(suceeded) end
+    end
+
+    --Check if profileName is not null
+    if(not profileName or type(profileName) ~= "string") then
+        addon:Debug(addon.L["Givine profile name is null"])
+        callback(true)
+        return
+    end
+
+    --Check  if table exits
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
+        addon:Debug(addon.L["Could not change talents to Profile '%s' as it does not exits in the database"]:format(profileName))
+        callback(true)
+        return
+    end
+
+    --If we cannot change talents why even try?
+    if(not addon:CanChangeTalents()) then
+        if(addon.sv.config.autoUseItems) then
+            local tomesID = 
+            {
+                153647, -- Quit mind
+                141446, -- Tranquil mind crafted
+                143785, -- tranquil mind _ dalaran quest
+                143780  -- tranquil mind _ random
+            }
+            --Check for level to add the Clear mind tome
+            if (UnitLevel("player") <= 109) then
+                table.insert(tomesID, 141640) -- Clear mind
+            end
+
+            --Tomes that can be used
+            local itemIDToUse = nil
+            local bagID = 0
+            local slot = 0
+            --Find any tome usable in the bags
+            for bag = 0, NUM_BAG_SLOTS + 1 do
+                for bagSlot = 1, GetContainerNumSlots(bag) do
+                    local currentItemInSlotID = GetContainerItemID(bag, bagSlot)
+                    for index, id in ipairs(tomesID) do
+                        if(id == currentItemInSlotID) then
+                            itemIDToUse = currentItemInSlotID
+                            bagID = bag
+                            slot = bagSlot
+                            break
+                        end
+                    end
+                end
+            end
+
+
+            --Check if we found an item if not return false
+            if(not itemIDToUse) then
+                --No item found so return
+                addon:Print(addon.L["Could not find a Tome to use and change talents"])
+                callback(false)
+                return
+            end
+
+            -- Set the item attibute
+            addon.GlobalFrames.UseTome:SetAttribute("item", bagID .. " " .. slot);
+            --Got an item so open the popup to ask to use it!
+            local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, nil, addon.GlobalFrames.UseTome)
+            if(dialog) then
+                dialog.data = {["name"] = profileName, ["callback"] = callback}
+                
+            end
+        else
+            --No check for usage so just return
+            addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
+            callback(false)
+        end
+        return
+    end
+    
+    --Function to set talents
+    addon:SetTalents(profileName)
+    callback(true)
+end
+
+--Helper function to avoid needing to copy-caste every time...
+function addon:SetTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch
     addon.G.SwitchingTalents = true
 
@@ -144,9 +236,9 @@ function addon:ActivateTalentProfile(profileName)
     C_Timer.After(0.3,function() addon.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
     addon.sv.Talents.SelectedTalentsProfile = profileName
-    return true
 end
 
+--Check if a given porfile is the current talents
 function addon:IsCurrentTalentProfile(profileName)
     --Check if null or not existing
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table"
@@ -176,6 +268,7 @@ function addon:IsCurrentTalentProfile(profileName)
     return true
 end
 
+--Gets the porfile that is active from all the saved porfiles
 function addon:GetCurrentProfileFromSaved()
     --Check if null or not existing
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table") then
@@ -189,3 +282,30 @@ function addon:GetCurrentProfileFromSaved()
     end
     return addon.CustomProfileName
 end
+
+--Helper function to execute a command in chat
+function addon:RunSlashCmd(cmd)
+    local slash, rest = cmd:match("^(%S+)%s*(.-)$")
+    addon:Print(cmd)
+    for name, func in pairs(SlashCmdList) do
+       local i, slashCmd = 1
+       repeat
+          slashCmd, i = _G["SLASH_"..name..i], i + 1
+          if slashCmd == slash then
+             return true, func(rest)
+          end
+       until not slashCmd
+    end
+    -- Okay, so it's not a slash command. It may also be an emote.
+    local i = 1
+    while _G["EMOTE" .. i .. "_TOKEN"] do
+       local j, cn = 2, _G["EMOTE" .. i .. "_CMD1"]
+       while cn do
+          if cn == slash then
+             return true, DoEmote(_G["EMOTE" .. i .. "_TOKEN"], rest);
+          end
+          j, cn = j+1, _G["EMOTE" .. i .. "_CMD" .. j]
+       end
+       i = i + 1
+    end
+  end
