@@ -42,7 +42,7 @@ function FrameHelper:CreateTalentFrameUI()
 
     --If the selected profile is null or custom or empty select custom and make selected talent custom
     if(addon.sv.Talents.SelectedTalentsProfile == nil or addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName or  addon.sv.Talents.SelectedTalentsProfile == "") then
-        UpperTalentsUI.DeleteButtoActivateTalentProfilen:Disable()
+        UpperTalentsUI.DeleteButton:Disable()
         addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
         UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, addon.CustomProfileName)
     else

@@ -13,7 +13,6 @@ local GlobalFrames = addon.GlobalFrames
 --##########################################################################################################################
 function GlobalFrames:Init()
     GlobalFrames.UseTome = CreateFrame("Button", "SS_ButtonUseTomePopup", UIParent, "UIPanelButtonTemplate, SecureActionButtonTemplate")
-    GlobalFrames.UseTome:SetAttribute("type", "item")
     GlobalFrames.UseTome:Hide()
     StaticPopupDialogs["SwitchSwitch_ConfirmTomeUsage"] =
     {
