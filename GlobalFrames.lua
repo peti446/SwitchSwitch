@@ -55,7 +55,7 @@ function GlobalFrames:Init()
     }
     --Frame for auto porfile sugestor in instance
     GlobalFrames.ProfileSuggestion = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
-    GlobalFrames.ProfileSuggestion:SetPoint("CENTER")
+    GlobalFrames.ProfileSuggestion:SetPoint(addon.sv.config.SuggestionFramePoint.point, UIParent, addon.sv.config.SuggestionFramePoint.relativePoint, addon.sv.config.SuggestionFramePoint.frameX, addon.sv.config.SuggestionFramePoint.frameY)
     GlobalFrames.ProfileSuggestion:SetSize(300, 100)
     --Add the first text tp notify the user what talent we ar about to change
     GlobalFrames.ProfileSuggestion.InfoText = GlobalFrames.ProfileSuggestion:CreateFontString(nil, "ARTWORK", "GameFontWhite") 
@@ -82,5 +82,22 @@ function GlobalFrames:Init()
     --Set the buttons functions
     --Cancel button
     GlobalFrames.ProfileSuggestion.CancelButton:SetScript("OnClick", function()  GlobalFrames.ProfileSuggestion:Hide() end)
+
+    --Make the frame moveable
+    GlobalFrames.ProfileSuggestion:SetMovable(true);
+    GlobalFrames.ProfileSuggestion:EnableMouse(true);
+    GlobalFrames.ProfileSuggestion:RegisterForDrag("LeftButton");
+    GlobalFrames.ProfileSuggestion:SetScript("OnDragStart", GlobalFrames.ProfileSuggestion.StartMoving);
+    GlobalFrames.ProfileSuggestion:SetScript("OnDragStop", function(self)
+            self:StopMovingOrSizing();
+            point1, _, relativePoint1, xOfs, yOfs = self:GetPoint(1);
+            addon.sv.config.SuggestionFramePoint.point = point1;
+            addon.sv.config.SuggestionFramePoint.relativePoint = relativePoint1;
+            addon.sv.config.SuggestionFramePoint.frameX = xOfs;
+            addon.sv.config.SuggestionFramePoint.frameY = yOfs;
+        end
+        );
+
+    --Hide the frame by default
     GlobalFrames.ProfileSuggestion:Show()
 end

@@ -11,6 +11,13 @@ local function GetDefaultConfig()
         ["Version"] = addon.version,
         ["debug"] = false,
         ["autoUseItems"] = false,
+        ["SuggestionFramePoint"] =
+        {
+            ["point"] = "CENTER",
+            ["relativePoint"] = "CENTER",
+            ["frameX"] = 0,
+            ["frameY"] = 0
+        }
     }
 end
 
