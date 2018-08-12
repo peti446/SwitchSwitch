@@ -108,15 +108,28 @@ local function CreateSuggestionFrame()
     frame:SetScript("OnShow", function(self)
         self.ElapsedTime = 0
         self.InfoText:SetText(addon.L["Would you like to change you talents to %s?"]:format(self.ChangeProfileButton.Profile))
+        --If no time is given then hide the text
+        if(addon.sv.config.maxTimeSuggestionFrame == 0) then
+            self.RemainingText:Hide()
+        else 
+            self.RemainingText:Show()
+        end
     end)
     frame:SetScript("OnUpdate", function(self, elapsed)
+        --If the max time is 0 then not update anything
+        if(addon.sv.config.maxTimeSuggestionFrame == 0) then
+            return
+        end
+        --Update elapsed time and string
         self.ElapsedTime = self.ElapsedTime + elapsed
         self.RemainingText:SetText(addon.L["Frame will close after %s seconds..."]:format(string.format("%.0f",addon.sv.config.maxTimeSuggestionFrame - self.ElapsedTime)))
+        --If the time given passed hide
         if(self.ElapsedTime >= addon.sv.config.maxTimeSuggestionFrame) then
             self:Hide()
         end
     end)
 
+    --Debuging text
     addon:Debug("Created Suggestion frame!")
 
     --Hide the frame by default
@@ -127,10 +140,12 @@ end
 
 
 function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
-    if(not profileToActivate or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileToActivate]) then
+    --First check if the profile is valid and exists
+    if(not profileToActivate or profileToActivate == "" or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileToActivate]) then
         addon:Debug("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
+    --Set the frame or create it, set data and show the frame.
     GlobalFrames.ProfileSuggestion = GlobalFrames.ProfileSuggestion or CreateSuggestionFrame()
     GlobalFrames.ProfileSuggestion.ChangeProfileButton.Profile = profileToActivate
     GlobalFrames.ProfileSuggestion:Show()

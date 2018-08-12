@@ -152,21 +152,29 @@ end
 
 function TalentUIFrame:NewProfileOnTextChange(frame) 
     local data = frame:GetParent().editBox:GetText()
+
+    --Check if text is not nill or not empty
     if(data ~= nil and data ~= '') then
+
         if(data:lower() == addon.CustomProfileName:lower()) then
+            --Text is "custom" so disable the Create button and give a warning
             frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
             frame:GetParent().button1:Disable()
         elseif(data:len() > 20) then
+            --Text is too long, disable create button and give a warning
             frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
             frame:GetParent().button1:Disable()
         else
+            --Text is fine so enable everything
             frame:GetParent().button1:Enable()
             frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
         end
     else
+        --Empty so disable Create button
         frame:GetParent().button1:Disable()
         frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
     end
+    --Rezise the frame
     StaticPopup_Resize(frame:GetParent(), frame:GetParent().which)
 end
 
@@ -215,9 +223,11 @@ end
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
     if(self.LastPorfileUpdateName ~= addon.sv.Talents.SelectedTalentsProfile) then
+        --Update the local variable to avoud updating every frame
         self.LastPorfileUpdateName = addon.sv.Talents.SelectedTalentsProfile
-        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
 
+        --Update the UI elements
+        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
         if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
             self.DeleteButton:Disable()
         else

@@ -24,6 +24,7 @@ function addon:Print(...)
     DEFAULT_CHAT_FRAME:AddMessage(msg);
 end
 
+--Print a table, if the value of a key is a talbe recursivly call the function again
 function addon:PrintTable(tbl, indent)
     if not indent then indent = 0 end
     if type(tbl) == 'table' then
@@ -45,27 +46,34 @@ function addon:DoesTalentProfileExist(Profile)
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
         addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
     end
-    --Iterate 
+    --Iterate to find the profile (could use quick [profile] to see if it exits, but we want to compare allin lower (names are not case sentivies))
     for k,v in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
         if(k:lower() == Profile:lower()) then
+            --Profile exists
             return true
         end
     end
+    --Profile does not exist
     return false
 end
 
 --Get the talent from the current active spec
 function addon:GetCurrentTalents()
     local ChosenTalents = {};
+    --Iterate over all tiers
     for Tier = 1, GetMaxTalentTier() do
+        --Create default table
         ChosenTalents[Tier] =
         {
             ["id"] = nil,
             ["tier"] = nil,
             ["column"] = nil
         }
+        --Iterate trought the 2 columnds
         for Column = 1, 3 do
+            --Get talent info
             talentID, name, texture, selected, available, _, _, _, _, _, _ = GetTalentInfo(Tier, Column, GetActiveSpecGroup())
+            --If the talent is selected store the nececary information
             if(selected) then
                 ChosenTalents[Tier]["id"] = talentID
                 ChosenTalents[Tier]["tier"] = Tier
@@ -74,6 +82,7 @@ function addon:GetCurrentTalents()
             end
         end
     end
+    --Return talents
     return ChosenTalents;
 end
 
@@ -83,6 +92,7 @@ function addon:CanChangeTalents()
     if(IsResting()) then
         return true
     end
+    --All buffs ids for the tomes
     local buffLookingFor = 
     {
         226234,
@@ -93,6 +103,8 @@ function addon:CanChangeTalents()
         256231,
         256229
     }
+
+    --There is no quick way to get if a player has a specific buff so we need to go tought all players buff and check if its one of the one we need
     for i = 1, 40 do
         local spellID = select(10, UnitBuff("player", i))
         for index, id in ipairs(buffLookingFor) do
@@ -101,6 +113,7 @@ function addon:CanChangeTalents()
             end
         end
     end
+    --Buff not found
     return false
 end
 
@@ -240,35 +253,10 @@ function addon:GetCurrentProfileFromSaved()
     --Iterate trough every talent profile
     for name, TalentArray in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
         if(addon:IsCurrentTalentProfile(name)) then
+            --Return the currentprofilename
             return name
         end
     end
+    --Return the custom profile name
     return addon.CustomProfileName
 end
-
---Helper function to execute a command in chat
-function addon:RunSlashCmd(cmd)
-    local slash, rest = cmd:match("^(%S+)%s*(.-)$")
-    addon:Print(cmd)
-    for name, func in pairs(SlashCmdList) do
-       local i, slashCmd = 1
-       repeat
-          slashCmd, i = _G["SLASH_"..name..i], i + 1
-          if slashCmd == slash then
-             return true, func(rest)
-          end
-       until not slashCmd
-    end
-    -- Okay, so it's not a slash command. It may also be an emote.
-    local i = 1
-    while _G["EMOTE" .. i .. "_TOKEN"] do
-       local j, cn = 2, _G["EMOTE" .. i .. "_CMD1"]
-       while cn do
-          if cn == slash then
-             return true, DoEmote(_G["EMOTE" .. i .. "_TOKEN"], rest);
-          end
-          j, cn = j+1, _G["EMOTE" .. i .. "_CMD" .. j]
-       end
-       i = i + 1
-    end
-  end
