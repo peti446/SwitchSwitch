@@ -17,7 +17,8 @@ local function GetDefaultConfig()
             ["relativePoint"] = "CENTER",
             ["frameX"] = 0,
             ["frameY"] = 0
-        }
+        },
+        ["maxTimeSuggestionFrame"] = 15
     }
 end
 

@@ -53,6 +53,20 @@ function GlobalFrames:Init()
             self.insertedFrame:Hide()
         end
     }
+end
+
+
+function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
+    if(not profileToActivate or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileToActivate]) then
+        addon:Debug("Could not open 'Sugestion frame' as either the profile is null or does not exist")
+        return
+    end
+    GlobalFrames.ProfileSuggestion = GlobalFrames.ProfileSuggestion or CreateSuggestionFrame()
+    GlobalFrames.ProfileSuggestion.ChangePorfileButton.Porfile = profileToActivate
+    GlobalFrames.ProfileSuggestion:Show()
+end
+
+local function CreateSuggestionFrame()
     --Frame for auto porfile sugestor in instance
     GlobalFrames.ProfileSuggestion = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
     GlobalFrames.ProfileSuggestion:SetPoint(addon.sv.config.SuggestionFramePoint.point, UIParent, addon.sv.config.SuggestionFramePoint.relativePoint, addon.sv.config.SuggestionFramePoint.frameX, addon.sv.config.SuggestionFramePoint.frameY)
@@ -66,7 +80,7 @@ function GlobalFrames:Init()
     GlobalFrames.ProfileSuggestion.RemainingText = GlobalFrames.ProfileSuggestion:CreateFontString(nil, "ARTWORK", "GameFontWhite")
     GlobalFrames.ProfileSuggestion.RemainingText:SetPoint("BOTTOMLEFT", GlobalFrames.ProfileSuggestion, "BOTTOMLEFT", 10, 10)
     GlobalFrames.ProfileSuggestion.RemainingText:SetPoint("BOTTOMRIGHT", GlobalFrames.ProfileSuggestion, "BOTTOMRIGHT", -10, 10)
-    GlobalFrames.ProfileSuggestion.RemainingText:SetText(addon.L["Frame will close after %s seconds..."])
+    GlobalFrames.ProfileSuggestion.RemainingText:SetText(addon.L["Frame will close after %d seconds..."])
     --Add Buttons for the frame
     --Change button
     GlobalFrames.ProfileSuggestion.ChangePorfileButton = CreateFrame("BUTTON", "SS_SuggestionFrameChangeButton", GlobalFrames.ProfileSuggestion, "UIPanelButtonTemplate")
@@ -81,7 +95,19 @@ function GlobalFrames:Init()
 
     --Set the buttons functions
     --Cancel button
-    GlobalFrames.ProfileSuggestion.CancelButton:SetScript("OnClick", function()  GlobalFrames.ProfileSuggestion:Hide() end)
+    GlobalFrames.ProfileSuggestion.CancelButton:SetScript("OnClick", function(self)  self:GetParent():Hide() end)
+    --Change button
+    GlobalFrames.ProfileSuggestion.ChangePorfileButton:SetScript("OnClick", function(self)
+        addon:ActivateTalentProfileCallback(self.Porfile, function(changed)
+            if(changed) then
+                addon.sv.Talents.SelectedTalentsProfile = self.Profile
+                if(addon.TalentUIFrame.UpperTalentsUI and type(addon.TalentUIFrame.UpperTalentsUI) == "table") then
+                    addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Enable()
+                    UIDropDownMenu_SetSelectedValue(addon.TalentUIFrame.UpperTalentsUI.DropDownTalents, self.Profile)
+                end
+            end
+        end)
+    end)
 
     --Make the frame moveable
     GlobalFrames.ProfileSuggestion:SetMovable(true);
@@ -95,9 +121,20 @@ function GlobalFrames:Init()
             addon.sv.config.SuggestionFramePoint.relativePoint = relativePoint1;
             addon.sv.config.SuggestionFramePoint.frameX = xOfs;
             addon.sv.config.SuggestionFramePoint.frameY = yOfs;
+    end);
+
+    -- Add update to the frame so it can dissaper after a certain time
+    GlobalFrames.ProfileSuggestion:Setscript("OnShow", function(self)
+        self.ElapsedTime = 0
+    end)
+    GlobalFrames.ProfileSuggestion:SetScript("OnUpdate", function(self, elapsed)
+        self.ElapsedTime = self.ElapsedTime + elapsed
+        self.RemainingText:SetText(addon.L["Frame will close after %s seconds..."]:format(string.format("%.0f",ElapsedTime)))
+        if(self.ElapsedTime >= addon.sv.config.maxTimeSuggestionFrame) then
+            self:Hide()
         end
-        );
+    end)
 
     --Hide the frame by default
-    GlobalFrames.ProfileSuggestion:Show()
+    GlobalFrames.ProfileSuggestion:Hide()
 end

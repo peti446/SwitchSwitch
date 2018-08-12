@@ -198,7 +198,6 @@ function addon:ActivateTalentProfileCallback(profileName, callback)
             local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, nil, addon.GlobalFrames.UseTome)
             if(dialog) then
                 dialog.data = {["name"] = profileName, ["callback"] = callback}
-                
             end
         else
             --No check for usage so just return
