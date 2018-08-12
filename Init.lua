@@ -18,7 +18,18 @@ local function GetDefaultConfig()
             ["frameX"] = 0,
             ["frameY"] = 0
         },
-        ["maxTimeSuggestionFrame"] = 15
+        ["maxTimeSuggestionFrame"] = 15,
+        ["autoSuggest"] = 
+        {
+            ["pvp"] = "",
+            ["arena"] = "",
+            ["raid"] = "",
+            ["party"] = 
+            {
+                ["HM"] = "",
+                ["MM"] = ""                
+            }
+        }
     }
 end
 
@@ -74,6 +85,23 @@ function addon:eventHandler(event, arg1)
                 addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Disable()
             end
         end
+    elseif(event == "PLAYER_ENTERING_WORLD") then
+        local inInstance, instanceType = IsInInstance()
+        if(inInstance) then
+            local porfileNameToUse = addon.sv.config.autoSuggest[instanceType]
+            if(instanceType == "party") then
+                local difficulty = GetDungeonDifficultyID()
+                local difficultyByID = 
+                {
+                    [1] = "HM", -- Normal mode but we truncate it up to hc profile mode
+                    [2] = "HM",
+                    [23] = "MM"
+                }
+                porfileNameToUse = addon.sv.config.autoSuggest[instanceType][difficultyByID[difficulty]])
+                return
+            end
+            addon.GlobalFrames:ToggleSuggestionFrame(porfileNameToUse)
+        end
     end
 end
 
@@ -85,3 +113,4 @@ addon.event_frame:SetScript("OnEvent", addon.eventHandler)
 addon.event_frame:RegisterEvent("ADDON_LOADED")
 addon.event_frame:RegisterEvent("PLAYER_LOGIN")
 addon.event_frame:RegisterEvent("PLAYER_TALENT_UPDATE")
+addon.event_frame:RegisterEvent("PLAYER_ENTERING_WORLD")

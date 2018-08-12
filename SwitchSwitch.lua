@@ -237,7 +237,7 @@ function addon:SetTalents(profileName)
     addon.sv.Talents.SelectedTalentsProfile = profileName
 end
 
---Check if a given porfile is the current talents
+--Check if a given profile is the current talents
 function addon:IsCurrentTalentProfile(profileName)
     --Check if null or not existing
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table"
@@ -267,7 +267,7 @@ function addon:IsCurrentTalentProfile(profileName)
     return true
 end
 
---Gets the porfile that is active from all the saved porfiles
+--Gets the profile that is active from all the saved profiles
 function addon:GetCurrentProfileFromSaved()
     --Check if null or not existing
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table") then
