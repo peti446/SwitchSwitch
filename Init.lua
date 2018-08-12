@@ -108,7 +108,7 @@ function addon:eventHandler(event, arg1)
                     [2] = "HM",
                     [23] = "MM"
                 }
-                porfileNameToUse = addon.sv.config.autoSuggest[instanceType][difficultyByID[difficulty]])
+                porfileNameToUse = addon.sv.config.autoSuggest[instanceType][difficultyByID[difficulty]]
             end
             --Check if we are already in the current porfile
             if(not addon:IsCurrentTalentProfile(porfileNameToUse)) then
