@@ -87,15 +87,7 @@ local function CreateSuggestionFrame()
     frame.CancelButton:SetScript("OnClick", function(self)  self:GetParent():Hide() end)
     --Change button
     frame.ChangeProfileButton:SetScript("OnClick", function(self)
-        addon:ActivateTalentProfileCallback(self.Profile, function(changed)
-            if(changed) then
-                addon.sv.Talents.SelectedTalentsProfile = self.Profile
-                if(addon.TalentUIFrame.UpperTalentsUI and type(addon.TalentUIFrame.UpperTalentsUI) == "table") then
-                    addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Enable()
-                    UIDropDownMenu_SetSelectedValue(addon.TalentUIFrame.UpperTalentsUI.DropDownTalents, self.Profile)
-                end
-            end
-        end)
+        addon:ActivateTalentProfile(self.Profile)
     end)
 
     --Make the frame moveable

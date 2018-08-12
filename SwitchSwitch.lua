@@ -108,44 +108,12 @@ function addon:ActivateTalentProfile(profileName)
     --Check if profileName is not null
     if(not profileName or type(profileName) ~= "string") then
         addon:Debug(addon.L["Givine profile name is null"])
-        return false
-    end
-
-    --Check  if table exits
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
-        addon:Debug(addon.L["Could not change talents to Profile '%s' as it does not exits in the database"]:format(profileName))
-        return false
-    end
-
-    --If we cannot change talents why even try?
-    if(not addon:CanChangeTalents()) then
-        addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
-        return false
-    end
-
-    --Function to set talents
-    addon:SetTalents(profileName)
-
-    return true
-end
-
-function addon:ActivateTalentProfileCallback(profileName, callback)
-    --Check if callbar is valid if not assign it a simple funciton
-    if(not callback) then
-        callback = function(suceeded) end
-    end
-
-    --Check if profileName is not null
-    if(not profileName or type(profileName) ~= "string") then
-        addon:Debug(addon.L["Givine profile name is null"])
-        callback(true)
         return
     end
 
     --Check  if table exits
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
         addon:Debug(addon.L["Could not change talents to Profile '%s' as it does not exits in the database"]:format(profileName))
-        callback(true)
         return
     end
 
@@ -188,7 +156,6 @@ function addon:ActivateTalentProfileCallback(profileName, callback)
             if(not itemIDToUse) then
                 --No item found so return
                 addon:Print(addon.L["Could not find a Tome to use and change talents"])
-                callback(false)
                 return
             end
 
@@ -202,16 +169,13 @@ function addon:ActivateTalentProfileCallback(profileName, callback)
         else
             --No check for usage so just return
             addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
-            callback(false)
         end
         return
     end
-    
+
     --Function to set talents
     addon:SetTalents(profileName)
-    callback(true)
 end
-
 --Helper function to avoid needing to copy-caste every time...
 function addon:SetTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch

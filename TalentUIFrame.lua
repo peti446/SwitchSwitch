@@ -18,6 +18,12 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI:SetPoint("TOPLEFT", PlayerTalentFrameTalents, "TOPLEFT", 60, 30)
     UpperTalentsUI:SetPoint("BOTTOMRIGHT", PlayerTalentFrameTalents, "TOPRIGHT", -110, 2)
 
+    --Set variable for update
+    UpperTalentsUI.LastPorfileUpdateName = ""
+
+    --Set scripts for the fram
+    UpperTalentsUI:SetScript("OnUpdate", TalentUIFrame.UpdateUpperFrame)
+
     --Create the new and save buttons
     UpperTalentsUI.DeleteButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
     UpperTalentsUI.DeleteButton:SetScript("OnClick", function()
@@ -40,16 +46,6 @@ function TalentUIFrame:CreateTalentFrameUI()
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, TalentUIFrame.Initialize_Talents_List)
 
-    --If the selected profile is null or custom or empty select custom and make selected talent custom
-    if(addon.sv.Talents.SelectedTalentsProfile == nil or addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName or  addon.sv.Talents.SelectedTalentsProfile == "") then
-        UpperTalentsUI.DeleteButton:Disable()
-        addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
-        UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, addon.CustomProfileName)
-    else
-        UIDropDownMenu_SetSelectedValue(UpperTalentsUI.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
-        UpperTalentsUI.DeleteButton:Enable()
-    end
-
     --Create new Static popup dialog
     StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
     {
@@ -67,23 +63,7 @@ function TalentUIFrame:CreateTalentFrameUI()
             TalentUIFrame:OnAceptNewprofile(self)
         end,
         EditBoxOnTextChanged = function (self) 
-            local data = self:GetParent().editBox:GetText()
-            if(data ~= nil and data ~= '') then
-                if(data:lower() == addon.CustomProfileName:lower()) then
-                    self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
-                    self:GetParent().button1:Disable()
-                elseif(data:len() > 20) then
-                    self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
-                    self:GetParent().button1:Disable()
-                else
-                    self:GetParent().button1:Enable()
-                    self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
-                end
-            else
-                self:GetParent().button1:Disable()
-                self:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
-            end
-            StaticPopup_Resize(self:GetParent(), self:GetParent().which)
+            TalentUIFrame:NewProfileOnTextChange(self)
         end,
         OnShow = function(self)
             self.button1:Disable()
@@ -103,8 +83,7 @@ function TalentUIFrame:CreateTalentFrameUI()
         enterClicksFirstButton = true,
         showAlert = true,
         OnAccept = function(self, profileName)
-            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
-            addon:Print(addon.L["Profile '%s' overwritten!"]:format(profileName))
+            TalentUIFrame:OnAcceptOverwrrite(self, profileName)
         end,
         OnCancel = function(self, profileName)
             local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
@@ -166,30 +145,29 @@ end
 
 function TalentUIFrame.SetDropDownValue(self, arg1, arg2, checked)
     if (not checked) then
-        --Temp profile to check in case we cannot change talents
-        local tempOldSelected = addon.sv.Talents.SelectedTalentsProfile
-		-- set selected value as selected
-        UIDropDownMenu_SetSelectedValue(arg1, self.value)
-        --Set the global value so we remember when we log back in
-        addon.sv.Talents.SelectedTalentsProfile = self.value
-        --Enable the delete button
-        addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Enable()
-        --Try to change talents
-        addon:ActivateTalentProfileCallback(self.value, function(changed)
-            if(not changed) then
-                if(tempOldSelected == "") then
-                    tempOldSelected = addon.CustomProfileName
-                    addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Disable()
-                end
-                --Set to custom as we could not active the Profile
-                UIDropDownMenu_SetSelectedValue(arg1, tempOldSelected)
-                addon.sv.Talents.SelectedTalentsProfile = tempOldSelected
-                return
-            end
-            --Enable the button
-            addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Enable()
-        end)
+        --Change Talents!
+        addon:ActivateTalentProfile(self.value)
     end
+end
+
+function TalentUIFrame:NewProfileOnTextChange(frame) 
+    local data = frame:GetParent().editBox:GetText()
+    if(data ~= nil and data ~= '') then
+        if(data:lower() == addon.CustomProfileName:lower()) then
+            frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
+            frame:GetParent().button1:Disable()
+        elseif(data:len() > 20) then
+            frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
+            frame:GetParent().button1:Disable()
+        else
+            frame:GetParent().button1:Enable()
+            frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
+        end
+    else
+        frame:GetParent().button1:Disable()
+        frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
+    end
+    StaticPopup_Resize(frame:GetParent(), frame:GetParent().which)
 end
 
 function TalentUIFrame:OnAceptNewprofile(frame)
@@ -205,34 +183,46 @@ function TalentUIFrame:OnAceptNewprofile(frame)
     end
 
     --If talent spec table does not exist create one
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
+    if(not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) then
         addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
     end
 
     --profile name does not exist so create it
     addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
     addon.sv.Talents.SelectedTalentsProfile = profileName
-    --Select the new Profile
-    UIDropDownMenu_SetSelectedValue(TalentUIFrame.UpperTalentsUI.DropDownTalents, profileName)
-    UIDropDownMenu_SetText(TalentUIFrame.UpperTalentsUI.DropDownTalents, profileName)
+
     --Let the user know that the profile has been created
     addon:Print(addon.L["Talent profile %s created!"]:format(profileName))
 end
 
 function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
     --Check if the Profile exists
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile]) ~= "table") then
+    if(not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile]) ~= "table") then
         return
     end
 
     --Delete the Profile
     addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = nil
+    addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
+end
 
-    --If it is the current selected Profile change the selected vlaue to custom
-    if(profile == addon.sv.Talents.SelectedTalentsProfile) then
-        UIDropDownMenu_SetSelectedValue(TalentUIFrame.UpperTalentsUI.DropDownTalents, addon.CustomProfileName)
-        addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
-        addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Disable()
+function TalentUIFrame:OnAcceptOverwrrite(frame, profile)
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = addon:GetCurrentTalents()
+    addon.sv.Talents.SelectedTalentsProfile = profile
+    addon:Print(addon.L["Profile '%s' overwritten!"]:format(profile))
+end
+
+function TalentUIFrame.UpdateUpperFrame(self, elapsed)
+    --Just to make sure we dont update all every frame, as 90% of the time it will not change
+    if(self.LastPorfileUpdateName ~= addon.sv.Talents.SelectedTalentsProfile) then
+        self.LastPorfileUpdateName = addon.sv.Talents.SelectedTalentsProfile
+        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+
+        if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
+            self.DeleteButton:Disable()
+        else
+            self.DeleteButton:Enable()
+        end
     end
 end
 

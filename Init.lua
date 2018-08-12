@@ -80,12 +80,8 @@ function addon:eventHandler(event, arg1)
         --Unregister current event
         self:UnregisterEvent(event)
     elseif(event == "PLAYER_TALENT_UPDATE") then
-        if(IsAddOnLoaded("Blizzard_TalentUI") and not addon.G.SwitchingTalents) then
+        if( not addon.G.SwitchingTalents) then
             addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
-            UIDropDownMenu_SetSelectedValue(addon.TalentUIFrame.UpperTalentsUI.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
-            if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
-                addon.TalentUIFrame.UpperTalentsUI.DeleteButton:Disable()
-            end
         end
     elseif(event == "PLAYER_ENTERING_WORLD") then
         --Check if we actually switched map from last time
