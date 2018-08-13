@@ -39,7 +39,7 @@ local function CreateConfigFrame()
     frame.autoUseItemsCB.text:SetFontObject("GameFontWhite")
 
     frame.autoUseItemsCDText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-    frame.autoUseItemsCDText:SetText(addon.L["Time to hide the instance suggestion frame"]..":")
+    frame.autoUseItemsCDText:SetText(addon.L["Autofade timer for auto-change frame"]..":")
     frame.autoUseItemsCDText:SetPoint("TOPLEFT", frame.autoUseItemsCB, "BOTTOMLEFT", 10, -3)
 
     frame.autoUseItemsCDSlider = CreateFrame("Slider", nil, frame, "OptionsSliderTemplate")
@@ -55,7 +55,7 @@ local function CreateConfigFrame()
     frame.autoUseItemsCDSlider:SetValueStep(1)
     frame.autoUseItemsCDSlider.Text2 = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
     frame.autoUseItemsCDSlider.Text2:SetPoint("LEFT", frame.autoUseItemsCDSlider, "RIGHT", 15, 0)
-    frame.autoUseItemsCDSlider.Text2:SetText(addon.L["(0 to disable)"])
+    frame.autoUseItemsCDSlider.Text2:SetText(addon.L["(0 to disable auto-fade)"])
 
     frame.ProfilesConfigText = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeLeft")
     frame.ProfilesConfigText:SetText(addon.L["Profiles for instance auto-change:"])
