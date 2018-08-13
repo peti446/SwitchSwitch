@@ -239,7 +239,7 @@ end
 --##########################################################################################################################
 --                                  Helper Functions
 --##########################################################################################################################
-function TalentUIFrame:CreateButton(point, parentFrame, relativeFrame, relativePoint, text, width, height, xOffSet, yOffSet, TextHeight)
+function TalentUIFrame:CreateButton(point, parentFrame, relativeFrame, relativePoint, text, width, height, xOffSet, yOffSet, ButtonName, TextHeight)
     --Set defalt values in case not specified
     width = width or 100
     height = height or 20
@@ -248,7 +248,7 @@ function TalentUIFrame:CreateButton(point, parentFrame, relativeFrame, relativeP
     TextHeight = TextHeight or ""
     text = text or "Not specified"
     --Create the button and set their value
-    local button = CreateFrame("Button", nil, parentFrame, "UIPanelButtonTemplate")
+    local button = CreateFrame("Button", ButtonName, parentFrame, "UIPanelButtonTemplate")
     button:SetPoint(point, relativeFrame, relativePoint, xOffSet, yOffSet)
     button:SetSize(width,height)
     button:SetText(text)

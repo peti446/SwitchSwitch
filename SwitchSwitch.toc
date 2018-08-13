@@ -10,5 +10,6 @@ localization/Loc.Core.lua
 SwitchSwitch.lua
 TalentUIFrame.lua
 GlobalFrames.lua
+ConfigFrame.lua
 Commands.lua
 Init.lua

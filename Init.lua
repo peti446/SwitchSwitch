@@ -74,6 +74,8 @@ function addon:eventHandler(event, arg1)
         --Load global frame
         addon.GlobalFrames:Init()
 
+        addon.ConfigFrame:Init()
+
         --Check if talents is a Profile
         addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
 
