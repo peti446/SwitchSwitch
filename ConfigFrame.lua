@@ -8,7 +8,7 @@ local ConfigFrame = addon.ConfigFrame
 
 
 function ConfigFrame:Init()
-  --  ConfigFrame:ToggleFrame()
+    ConfigFrame:ToggleFrame()
 end
 
 --##########################################################################################################################
@@ -32,11 +32,13 @@ local function CreateConfigFrame()
     frame.DebugModeCB:SetPoint("TOPLEFT", frame.GeneralText, "BOTTOMLEFT", 2, -5)
     frame.DebugModeCB.text:SetText(addon.L["Debug mode"])
     frame.DebugModeCB.text:SetFontObject("GameFontWhite")
+    frame.DebugModeCB:SetScript("OnClick", function(self) addon.sv.config.debug = self:GetChecked()  end)
 
     frame.autoUseItemsCB = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
     frame.autoUseItemsCB:SetPoint("TOPLEFT", frame.DebugModeCB, "BOTTOMLEFT")
     frame.autoUseItemsCB.text:SetText(addon.L["Prompact to use Tome to change talents?"])
     frame.autoUseItemsCB.text:SetFontObject("GameFontWhite")
+    frame.autoUseItemsCB:SetScript("OnClick", function(self) addon.sv.config.autoUseItems = self:GetChecked()  end)
 
     frame.autoUseItemsCDText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
     frame.autoUseItemsCDText:SetText(addon.L["Autofade timer for auto-change frame"]..":")
@@ -50,23 +52,35 @@ local function CreateConfigFrame()
     frame.autoUseItemsCDSlider.High:SetText(frame.autoUseItemsCDSlider.maxValue)
     local point, relativeTo, relativePoint, xOfs, yOfs = frame.autoUseItemsCDSlider.Text:GetPoint()
     frame.autoUseItemsCDSlider.Text:SetPoint("TOP", relativeTo, "BOTTOM", 0, -25)
-    frame.autoUseItemsCDSlider.Text:SetText("sdd")
-    frame.autoUseItemsCDSlider:SetValue(15)
+    frame.autoUseItemsCDSlider.Text:SetText("15")
     frame.autoUseItemsCDSlider:SetValueStep(1)
     frame.autoUseItemsCDSlider.Text2 = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
     frame.autoUseItemsCDSlider.Text2:SetPoint("LEFT", frame.autoUseItemsCDSlider, "RIGHT", 15, 0)
     frame.autoUseItemsCDSlider.Text2:SetText(addon.L["(0 to disable auto-fade)"])
+    frame.autoUseItemsCDSlider:SetScript("OnValueChanged", function(self,value, userInput)
+        frame.autoUseItemsCDSlider.Text:SetText(string.format("%.f", value))
+        addon.sv.config.maxTimeSuggestionFrame = tonumber(string.format("%.f", value))
+    end)
+    frame.autoUseItemsCDSlider:SetValue(addon.sv.config.maxTimeSuggestionFrame)
 
     frame.ProfilesConfigText = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeLeft")
     frame.ProfilesConfigText:SetText(addon.L["Profiles for instance auto-change:"])
     frame.ProfilesConfigText:SetPoint("TOPLEFT", frame.autoUseItemsCDSlider.Low, "BOTTOMLEFT", -13, -10)
 
+    frame.ProfilesConfigText.Description = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    frame.ProfilesConfigText.Description:SetText(addon.L["If you select a profile from any of the dropdown boxes, when etering the specific instance, you will be greeted with a popup that will ask you if you want to change to that profile."])
+    frame.ProfilesConfigText.Description:SetPoint("TOPLEFT", frame.ProfilesConfigText, "BOTTOMLEFT", 5, -5)
+    frame.ProfilesConfigText.Description:SetWidth(350)
+    frame.ProfilesConfigText.Description:SetJustifyH("LEFT")
+
     frame.ArenaText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-    frame.ArenaText:SetPoint("TOPLEFT", frame.ProfilesConfigText, "BOTTOMLEFT", 0, -20)
+    frame.ArenaText:SetPoint("TOPLEFT", frame.ProfilesConfigText.Description, "BOTTOMLEFT", 0, -20)
     frame.ArenaText:SetText(addon.L["Arenas"] .. ":")
     frame.ArenaText.DropDownMenu = CreateFrame("FRAME", nil, frame, "UIDropDownMenuTemplate")
     frame.ArenaText.DropDownMenu:SetPoint("LEFT", frame.ArenaText, "RIGHT", 0, -5)
+    frame.ArenaText.DropDownMenu.funcName = "arena"
     UIDropDownMenu_SetWidth(frame.ArenaText.DropDownMenu, 200)
+    UIDropDownMenu_Initialize(frame.ArenaText.DropDownMenu, ConfigFrame.SetUpButtons)
 
 
     frame.BattlegroundText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
@@ -74,7 +88,9 @@ local function CreateConfigFrame()
     frame.BattlegroundText:SetText(addon.L["Battlegrounds"]..":")
     frame.BattlegroundText.DropDownMenu = CreateFrame("FRAME", nil, frame, "UIDropDownMenuTemplate")
     frame.BattlegroundText.DropDownMenu:SetPoint("LEFT", frame.BattlegroundText, "RIGHT", 0, -5)
+    frame.BattlegroundText.DropDownMenu.funcName = "bg"
     UIDropDownMenu_SetWidth(frame.BattlegroundText.DropDownMenu, 200)
+    UIDropDownMenu_Initialize(frame.BattlegroundText.DropDownMenu, ConfigFrame.SetUpButtons)
 
 
     frame.RaidText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
@@ -82,7 +98,9 @@ local function CreateConfigFrame()
     frame.RaidText:SetText(addon.L["Raid"] .. ":")
     frame.RaidText.DropDownMenu = CreateFrame("FRAME", nil, frame, "UIDropDownMenuTemplate")
     frame.RaidText.DropDownMenu:SetPoint("LEFT", frame.RaidText, "RIGHT", 0, -5)
+    frame.RaidText.DropDownMenu.funcName = "raid"
     UIDropDownMenu_SetWidth(frame.RaidText.DropDownMenu, 200)
+    UIDropDownMenu_Initialize(frame.RaidText.DropDownMenu, ConfigFrame.SetUpButtons)
 
 
     frame.Party = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
@@ -95,7 +113,9 @@ local function CreateConfigFrame()
     frame.Party.HC:SetText(addon.L["Heroic"] .. ":")
     frame.Party.HC.DropDownMenu = CreateFrame("FRAME", nil, frame, "UIDropDownMenuTemplate")
     frame.Party.HC.DropDownMenu:SetPoint("LEFT", frame.Party.HC, "RIGHT", 0, -5)
+    frame.Party.HC.DropDownMenu.funcName = "partyhc"
     UIDropDownMenu_SetWidth(frame.Party.HC.DropDownMenu, 200)
+    UIDropDownMenu_Initialize(frame.Party.HC.DropDownMenu, ConfigFrame.SetUpButtons)
 
 
     frame.Party.MM = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
@@ -103,8 +123,29 @@ local function CreateConfigFrame()
     frame.Party.MM:SetText(addon.L["Mythic"] .. ":")
     frame.Party.MM.DropDownMenu = CreateFrame("FRAME", nil, frame, "UIDropDownMenuTemplate")
     frame.Party.MM.DropDownMenu:SetPoint("LEFT", frame.Party.MM, "RIGHT", 0, -5)
+    frame.Party.MM.DropDownMenu.funcName = "bpartymmg"
     UIDropDownMenu_SetWidth(frame.Party.MM.DropDownMenu, 200)
+    UIDropDownMenu_Initialize(frame.Party.MM.DropDownMenu, ConfigFrame.SetUpButtons)
 
+
+    --Make the frame moveable
+    frame:SetMovable(true)
+    frame:EnableMouse(true)
+    frame:RegisterForDrag("LeftButton")
+    frame:SetScript("OnDragStart", frame.StartMoving)
+    frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end);
+
+    --Set on shown script
+    frame:SetScript("OnShow", function(self)
+        self.autoUseItemsCDSlider:SetValue(addon.sv.config.maxTimeSuggestionFrame)
+        self.autoUseItemsCB:SetChecked(addon.sv.config.autoUseItems)
+        self.DebugModeCB:SetChecked(addon.sv.config.debug)
+        UIDropDownMenu_SetSelectedValue(self.ArenaText.DropDownMenu, addon.sv.config.autoSuggest.arena)
+        UIDropDownMenu_SetSelectedValue(self.BattlegroundText.DropDownMenu, addon.sv.config.autoSuggest.pvp)
+        UIDropDownMenu_SetSelectedValue(self.RaidText.DropDownMenu, addon.sv.config.autoSuggest.raid)
+        UIDropDownMenu_SetSelectedValue(self.Party.HC.DropDownMenu, addon.sv.config.autoSuggest.party.HM)
+        UIDropDownMenu_SetSelectedValue(self.Party.MM.DropDownMenu, addon.sv.config.autoSuggest.party.MM)
+    end)
 
     --Hide the frame by default
     frame:Hide()
@@ -118,11 +159,83 @@ function ConfigFrame:ToggleFrame()
 end
 
 --##########################################################################################################################
---                                  Sub-Functions
+--                                  Dropdown functions
 --##########################################################################################################################
+function ConfigFrame.SetUpButtons(self, level, menuList)
+    local menuList = {
+        {
+            text = "None",
+            value = ""
+        }
+    }
+    --Get all profile names and create the list for the dropdown menu
+    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
+        for TalentProfileName, data in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+            table.insert(menuList, {
+                text = TalentProfileName
+            })
+        end
+    end
+
+    
+    --Make sure level is always set
+    if(not level) then
+        level = 1
+    end
+
+    --Get correct function
+    local funcs = 
+    {
+        ["arena"] = ConfigFrame.SetArenasValue,
+        ["bg"] = ConfigFrame.SetBattlegroundsValue,
+        ["raid"] = ConfigFrame.SetRaidValue,
+        ["partyhc"] = ConfigFrame.SetPartyHCValue,
+        ["partymm"] = ConfigFrame.SetPartyMMValue
+    }
 
 
+    --Create all buttons and attach the nececarry information
+	for index = 1, #menuList do
+        local info = menuList[index]
+		if (info.text) then
+            info.index = index
+            info.func = funcs[self.funcName]
+			UIDropDownMenu_AddButton( info, level )
+		end
+	end
+end
 
---##########################################################################################################################
---                                  Helper functions
---##########################################################################################################################
+function ConfigFrame.SetArenasValue(self, arg1, arg2, checked)
+    if(checked) then
+        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
+        addon.sv.config.autoSuggest.arena = self.value
+    end
+end
+
+function ConfigFrame.SetBattlegroundsValue(self, arg1, arg2, checked)
+    if(checked) then
+        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
+        addon.sv.config.autoSuggest.pvp = self.value
+    end
+end
+
+function ConfigFrame.SetRaidValue(self, arg1, arg2, checked)
+    if(checked) then
+        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
+        addon.sv.config.autoSuggest.raid = self.value
+    end
+end
+
+function ConfigFrame.SetPartyHCValue(self, arg1, arg2, checked)
+    if(checked) then
+        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
+        addon.sv.config.autoSuggest.party.HM = self.value
+    end
+end
+
+function ConfigFrame.SetPartyMMValue(self, arg1, arg2, checked)
+    if(checked) then
+        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
+        addon.sv.config.autoSuggest.party.MM = self.value
+    end
+end

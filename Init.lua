@@ -12,7 +12,7 @@ local function GetDefaultConfig()
     return {
         ["Version"] = addon.version,
         ["debug"] = false,
-        ["autoUseItems"] = false,
+        ["autoUseItems"] = true,
         ["SuggestionFramePoint"] =
         {
             ["point"] = "CENTER",
