@@ -118,6 +118,15 @@ local function CreateSuggestionFrame()
             self:Hide()
         end
     end)
+    frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    frame:SetScript("OnEvent", function(self, event, ...)
+        if event =="PLAYER_REGEN_DISABLED" then
+            self:Hide()
+        else
+            self:Show()
+        end
+    end)
 
     --Debuging text
     addon:Debug("Created Suggestion frame!")

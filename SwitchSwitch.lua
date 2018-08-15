@@ -120,9 +120,14 @@ end
 function addon:ActivateTalentProfile(profileName)
     addon:Print(addon.L["Changing talents"])
 
+    if(UnitAffectingCombat("Player")) then
+        addon:Debug("Player is in combat.")
+        return
+    end
+
     --Check if profileName is not null
     if(not profileName or type(profileName) ~= "string") then
-        addon:Debug(addon.L["Givine profile name is null"])
+        addon:Debug("Given profile name is null")
         return
     end
 
