@@ -118,6 +118,8 @@ function addon:CanChangeTalents()
 end
 
 function addon:ActivateTalentProfile(profileName)
+    addon:Print(addon.L["Changing talents"])
+
     --Check if profileName is not null
     if(not profileName or type(profileName) ~= "string") then
         addon:Debug(addon.L["Givine profile name is null"])
