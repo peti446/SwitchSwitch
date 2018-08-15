@@ -42,16 +42,6 @@ function GlobalFrames:Init()
             self.insertedFrame:Show()
             self.button1:Hide()
          end,
-        OnAccept = function(self, data)
-            --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
-            C_Timer.After(1, function() data.callback(addon:ActivateTalentProfile(data.name)) end)
-            self.insertedFrame:Hide()
-        end,
-        OnCancel = function(self, data)
-            --Make sure everything works fine and gets disabled properly
-            data.callback(false)
-            self.insertedFrame:Hide()
-        end
     }
 end
 

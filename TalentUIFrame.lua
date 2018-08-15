@@ -19,7 +19,7 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI:SetPoint("BOTTOMRIGHT", PlayerTalentFrameTalents, "TOPRIGHT", -110, 2)
 
     --Set variable for update
-    UpperTalentsUI.LastPorfileUpdateName = ""
+    UpperTalentsUI.LastPorfileUpdateName = "Custom"
 
     --Set scripts for the fram
     UpperTalentsUI:SetScript("OnUpdate", TalentUIFrame.UpdateUpperFrame)
@@ -228,6 +228,7 @@ function TalentUIFrame.UpdateUpperFrame(self, elapsed)
 
         --Update the UI elements
         UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+        UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
         if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
             self.DeleteButton:Disable()
         else
