@@ -86,6 +86,8 @@ function addon:eventHandler(event, arg1)
     elseif(event == "PLAYER_ENTERING_WORLD") then
         --Check if we actually switched map from last time
         local instanceID = select(8,GetInstanceInfo())
+        --Debuging
+        addon:Debug("Entering instance:" .. string.join(" - ", tostringall(GetInstanceInfo())))
         if(addon.LastInstanceID == instanceID) then
             return
         end
@@ -94,6 +96,8 @@ function addon:eventHandler(event, arg1)
         local inInstance, instanceType = IsInInstance()
         if(inInstance) then
             local porfileNameToUse = addon.sv.config.autoSuggest[instanceType]
+
+            addon:Debug("Instance type: " .. instanceType)
 
             --Party is a table so we need to ge the profile out via dificullty
             if(instanceType == "party") then
@@ -107,9 +111,11 @@ function addon:eventHandler(event, arg1)
                 porfileNameToUse = addon.sv.config.autoSuggest[instanceType][difficultyByID[difficulty]]
             end
             --Check if we are already in the current porfile
-            if(not addon:IsCurrentTalentProfile(porfileNameToUse)) then
+            if(not addon:IsCurrentTalentProfile(porfileNameToUse) and porfileNameToUse ~= "") then
                 addon.GlobalFrames:ToggleSuggestionFrame(porfileNameToUse)
+                return
             end
+            addon:Debug("Profile " .. porfileNameToUse .. " is already in use.")
         end
     end
 end

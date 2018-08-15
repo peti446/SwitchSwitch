@@ -135,6 +135,7 @@ function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
         addon:Debug("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
+    addon:Debug("Showing Toggle suggestion frame")
     --Set the frame or create it, set data and show the frame.
     GlobalFrames.ProfileSuggestion = GlobalFrames.ProfileSuggestion or CreateSuggestionFrame()
     GlobalFrames.ProfileSuggestion.ChangeProfileButton.Profile = profileToActivate

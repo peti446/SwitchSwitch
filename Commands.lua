@@ -11,17 +11,31 @@ local Commands = addon.Commands
 --                                  Commands Fnctions
 --##########################################################################################################################
 function Commands:Help()
-    addon:Print("--------- |cff00F3FFList of commands:|r ---------");
-    addon:Print("|cff188E01/ss help|r - Shows all commands.");
-    addon:Print("|cff188E01/ss config|r - Shows the config frame.");
-	addon:Print("|cff188E01/ss load <profileName>|r - Loads a talent profile.");
+    addon:Print("--------- |cff00F3FF".addon.L["List of commands"].":|r ---------");
+    addon:Print("|cff188E01/ss help|r - " .. addon.L["Shows all commands"] .. ".");
+    addon:Print("|cff188E01/ss config|r - " .. addon.L["Shows the config frame"] .. ".");
+	addon:Print("|cff188E01/ss load <profileName>|r - " .. addon.L["Loads a talent profile"] .. ".");
+	addon:Print("|cff188E01/ss resetFrame suggestion|r - " .. addon.L["Resets the suggestion frame location"] .. ".");
 	addon:Print("-------------------------------------");
 end
 
 function Commands:LoadProfileCMD(...)
+	addon:Debug("Changing talents to: " .. ...)
 	addon:ActivateTalentProfile(string.join(" ", tostringall(...)))
 end
 
+
+function Commands:ResetFrameLocation(frame)
+	if(frame = "suggestion") then
+		addon.sv.config.SuggestionFramePoint =
+		{
+			["point"] = "CENTER",
+			["relativePoint"] = "CENTER",
+			["frameX"] = 0,
+			["frameY"] = 0
+		}
+	end
+end
 
 --##########################################################################################################################
 --                                  Commands handling
@@ -31,6 +45,7 @@ local CommandList =
 	["config"] = addon.ConfigFrame.ToggleFrame,
 	["help"] = Commands.Help,
 	["load"] = Commands.LoadProfileCMD
+	["resetFrame"] = Commands.ResetFrameLocation
 }
 
 local function HandleSlashCommands(str)
