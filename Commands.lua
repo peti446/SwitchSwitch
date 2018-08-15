@@ -10,8 +10,17 @@ local Commands = addon.Commands
 --##########################################################################################################################
 --                                  Commands Fnctions
 --##########################################################################################################################
+function Commands:Help()
+    addon:Print("--------- |cff00F3FFList of commands:|r ---------");
+    addon:Print("|cff188E01/ss help|r - Shows all commands.");
+    addon:Print("|cff188E01/ss config|r - Shows the config frame.");
+	addon:Print("|cff188E01/ss load <profileName>|r - Loads a talent profile.");
+	addon:Print("-------------------------------------");
+end
 
-
+function Commands:LoadProfileCMD(...)
+	addon:ActivateTalentProfile(string.join(" ", tostringall(...)))
+end
 
 
 --##########################################################################################################################
@@ -19,10 +28,14 @@ local Commands = addon.Commands
 --##########################################################################################################################
 local CommandList =
 {
+	["config"] = addon.ConfigFrame.ToggleFrame,
+	["help"] = Commands.Help,
+	["load"] = Commands.LoadProfileCMD
 }
 
 local function HandleSlashCommands(str)
-    if (#str == 0) then	
+	if (#str == 0) then
+		Commands:Help()
 		-- User entered command without any args
 		return
 	end	
@@ -49,6 +62,7 @@ local function HandleSlashCommands(str)
 				end
 			else
 				-- does not exist!
+				Commands:Help()
 				return
 			end
 		end

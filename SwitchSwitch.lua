@@ -126,7 +126,7 @@ function addon:ActivateTalentProfile(profileName)
 
     --Check  if table exits
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
-        addon:Debug(addon.L["Could not change talents to Profile '%s' as it does not exits in the database"]:format(profileName))
+        addon:Print(addon.L["Could not change talents to Profile '%s' as it does not exit"]:format(profileName))
         return
     end
 

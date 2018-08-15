@@ -6,11 +6,6 @@ local addonName, addon = ...
 addon.ConfigFrame = {}
 local ConfigFrame = addon.ConfigFrame
 
-
-function ConfigFrame:Init()
-    ConfigFrame:ToggleFrame()
-end
-
 --##########################################################################################################################
 --                                  Config Frame Init
 --##########################################################################################################################
@@ -177,65 +172,36 @@ function ConfigFrame.SetUpButtons(self, level, menuList)
         end
     end
 
-    
     --Make sure level is always set
     if(not level) then
         level = 1
     end
-
-    --Get correct function
-    local funcs = 
-    {
-        ["arena"] = ConfigFrame.SetArenasValue,
-        ["bg"] = ConfigFrame.SetBattlegroundsValue,
-        ["raid"] = ConfigFrame.SetRaidValue,
-        ["partyhc"] = ConfigFrame.SetPartyHCValue,
-        ["partymm"] = ConfigFrame.SetPartyMMValue
-    }
-
 
     --Create all buttons and attach the nececarry information
 	for index = 1, #menuList do
         local info = menuList[index]
 		if (info.text) then
             info.index = index
-            info.func = funcs[self.funcName]
+            info.arg1 = self
+            info.func = ConfigFrame.SetSelectedValueAutoChange
 			UIDropDownMenu_AddButton( info, level )
 		end
 	end
 end
 
-function ConfigFrame.SetArenasValue(self, arg1, arg2, checked)
-    if(checked) then
-        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
-        addon.sv.config.autoSuggest.arena = self.value
-    end
-end
-
-function ConfigFrame.SetBattlegroundsValue(self, arg1, arg2, checked)
-    if(checked) then
-        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
-        addon.sv.config.autoSuggest.pvp = self.value
-    end
-end
-
-function ConfigFrame.SetRaidValue(self, arg1, arg2, checked)
-    if(checked) then
-        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
-        addon.sv.config.autoSuggest.raid = self.value
-    end
-end
-
-function ConfigFrame.SetPartyHCValue(self, arg1, arg2, checked)
-    if(checked) then
-        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
-        addon.sv.config.autoSuggest.party.HM = self.value
-    end
-end
-
-function ConfigFrame.SetPartyMMValue(self, arg1, arg2, checked)
-    if(checked) then
-        UIDropDownMenu_SetSelectedValue(self:GetParent(), self.value)
-        addon.sv.config.autoSuggest.party.MM = self.value
+function ConfigFrame.SetSelectedValueAutoChange(self, arg1, arg2, checked)
+    if(not checked) then
+        UIDropDownMenu_SetSelectedValue(arg1, self.value)
+        if(arg1.funcName == "arena") then
+            addon.sv.config.autoSuggest.arena = self.value
+        elseif(arg1.funcName == "bg") then
+            addon.sv.config.autoSuggest.pvp = self.value
+        elseif(arg1.funcName == "raid") then
+            addon.sv.config.autoSuggest.raid = self.value
+        elseif(arg1.funcName == "partyhc") then
+            addon.sv.config.autoSuggest.party.HM = self.value
+        elseif(arg1.funcName == "partymm") then
+            addon.sv.config.autoSuggest.party.MM = self.value
+        end
     end
 end
