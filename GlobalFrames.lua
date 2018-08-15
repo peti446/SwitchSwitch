@@ -129,9 +129,8 @@ local function CreateSuggestionFrame()
     frame:SetScript("OnEvent", function(self, event, ...)
         if event =="PLAYER_REGEN_DISABLED" then
             self:Hide()
-        else
-            self:Show()
         end
+        self:UnregisterEvent(event)
     end)
 
     --Debuging text
