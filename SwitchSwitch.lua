@@ -184,7 +184,7 @@ function addon:ActivateTalentProfile(profileName)
             --Got an item so open the popup to ask to use it!
             local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, nil, addon.GlobalFrames.UseTome)
             if(dialog) then
-                dialog.data = {["name"] = profileName, ["callback"] = callback}
+                dialog.data = profileName
             end
         else
             --No check for usage so just return

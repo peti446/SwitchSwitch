@@ -115,7 +115,7 @@ end
 --##########################################################################################################################
 --                                  Frames Component handler
 --##########################################################################################################################
-function TalentUIFrame.Initialize_Talents_List(self, level, menuList)
+function TalentUIFrame.Initialize_Talents_List(self, level, menuLists)
     local menuList = {}
     --Get all profile names and create the list for the dropdown menu
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
@@ -140,7 +140,8 @@ function TalentUIFrame.Initialize_Talents_List(self, level, menuList)
             info.func = TalentUIFrame.SetDropDownValue
 			UIDropDownMenu_AddButton( info, level )
 		end
-	end
+    end
+    UIDropDownMenu_Refresh(self)
 end
 
 function TalentUIFrame.SetDropDownValue(self, arg1, arg2, checked)
@@ -223,12 +224,17 @@ end
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
     if(self.LastPorfileUpdateName ~= addon.sv.Talents.SelectedTalentsProfile) then
+        addon:Debug("Updating Talent UI: " .. addon.sv.Talents.SelectedTalentsProfile)
         --Update the local variable to avoud updating every frame
         self.LastPorfileUpdateName = addon.sv.Talents.SelectedTalentsProfile
 
         --Update the UI elements
         UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
-        UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+
+        if(addon.sv.Talents.SelectedTalentsProfile ~= "") then
+            UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+        end
+        
         if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
             self.DeleteButton:Disable()
         else

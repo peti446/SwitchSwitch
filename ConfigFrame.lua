@@ -118,7 +118,7 @@ local function CreateConfigFrame()
     frame.Party.MM:SetText(addon.L["Mythic"] .. ":")
     frame.Party.MM.DropDownMenu = CreateFrame("FRAME", nil, frame, "UIDropDownMenuTemplate")
     frame.Party.MM.DropDownMenu:SetPoint("LEFT", frame.Party.MM, "RIGHT", 0, -5)
-    frame.Party.MM.DropDownMenu.funcName = "bpartymmg"
+    frame.Party.MM.DropDownMenu.funcName = "partymm"
     UIDropDownMenu_SetWidth(frame.Party.MM.DropDownMenu, 200)
     UIDropDownMenu_Initialize(frame.Party.MM.DropDownMenu, ConfigFrame.SetUpButtons)
 
@@ -140,6 +140,12 @@ local function CreateConfigFrame()
         UIDropDownMenu_SetSelectedValue(self.RaidText.DropDownMenu, addon.sv.config.autoSuggest.raid)
         UIDropDownMenu_SetSelectedValue(self.Party.HC.DropDownMenu, addon.sv.config.autoSuggest.party.HM)
         UIDropDownMenu_SetSelectedValue(self.Party.MM.DropDownMenu, addon.sv.config.autoSuggest.party.MM)
+        UIDropDownMenu_SetText(self.ArenaText.DropDownMenu, addon.sv.config.autoSuggest.arena ~= "" and addon.sv.config.autoSuggest.arena or "None")
+        UIDropDownMenu_SetText(self.BattlegroundText.DropDownMenu, addon.sv.config.autoSuggest.pvp ~= "" and addon.sv.config.autoSuggest.pvp or "None")
+        UIDropDownMenu_SetText(self.RaidText.DropDownMenu, addon.sv.config.autoSuggest.raid ~= "" and addon.sv.config.autoSuggest.raid or "None")
+        UIDropDownMenu_SetText(self.Party.HC.DropDownMenu, addon.sv.config.autoSuggest.party.HM ~= "" and addon.sv.config.autoSuggest.party.HM or "None")
+        UIDropDownMenu_SetText(self.Party.MM.DropDownMenu, addon.sv.config.autoSuggest.party.MM ~= "" and addon.sv.config.autoSuggest.party.MM or "None")
+        
     end)
 
     --Hide the frame by default

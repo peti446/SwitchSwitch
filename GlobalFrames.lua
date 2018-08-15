@@ -42,6 +42,11 @@ function GlobalFrames:Init()
             self.insertedFrame:Show()
             self.button1:Hide()
          end,
+         OnAccept = function(self, data)
+            --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
+            C_Timer.After(1, function() addon:ActivateTalentProfile(name) end)
+            self.insertedFrame:Hide()
+        end,
     }
 end
 
@@ -78,6 +83,7 @@ local function CreateSuggestionFrame()
     --Change button
     frame.ChangeProfileButton:SetScript("OnClick", function(self)
         addon:ActivateTalentProfile(self.Profile)
+        self:GetParent():Hide()
     end)
 
     --Make the frame moveable
