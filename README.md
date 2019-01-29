@@ -3,6 +3,8 @@
 
 This addon allows you to change between different talent profiles, and configure these profiles to prompt you when you enter an instance and more!
 
+### _**[Project site](https://wow.curseforge.com/projects/switchswitch)**_
+
 ### ***Features:***
 
 This addon allows you to create multiple profiles of talents to be able to rapidly switch between them with a couple of clicks or commands (macros).
