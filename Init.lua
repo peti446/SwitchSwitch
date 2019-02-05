@@ -76,6 +76,10 @@ function addon:eventHandler(event, arg1)
         --Load global frame
         addon.GlobalFrames:Init()
 
+        --Load the UI if not currently loaded
+        if(not IsAddOnLoaded("Blizzard_TalentUI")) then
+            LoadAddOn("Blizzard_TalentUI")
+        end
         --Check if talents is a Profile
         addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
 
@@ -114,6 +118,7 @@ function addon:eventHandler(event, arg1)
             end
             --Check if we are already in the current porfile
             if(not addon:IsCurrentTalentProfile(porfileNameToUse) and porfileNameToUse ~= "") then
+                addon:Debug("Atuo suggest changing to profile: " .. porfileNameToUse)
                 addon.GlobalFrames:ToggleSuggestionFrame(porfileNameToUse)
                 return
             end
@@ -142,20 +147,30 @@ function addon:Update()
         --If the version is lower then the 1.1 (the version will be 1.0), the data will be in the wrong fformat so update it
         if(oldTalentsVersion < 1.1) then
             --No pvp talents are present so lets just get the current table and set it to pva and leave pvp empty
-            local newFormat =
-            {
-                ["pva"] = {},
-                ["pvp"] = {}
-            }
-            newFormat.pva = addon:deepcopy(addon.sv.Talents.TalentsProfiles)
-            --Update the format
-            addon.sv.Talents.TalentsProfiles = newFormat;
+            --Iterate over each spec and then talents set
+            for specID, talentSets in pairs(addon.sv.Talents.TalentsProfiles) do
+                for talentSetName, normalTalentInfoTbl in pairs(talentSets) do
+                    --By default the format of the normal talbe info will be the information of normal talents so just copy these to the pva fuield
+                    local newFormat = 
+                    {
+                        ["pva"] = addon:deepcopy(normalTalentInfoTbl),
+                        ["pvp"] = {}
+                    }
+                    --Updathe the table
+                    addon.sv.Talents.TalentsProfiles[specID][talentSetName] = newFormat
+                end
+            end
         end
 
         --Update the version
         addon.sv.Talents.Version = addon.version
     end
 
+    --Update config
+    if(oldConfigVersion ~= currentVersion) then
+
+        addon.sv.config.Version = addon.version
+    end
 end
 
 -- Event handling frame

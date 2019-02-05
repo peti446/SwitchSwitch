@@ -26,13 +26,14 @@ function TalentUIFrame:CreateTalentFrameUI()
 
     --Create the new and save buttons
     UpperTalentsUI.DeleteButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
+    UpperTalentsUI.DeleteButton:Disable()
     UpperTalentsUI.DeleteButton:SetScript("OnClick", function()
         local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.sv.Talents.SelectedTalentsProfile)
         if(dialog) then
             dialog.data = addon.sv.Talents.SelectedTalentsProfile
         end 
     end)
-    UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI.DeleteButton, UpperTalentsUI.DeleteButton, "TOPLEFT", addon.L["New"], 80, nil, -5, 0) 
+    UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI.DeleteButton, UpperTalentsUI.DeleteButton, "TOPLEFT", addon.L["Save"], 80, nil, -5, 0) 
     UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")end)
     --Create Talent string
     UpperTalentsUI.CurrentPorfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
@@ -237,8 +238,10 @@ function TalentUIFrame.UpdateUpperFrame(self, elapsed)
         
         if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
             self.DeleteButton:Disable()
+            self.NewButton:Enable()
         else
             self.DeleteButton:Enable()
+            self.NewButton:Disable()
         end
     end
 end

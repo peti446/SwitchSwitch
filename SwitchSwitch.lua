@@ -93,7 +93,8 @@ function addon:GetCurrentTalents()
         talentSet["pvp"][Tier] =
         {
             ["unlocked"] = enabled,
-            ["id"] = selectedTalent
+            ["id"] = selectedTalent,
+            ["tier"] = Tier
         }
     end
     --Return talents
@@ -215,8 +216,13 @@ function addon:SetTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch
     addon.G.SwitchingTalents = true
 
-    --Learn talents
-    for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) do
+    --Check if the talent addon is up
+    if(not IsAddOnLoaded("Blizzard_TalentUI")) then
+        LoadAddOn("Blizzard_TalentUI")
+    end
+
+    --Learn talents normal talents
+    for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva) do
         --Get the current talent info to see if the talent id changed
         local talent = GetTalentInfo(talentTbl.tier, talentTbl.column, 1)
         if talentTbl.tier > 0 and talentTbl.column > 0  then
@@ -227,6 +233,22 @@ function addon:SetTalents(profileName)
             end
         end
     end
+    --Leanr pvp talent
+    for i, pvpTalentTabl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
+        if(pvpTalentTabl.enabled and pvpTalentTabl.id ~= nil) then
+            --Make sure the talent is not used anywhere else, set to random if used in anothet tier
+            for i2 = 1, 4 do
+                enabled, selectedTalent, availableTalents = C_SpecializationInfo.GetPvpTalentSlotInfo(i2)
+                if(pvpTalentTabl.id == selected and pvpTalentTabl.tier ~= i2) then
+                    --Get random talent
+                    LearnPvpTalent(availableTalents[math.random(#availableTalents)], i2)
+                end
+            end
+            --Lern the talent in the tier
+            LearnPvpTalent(pvpTalentTabl.id, pvpTalentTabl.tier)
+        end
+    end 
+
     --Print and return
     addon:Print(addon.L["Changed talents to '%s'"]:format(profileName))
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
@@ -242,24 +264,33 @@ function addon:IsCurrentTalentProfile(profileName)
         or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
         return false
     end
-    --Get current tier
-    local currentTalents = addon:GetCurrentTalents()
-    for i, talentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) do
-        if(currentTalents[talentInfo.tier].tier ~= talentInfo.tier) then
+
+    local currentActiveTalents = addon:GetCurrentTalents()
+    --Check pvp talents
+    for i, pvpTalentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
+        --Check if the first talent is equal
+        if(currentActiveTalents.pvp.id ~= pvpTalentInfo.id or currentActiveTalents.pvp.unlocked ~= pvpTalentInfo.unlocked) then
+            return false
+        end
+    end
+
+    --Check normal talents
+    for i, talentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva) do
+        if(currentActiveTalents.pva[talentInfo.tier].tier ~= talentInfo.tier) then
             --Not in current tier iterate to find tier
-            for i2, currentTalentInfo in ipairs(currentTalentInfo) do
+            for i2, currentTalentInfo in ipairs(currentActiveTalents.pva) do
                 if(currentTalentInfo.tier == talentInfo.tier) then
                     --In correct tier, check columns to see if equals, if not retun false
-                    if(currentTalents[talentInfo.tier].column ~= talentInfo.column) then
+                    if(currentActiveTalents.pva[talentInfo.tier].column ~= talentInfo.column) then
                         return false
                     end
                 end
             end
         else
             --In correct tier, check columns to see if equals, if not retun false
-            if(currentTalents[talentInfo.tier].column ~= talentInfo.column) then
+            if(currentActiveTalents.pva[talentInfo.tier].column ~= talentInfo.column) then
                 return false
-            end
+            end 
         end
     end
     return true
@@ -297,3 +328,9 @@ function addon:deepcopy(orig)
     end
     return copy
 end
+
+function addon:tablelength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
+  end
