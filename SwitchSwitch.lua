@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.0"
+addon.version = "1.1"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
@@ -59,11 +59,15 @@ end
 
 --Get the talent from the current active spec
 function addon:GetCurrentTalents()
-    local ChosenTalents = {};
-    --Iterate over all tiers
+    local talentSet =
+    {
+        ["pva"] = {},
+        ["pvp"] = {}
+    }
+    --Iterate over all tiers of talents normal
     for Tier = 1, GetMaxTalentTier() do
         --Create default table
-        ChosenTalents[Tier] =
+        talentSet["pva"][Tier] =
         {
             ["id"] = nil,
             ["tier"] = nil,
@@ -75,15 +79,25 @@ function addon:GetCurrentTalents()
             talentID, name, texture, selected, available, _, _, _, _, _, _ = GetTalentInfo(Tier, Column, GetActiveSpecGroup())
             --If the talent is selected store the nececary information
             if(selected) then
-                ChosenTalents[Tier]["id"] = talentID
-                ChosenTalents[Tier]["tier"] = Tier
-                ChosenTalents[Tier]["column"] = Column
+                talentSet["pva"][Tier]["id"] = talentID
+                talentSet["pva"][Tier]["tier"] = Tier
+                talentSet["pva"][Tier]["column"] = Column
                 break
             end
         end
     end
+
+    --Iterate over pvp talents
+    for Tier = 1, 4 do
+        enabled, selectedTalent, _ = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
+        talentSet["pvp"][Tier] =
+        {
+            ["unlocked"] = enabled,
+            ["id"] = selectedTalent
+        }
+    end
     --Return talents
-    return ChosenTalents;
+    return talentSet;
 end
 
 --Check if we can switch talents
@@ -266,4 +280,20 @@ function addon:GetCurrentProfileFromSaved()
     end
     --Return the custom profile name
     return addon.CustomProfileName
+end
+--Lua helper functions
+--creates a deep copy of the table
+function addon:deepcopy(orig)
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[addon:deepcopy(orig_key)] = addon:deepcopy(orig_value)
+        end
+        setmetatable(copy, addon:deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
 end

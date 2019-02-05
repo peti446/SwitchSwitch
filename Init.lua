@@ -68,6 +68,8 @@ function addon:eventHandler(event, arg1)
         addon.sv = {}
         addon.sv.Talents = SwitchSwitchTalents
         addon.sv.config = SwitchSwitchConfig
+        --Update the tables in case they are not updated
+        addon:Update();
     elseif(event == "PLAYER_LOGIN") then
         --Load Commands
         addon.Commands:Init()
@@ -118,6 +120,42 @@ function addon:eventHandler(event, arg1)
             addon:Debug("Profile " .. porfileNameToUse .. " is already in use.")
         end
     end
+end
+
+function addon:Update()
+    --Get the old version
+    local oldConfigVersion = addon.sv.config.Version
+    local oldTalentsVersion = addon.sv.Talents.Version 
+    --Convert the string to numbers
+    if(type(oldConfigVersion) == "string") then
+        oldConfigVersion = tonumber(oldConfigVersion)
+    end
+    if(type(oldTalentsVersion) == "string") then
+        oldTalentsVersion = tonumber(oldTalentsVersion)
+    end
+    --Get current version in number
+    local currentVersion = tonumber(addon.version)
+
+
+    --Update talent table
+    if(oldTalentsVersion ~= currentVersion) then
+        --If the version is lower then the 1.1 (the version will be 1.0), the data will be in the wrong fformat so update it
+        if(oldTalentsVersion < 1.1) then
+            --No pvp talents are present so lets just get the current table and set it to pva and leave pvp empty
+            local newFormat =
+            {
+                ["pva"] = {},
+                ["pvp"] = {}
+            }
+            newFormat.pva = addon:deepcopy(addon.sv.Talents.TalentsProfiles)
+            --Update the format
+            addon.sv.Talents.TalentsProfiles = newFormat;
+        end
+
+        --Update the version
+        addon.sv.Talents.Version = addon.version
+    end
+
 end
 
 -- Event handling frame
