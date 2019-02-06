@@ -129,8 +129,8 @@ end
 
 function addon:Update()
     --Get the old version
-    local oldConfigVersion = addon.sv.config.Version
-    local oldTalentsVersion = addon.sv.Talents.Version 
+    local oldConfigVersion = addon.sv.config.Version or addon.version
+    local oldTalentsVersion = addon.sv.Talents.Version or addon.version
     --Convert the string to numbers
     if(type(oldConfigVersion) == "string") then
         oldConfigVersion = tonumber(oldConfigVersion)

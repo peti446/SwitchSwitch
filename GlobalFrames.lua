@@ -17,6 +17,11 @@ function GlobalFrames:Init()
     GlobalFrames.UseTome:SetAttribute("type", "item")
     GlobalFrames.UseTome:Hide()
 
+    GlobalFrames.SavePVPTalents = CreateFrame("CheckButton", "SS_CheckboxSavePVPTalents", UIParent, "UICheckButtonTemplate")
+    GlobalFrames.SavePVPTalents.text:SetText(addon.L["Save pvp talents?"])
+    GlobalFrames.SavePVPTalents:SetChecked(true)
+    GlobalFrames.SavePVPTalents:Hide()
+
     --Popup to notify the user if they want the addon to automaticly use a tome
     StaticPopupDialogs["SwitchSwitch_ConfirmTomeUsage"] =
     {

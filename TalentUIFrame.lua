@@ -34,7 +34,7 @@ function TalentUIFrame:CreateTalentFrameUI()
         end 
     end)
     UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI.DeleteButton, UpperTalentsUI.DeleteButton, "TOPLEFT", addon.L["Save"], 80, nil, -5, 0) 
-    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")end)
+    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp" , nil, nil, nil, addon.GlobalFrames.SavePVPTalents)end)
     --Create Talent string
     UpperTalentsUI.CurrentPorfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
     UpperTalentsUI.CurrentPorfie:SetText(addon.L["Talents"] .. ":")
@@ -60,15 +60,26 @@ function TalentUIFrame:CreateTalentFrameUI()
         hasEditBox = true,
         exclusive = true,
         enterClicksFirstButton = true,
+        --autoCompleteSource = TalentUIFrame.GetAutoCompleatProfiles,
+        OnShow = function(self) 
+            --Add the check box to ignore pvp talent
+            self.insertedFrame:SetParent(self)
+            self.editBox:ClearAllPoints()
+            self.editBox:SetPoint("TOP", self, "TOP", 0, -38);
+            self.insertedFrame:ClearAllPoints()
+            self.insertedFrame:SetPoint("BOTTOM", self, "BOTTOM", -self.insertedFrame.text:GetWidth()*0.5, 40)
+            self.insertedFrame:Show()
+         end,
         OnAccept = function(self)
             TalentUIFrame:OnAceptNewprofile(self)
         end,
         EditBoxOnTextChanged = function (self) 
             TalentUIFrame:NewProfileOnTextChange(self)
         end,
-        OnShow = function(self)
-            self.button1:Disable()
+        EditBoxOnEscapePressed = function(self)
+            self:GetParent():Hide();
         end,
+        hideOnEscape = 1
     }
     --Create the confirim save popup
     StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
@@ -83,13 +94,13 @@ function TalentUIFrame:CreateTalentFrameUI()
         exclusive = true,
         enterClicksFirstButton = true,
         showAlert = true,
-        OnAccept = function(self, profileName)
-            TalentUIFrame:OnAcceptOverwrrite(self, profileName)
+        OnAccept = function(self, data)
+            TalentUIFrame:OnAcceptOverwrrite(self, data.profile, data.savePVP)
         end,
-        OnCancel = function(self, profileName)
-            local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
+        OnCancel = function(self, data)
+            local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", nil, nil, nil, addon.GlobalFrames.SavePVPTalents)
             if(dialog) then
-                dialog.editBox:SetText(profileName)
+                dialog.editBox:SetText(data.profile)
             end
         end
     }
@@ -182,12 +193,16 @@ end
 
 function TalentUIFrame:OnAceptNewprofile(frame)
     local profileName = frame.editBox:GetText()
+    local savePVPTalents = frame.insertedFrame:GetChecked();
     --Check if the profile exits if so, change the text
     if(addon:DoesTalentProfileExist(profileName)) then
         frame.button1:Disable()
         local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTalemtsSavePopUp", profileName)
         if(dialog) then
-            dialog.data = profileName
+            dialog.data = {
+                ["profile"] = profileName,
+                ["savePVP"] = savePVPTalents
+            }
         end
         return
     end
@@ -197,8 +212,8 @@ function TalentUIFrame:OnAceptNewprofile(frame)
         addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
     end
 
-    --profile name does not exist so create it
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents()
+    --Save the talents
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents(savePVPTalents)
     addon.sv.Talents.SelectedTalentsProfile = profileName
 
     --Let the user know that the profile has been created
@@ -216,8 +231,8 @@ function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
     addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
 end
 
-function TalentUIFrame:OnAcceptOverwrrite(frame, profile)
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = addon:GetCurrentTalents()
+function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = addon:GetCurrentTalents(savePVP)
     addon.sv.Talents.SelectedTalentsProfile = profile
     addon:Print(addon.L["Profile '%s' overwritten!"]:format(profile))
 end
@@ -266,4 +281,8 @@ function TalentUIFrame:CreateButton(point, parentFrame, relativeFrame, relativeP
     button:SetHighlightFontObject("GameFontHighlight"..TextHeight)
     --Return the button
     return button
+end
+
+function TalentUIFrame.GetAutoCompleatProfiles(currentString)
+
 end

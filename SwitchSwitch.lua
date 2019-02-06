@@ -58,7 +58,12 @@ function addon:DoesTalentProfileExist(Profile)
 end
 
 --Get the talent from the current active spec
-function addon:GetCurrentTalents()
+function addon:GetCurrentTalents(saveTalentsPVP)
+    --If not provided save talents will be true
+    if(saveTalentsPVP == nil) then
+        saveTalentsPVP = true;
+    end
+
     local talentSet =
     {
         ["pva"] = {},
@@ -87,15 +92,18 @@ function addon:GetCurrentTalents()
         end
     end
 
-    --Iterate over pvp talents
-    for Tier = 1, 4 do
-        enabled, selectedTalent, _ = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
-        talentSet["pvp"][Tier] =
-        {
-            ["unlocked"] = enabled,
-            ["id"] = selectedTalent,
-            ["tier"] = Tier
-        }
+    --Only save talents if requested
+    if(saveTalentsPVP) then
+        --Iterate over pvp talents
+        for Tier = 1, 4 do
+            pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
+            talentSet["pvp"][Tier] =
+            {
+                ["unlocked"] = pvpTalentInfo.enabled,
+                ["id"] = pvpTalentInfo.selectedTalentID,
+                ["tier"] = Tier
+            }
+        end
     end
     --Return talents
     return talentSet;
@@ -236,13 +244,13 @@ function addon:SetTalents(profileName)
     end
     --Leanr pvp talent
     for i, pvpTalentTabl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
-        if(pvpTalentTabl.enabled and pvpTalentTabl.id ~= nil) then
+        if(pvpTalentTabl.unlocked and pvpTalentTabl.id ~= nil) then
             --Make sure the talent is not used anywhere else, set to random if used in anothet tier
             for i2 = 1, 4 do
-                enabled, selectedTalent, availableTalents = C_SpecializationInfo.GetPvpTalentSlotInfo(i2)
-                if(pvpTalentTabl.id == selected and pvpTalentTabl.tier ~= i2) then
+                local pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(i2)
+                if(pvpTalentTabl.id == pvpTalentInfo.selectedTalentID and pvpTalentTabl.tier ~= i2) then
                     --Get random talent
-                    LearnPvpTalent(availableTalents[math.random(#availableTalents)], i2)
+                    LearnPvpTalent(pvpTalentInfo.availableTalentIDs[math.random(#pvpTalentInfo.availableTalentIDs)], i2)
                 end
             end
             --Lern the talent in the tier
@@ -269,9 +277,17 @@ function addon:IsCurrentTalentProfile(profileName)
 
     local currentActiveTalents = addon:GetCurrentTalents()
     --Check pvp talents
+    local currentPVPTalentsTable = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
     for i, pvpTalentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
-        --Check if the first talent is equal
-        if(currentActiveTalents.pvp.id ~= pvpTalentInfo.id or currentActiveTalents.pvp.unlocked ~= pvpTalentInfo.unlocked) then
+        --Check if we got the talent
+        local hasTalent = false
+        for k, talentID in ipairs(currentPVPTalentsTable) do
+            if(talentID == pvpTalentInfo.id) then
+                hasTalent = true;
+            end
+        end
+        --We dont have the talent so just return false
+        if(not hasTalent) then
             addon:Debug("PVP tlanets does not match");
             return false
         end
@@ -279,10 +295,7 @@ function addon:IsCurrentTalentProfile(profileName)
     --Check normal talents
     for i, talentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva) do
         talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
-        if(known) then 
-            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva[i].column = column
-            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva[i].tier = row
-        else
+        if(not known) then
             addon:Debug(string.format("Talent with the name %s is not leanred", name))
             return false
         end
