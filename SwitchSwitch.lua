@@ -263,6 +263,7 @@ function addon:IsCurrentTalentProfile(profileName)
     --Check if null or not existing
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table"
         or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
+        addon:Debug(string.format("Profile name does not exist [%s]", profileName))
         return false
     end
 
@@ -271,27 +272,19 @@ function addon:IsCurrentTalentProfile(profileName)
     for i, pvpTalentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
         --Check if the first talent is equal
         if(currentActiveTalents.pvp.id ~= pvpTalentInfo.id or currentActiveTalents.pvp.unlocked ~= pvpTalentInfo.unlocked) then
+            addon:Debug("PVP tlanets does not match");
             return false
         end
     end
-
     --Check normal talents
     for i, talentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva) do
-        if(currentActiveTalents.pva[talentInfo.tier].tier ~= talentInfo.tier) then
-            --Not in current tier iterate to find tier
-            for i2, currentTalentInfo in ipairs(currentActiveTalents.pva) do
-                if(currentTalentInfo.tier == talentInfo.tier) then
-                    --In correct tier, check columns to see if equals, if not retun false
-                    if(currentActiveTalents.pva[talentInfo.tier].column ~= talentInfo.column) then
-                        return false
-                    end
-                end
-            end
+        talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
+        if(known) then 
+            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva[i].column = column
+            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva[i].tier = row
         else
-            --In correct tier, check columns to see if equals, if not retun false
-            if(currentActiveTalents.pva[talentInfo.tier].column ~= talentInfo.column) then
-                return false
-            end 
+            addon:Debug(string.format("Talent with the name %s is not leanred", name))
+            return false
         end
     end
     return true
@@ -301,6 +294,7 @@ end
 function addon:GetCurrentProfileFromSaved()
     --Check if null or not existing
     if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table") then
+        addon:Debug("Current specialization has no profiles")
         return addon.CustomProfileName
     end
     --Iterate trough every talent profile
@@ -310,6 +304,7 @@ function addon:GetCurrentProfileFromSaved()
             return name
         end
     end
+    addon:Debug("No profiles match current talnets")
     --Return the custom profile name
     return addon.CustomProfileName
 end
