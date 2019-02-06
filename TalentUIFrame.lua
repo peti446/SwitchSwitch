@@ -80,7 +80,6 @@ function TalentUIFrame:CreateTalentFrameUI()
         EditBoxOnEscapePressed = function(self)
             self:GetParent():Hide();
         end,
-        hideOnEscape = 1
     }
     --Create the confirim save popup
     StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
