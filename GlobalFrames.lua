@@ -44,7 +44,8 @@ function GlobalFrames:Init()
          end,
          OnAccept = function(self, data)
             --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
-            C_Timer.After(1, function() addon:ActivateTalentProfile(name) end)
+            addon:Debug("Changing talents after 1 seconds to " .. data)
+            C_Timer.After(1, function() addon:ActivateTalentProfile(data) end)
             self.insertedFrame:Hide()
         end,
     }
@@ -82,6 +83,7 @@ local function CreateSuggestionFrame()
     frame.CancelButton:SetScript("OnClick", function(self)  self:GetParent():Hide() end)
     --Change button
     frame.ChangeProfileButton:SetScript("OnClick", function(self)
+        addon:Debug("Clicked change talents to recomended: " .. self.Profile)
         addon:ActivateTalentProfile(self.Profile)
         self:GetParent():Hide()
     end)
@@ -149,7 +151,7 @@ function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
         addon:Debug("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
-    addon:Debug("Showing Toggle suggestion frame")
+    addon:Debug("Showing Toggle suggestion frame with profile: " .. profileToActivate)
     --Set the frame or create it, set data and show the frame.
     GlobalFrames.ProfileSuggestion = GlobalFrames.ProfileSuggestion or CreateSuggestionFrame()
     GlobalFrames.ProfileSuggestion.ChangeProfileButton.Profile = profileToActivate

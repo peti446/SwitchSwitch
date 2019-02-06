@@ -133,7 +133,6 @@ function addon:CanChangeTalents()
 end
 
 function addon:ActivateTalentProfile(profileName)
-    addon:Print(addon.L["Changing talents"])
 
     if(UnitAffectingCombat("Player")) then
         addon:Debug("Player is in combat.")
@@ -199,6 +198,7 @@ function addon:ActivateTalentProfile(profileName)
             --Got an item so open the popup to ask to use it!
             local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, nil, addon.GlobalFrames.UseTome)
             if(dialog) then
+                addon:Debug("Setting data to ask for tome usage to: " .. profileName)
                 dialog.data = profileName
             end
         else
@@ -215,6 +215,7 @@ end
 function addon:SetTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch
     addon.G.SwitchingTalents = true
+    addon:Print(addon.L["Changing talents"])
 
     --Check if the talent addon is up
     if(not IsAddOnLoaded("Blizzard_TalentUI")) then
