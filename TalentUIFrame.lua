@@ -60,7 +60,8 @@ function TalentUIFrame:CreateTalentFrameUI()
         hasEditBox = true,
         exclusive = true,
         enterClicksFirstButton = true,
-        --autoCompleteSource = TalentUIFrame.GetAutoCompleatProfiles,
+        autoCompleteSource = TalentUIFrame.GetAutoCompleatProfiles,
+        autoCompleteArgs = {},
         OnShow = function(self) 
             --Add the check box to ignore pvp talent
             self.insertedFrame:SetParent(self)
@@ -283,6 +284,15 @@ function TalentUIFrame:CreateButton(point, parentFrame, relativeFrame, relativeP
     return button
 end
 
-function TalentUIFrame.GetAutoCompleatProfiles(currentString)
-
+function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
+    local returnNames = {};
+    for name, _ in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+        if(name:find(currentString) ~= nil) then
+            table.insert(returnNames, {
+                ["name"] = name,
+                ["priority"] = LE_AUTOCOMPLETE_PRIORITY_OTHER
+            })
+        end
+    end
+    return returnNames;
 end
