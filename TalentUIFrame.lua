@@ -285,6 +285,7 @@ end
 
 function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
     local returnNames = {};
+    if(addon.sv.Talents.TalentsProfiles ~= nil and addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
     for name, _ in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
         if(name:find(currentString) ~= nil) then
             table.insert(returnNames, {
@@ -292,6 +293,7 @@ function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
                 ["priority"] = LE_AUTOCOMPLETE_PRIORITY_OTHER
             })
         end
+    end
     end
     return returnNames;
 end
