@@ -133,11 +133,25 @@ function addon:CanChangeTalents()
         -- Battleground Insight
         248473
     }
-
+    local debuffsLookingFor =
+    {
+        --PRepare for battle
+        290165,
+        279737
+    };
     --There is no quick way to get if a player has a specific buff so we need to go tought all players buff and check if its one of the one we need
     for i = 1, 40 do
         local spellID = select(10, UnitBuff("player", i))
         for index, id in ipairs(buffLookingFor) do
+            if(spellID == id) then
+                return true
+            end
+        end
+    end
+    --Check debufs aswell
+    for i = 1, 40 do
+        local spellID = select(10, UnitDebuff("player", i))
+        for index, id in ipairs(debuffsLookingFor) do
             if(spellID == id) then
                 return true
             end
