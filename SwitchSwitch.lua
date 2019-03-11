@@ -124,7 +124,14 @@ function addon:CanChangeTalents()
         227565,
         227569,
         256231,
-        256229
+        256229,
+        --Arena preparation wow
+        32727,
+        32728,
+        -- Dungeon preparation
+        228128,
+        -- Battleground Insight
+        248473
     }
 
     --There is no quick way to get if a player has a specific buff so we need to go tought all players buff and check if its one of the one we need
