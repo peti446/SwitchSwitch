@@ -12,11 +12,6 @@ local GlobalFrames = addon.GlobalFrames
 --                                  Frames Init
 --##########################################################################################################################
 function GlobalFrames:Init()
-    --Secure Action button to use item
-    GlobalFrames.UseTome = CreateFrame("Button", "SS_ButtonUseTomePopup", UIParent, "UIPanelButtonTemplate, SecureActionButtonTemplate")
-    GlobalFrames.UseTome:SetAttribute("type", "item")
-    GlobalFrames.UseTome:Hide()
-
     GlobalFrames.SavePVPTalents = CreateFrame("CheckButton", "SS_CheckboxSavePVPTalents", UIParent, "UICheckButtonTemplate")
     GlobalFrames.SavePVPTalents.text:SetText(addon.L["Save pvp talents?"])
     GlobalFrames.SavePVPTalents:SetChecked(true)
@@ -34,24 +29,29 @@ function GlobalFrames:Init()
         preferredIndex = 3,
         exclusive = true,
         enterClicksFirstButton = true,
-        OnShow = function(self) 
+        OnShow = function(self, data) 
             --Wellll as there is no build-in way to have secure button as part of a static popuop we need to replace the buttons shig
             -- so we do
-            self.insertedFrame:SetParent(self)
-            self.insertedFrame:ClearAllPoints()
-            self.insertedFrame:SetPoint(self.button1:GetPoint())
-            self.insertedFrame:SetWidth(self.button1:GetWidth())
-            self.insertedFrame:SetHeight(self.button1:GetHeight())
-            self.insertedFrame:SetText(self.button1:GetText())
-            self.insertedFrame:SetScript("PostClick", function() self.button1:Click() end)
-            self.insertedFrame:Show()
+            if(self.sbutton == nil) then
+                self.sbutton = CreateFrame("Button", "SS_ButtonUseTomePopup", self, "UIPanelButtonTemplate, SecureActionButtonTemplate");
+                self.sbutton:SetAttribute("type", "item");
+                self.sbutton:SetAttribute("item", data)
+                self.sbutton:SetParent(self)
+                self.sbutton:ClearAllPoints()
+                self.sbutton:SetPoint(self.button1:GetPoint())
+                self.sbutton:SetWidth(self.button1:GetWidth())
+                self.sbutton:SetHeight(self.button1:GetHeight())
+                self.sbutton:SetText(self.button1:GetText())
+                self.sbutton:SetScript("PostClick", function() self.button1:Click() end)
+            end
+            self.sbutton:Show()
             self.button1:Hide()
          end,
-         OnAccept = function(self, data)
+         OnAccept = function(self, data, data2)
             --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
-            addon:Debug("Changing talents after 1 seconds to " .. data)
-            C_Timer.After(1, function() addon:ActivateTalentProfile(data) end)
-            self.insertedFrame:Hide()
+            addon:Debug("Changing talents after 1 seconds to " .. data2)
+            C_Timer.After(1, function() addon:ActivateTalentProfile(data2) end)
+            self.sbutton:Hide()
         end,
     }
 end

@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.3"
+addon.version = "1.4"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
@@ -67,7 +67,8 @@ function addon:GetCurrentTalents(saveTalentsPVP)
     local talentSet =
     {
         ["pva"] = {},
-        ["pvp"] = {}
+        ["pvp"] = {},
+        ["essences"] = {}
     }
     --Iterate over all tiers of talents normal
     for Tier = 1, GetMaxTalentTier() do
@@ -105,6 +106,21 @@ function addon:GetCurrentTalents(saveTalentsPVP)
             }
         end
     end
+    --Get Essence information
+    local MilestoneIDs = {115,116,117}
+    for index, id in ipairs(MilestoneIDs) do
+        local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
+        if(milestonesInfo.unlocked) then
+            talentSet["essences"][milestonesInfo.ID] = C_AzeriteEssence.GetMilestoneEssence(id)
+        end
+    end
+    --local milestonesInfo = C_AzeriteEssence.GetMilestones()
+    --for i, slotInfo in ipairs(milestonesInfo) do
+    --    if(slotInfo.unlocked) then
+    --        talentSet["essences"][slotInfo.ID] = C_AzeriteEssence.GetMilestoneEssence(slotInfo.ID)
+    --        addon:Debug("asdasdda", slotInfo.ID)
+    --    end
+    --end
     --Return talents
     return talentSet;
 end
@@ -223,12 +239,11 @@ function addon:ActivateTalentProfile(profileName)
             end
 
             -- Set the item attibute
-            addon.GlobalFrames.UseTome:SetAttribute("item", bagID .. " " .. slot);
             --Got an item so open the popup to ask to use it!
-            local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, nil, addon.GlobalFrames.UseTome)
+            local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, bagID .. " " .. slot)
             if(dialog) then
                 addon:Debug("Setting data to ask for tome usage to: " .. profileName)
-                dialog.data = profileName
+                dialog.data2 = profileName
             end
         else
             --No check for usage so just return
@@ -251,8 +266,10 @@ function addon:SetTalents(profileName)
         LoadAddOn("Blizzard_TalentUI")
     end
 
+    local currentTalentPorfile = addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]
+
     --Learn talents normal talents
-    for i, talentTbl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva) do
+    for i, talentTbl in ipairs(currentTalentPorfile.pva) do
         --Get the current talent info to see if the talent id changed
         local talent = GetTalentInfo(talentTbl.tier, talentTbl.column, 1)
         if talentTbl.tier > 0 and talentTbl.column > 0  then
@@ -264,7 +281,7 @@ function addon:SetTalents(profileName)
         end
     end
     --Leanr pvp talent
-    for i, pvpTalentTabl in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
+    for i, pvpTalentTabl in ipairs(currentTalentPorfile.pvp) do
         if(pvpTalentTabl.unlocked and pvpTalentTabl.id ~= nil) then
             --Make sure the talent is not used anywhere else, set to random if used in anothet tier
             for i2 = 1, 4 do
@@ -278,6 +295,10 @@ function addon:SetTalents(profileName)
             LearnPvpTalent(pvpTalentTabl.id, pvpTalentTabl.tier)
         end
     end 
+    --Learn essences
+    for milestoneID, essenceID in pairs(currentTalentPorfile.essences) do
+        C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
+    end
 
     --Print and return
     addon:Print(addon.L["Changed talents to '%s'"]:format(profileName))
@@ -297,6 +318,14 @@ function addon:IsCurrentTalentProfile(profileName)
     end
 
     local currentActiveTalents = addon:GetCurrentTalents()
+    --Check essences
+    for milestoneID, essenceID in pairs(currentActiveTalents.essences) do
+        if( addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].essences[milestoneID] == nil or essenceID ~=  addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].essences[milestoneID]) then
+            addon:Debug("Essences do not match");
+            return false   
+        end
+    end
+
     --Check pvp talents
     local currentPVPTalentsTable = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
     for i, pvpTalentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do

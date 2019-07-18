@@ -53,9 +53,9 @@ function addon:eventHandler(event, arg1)
             --Default talents table
             SwitchSwitchTalents =
             {
-                SelectedTalentsProfile = "",
-                Version = addon.version,
-                TalentsProfiles = {}
+                ["SelectedTalentsProfile"] = "",
+                ["Version"] = addon.version,
+                ["TalentsProfiles"] = {}
             }
         end
 
@@ -85,7 +85,7 @@ function addon:eventHandler(event, arg1)
 
         --Unregister current event
         self:UnregisterEvent(event)
-    elseif(event == "PLAYER_TALENT_UPDATE") then
+    elseif(event == "PLAYER_TALENT_UPDATE" or event == "AZERITE_ESSENCE_UPDATE") then
         if( not addon.G.SwitchingTalents) then
             addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
         end
@@ -166,6 +166,19 @@ function addon:Update()
             end
         end
 
+        --If the version is lower then 1.4 the essence table is not included so add it
+        if(oldTalentsVersion < 1.4) then
+            for specID, talentSets in pairs(addon.sv.Talents.TalentsProfiles) do
+                for talentSetName, talentTable in pairs(talentSets) do
+                    --By default the format of the normal talbe info will be the information of normal talents so just copy these to the pva fuield
+                    local newFormat = addon:deepcopy(talentTable)
+                    newFormat["essences"] = {}
+                    --Updathe the table
+                    addon.sv.Talents.TalentsProfiles[specID][talentSetName] = newFormat
+                end
+            end
+        end
+
         --Update the version
         addon.sv.Talents.Version = addon.version
     end
@@ -186,3 +199,4 @@ addon.event_frame:RegisterEvent("ADDON_LOADED")
 addon.event_frame:RegisterEvent("PLAYER_LOGIN")
 addon.event_frame:RegisterEvent("PLAYER_TALENT_UPDATE")
 addon.event_frame:RegisterEvent("PLAYER_ENTERING_WORLD")
+addon.event_frame:RegisterEvent("AZERITE_ESSENCE_UPDATE")
