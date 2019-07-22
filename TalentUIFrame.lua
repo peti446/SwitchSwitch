@@ -10,8 +10,203 @@ local TalentUIFrame = addon.TalentUIFrame
 --##########################################################################################################################
 --                                  Init
 --##########################################################################################################################
+--Creates the edit frame
+function TalentUIFrame:CreateEditUI()
+    addon.TalentUIFrame.ProfileEditorFrame = CreateFrame("Frame", "SwitchSwitch_TalentFrameEditor", PlayerTalentFrame, "UIPanelDialogTemplate")
+    local editorFrame =  addon.TalentUIFrame.ProfileEditorFrame
+    
+    --Editor frame config
+    editorFrame:SetWidth(250)
+    editorFrame:SetPoint("TOPLEFT", PlayerTalentFrame, "TOPRIGHT")
+    editorFrame:SetPoint("BOTTOMLEFT", PlayerTalentFrame, "BOTTOMRIGHT")
+    editorFrame.Title:SetText(addon.L["Talent Porfile Editor"])
+    editorFrame:HookScript("OnHide", function(self) 
+        --Save all the data modified
+        addon:Debug("Closed editor, saving data...")
+        if(not self.GearSet:GetChecked() and addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing ~= nil) then
+            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing].gearSet = nil
+        end
+    end)
+    editorFrame:HookScript("OnShow", function(self) 
+        --Update the data
+        addon:Debug("Updating Edit frame data...")
+        self.InsideTitle:SetText(string.format(addon.L["Editing '%s'"], TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing or "ERROR"))
+        self.GearSet:SetChecked(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing].gearSet ~= nil or false)
+        if(self.GearSet:GetChecked()) then
+            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Show()
+        else
+            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Hide()
+        end
+        UIDropDownMenu_SetSelectedValue(TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame.DropDown, addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing].gearSet or "")
+        UIDropDownMenu_Refresh(TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame.DropDown)
+    end)
+    editorFrame:Hide()
+
+    --Title
+    editorFrame.InsideTitle = editorFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeLeft")
+    editorFrame.InsideTitle:SetPoint("TOPLEFT", editorFrame, "TOPLEFT", 35, -35)
+
+    --Selection of gear set
+    editorFrame.GearSet = CreateFrame("CheckButton", nil, editorFrame, "UICheckButtonTemplate")
+    editorFrame.GearSet:SetPoint("TOPLEFT", editorFrame.InsideTitle, "BOTTOMLEFT", -20, -10)
+    editorFrame.GearSet.text:SetText(addon.L["Auto equip gear set with this talent profile?"])
+    editorFrame.GearSet.text:SetFontObject("GameFontWhite")
+    editorFrame.GearSet.text:SetWidth(190)
+    editorFrame.GearSet:SetScript("OnClick", function(self)
+        if(self:GetChecked()) then
+            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Show()
+        else
+            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Hide()
+        end
+        end)
+
+    --Frame for the gear selection
+    editorFrame.GearSet.SelectionFrame = CreateFrame("Frame", nil, editorFrame.GearSet)
+    editorFrame.GearSet.SelectionFrame:SetPoint("TOPLEFT", editorFrame.GearSet, "BOTTOMLEFT", 5, -5)
+    editorFrame.GearSet.SelectionFrame:SetPoint("TOPRIGHT", editorFrame.GearSet, "BOTTOMRIGHT", 0, 0)
+    editorFrame.GearSet.SelectionFrame:SetPoint("BOTTOMRIGHT", editorFrame.GearSet, "BOTTOMRIGHT", 0, -25)
+    if(not editorFrame.GearSet:GetChecked()) then
+        editorFrame.GearSet.SelectionFrame:Hide()
+    end
+
+    --Text information
+    editorFrame.GearSet.SelectionFrame.Text = editorFrame.GearSet.SelectionFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
+    editorFrame.GearSet.SelectionFrame.Text:SetText(addon.L["Gear set to auto-equip:"])
+    editorFrame.GearSet.SelectionFrame.Text:SetPoint("TOPLEFT", editorFrame.GearSet.SelectionFrame, "TOPLEFT")
+    editorFrame.GearSet.SelectionFrame.Text:SetWidth(210)
+    editorFrame.GearSet.SelectionFrame.Text:SetJustifyH("LEFT")
+
+    --DropDown
+    editorFrame.GearSet.SelectionFrame.DropDown = CreateFrame("FRAME", nil, editorFrame.GearSet.SelectionFrame, "UIDropDownMenuTemplate")
+    editorFrame.GearSet.SelectionFrame.DropDown:SetPoint("TOPLEFT", editorFrame.GearSet.SelectionFrame.Text, "BOTTOMLEFT", -15, -5)
+    editorFrame.GearSet.SelectionFrame.DropDown.funcName = "equipedGear"
+    UIDropDownMenu_SetWidth(editorFrame.GearSet.SelectionFrame.DropDown, 190)
+    UIDropDownMenu_Initialize(editorFrame.GearSet.SelectionFrame.DropDown, function(self)
+        local info = UIDropDownMenu_CreateInfo()
+        info.text = "None"
+        info.value = ""
+        info.index = 1
+        info.arg1 = self
+        info.func = TalentUIFrame.SetSelectedValueForDropDowns
+        info.justifyH = "LEFT"
+        UIDropDownMenu_AddButton(info, 1)
+
+        for i, setID in ipairs(C_EquipmentSet.GetEquipmentSetIDs()) do
+            local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(setID)
+            info = UIDropDownMenu_CreateInfo()
+            info.text = name
+            info.value = setID
+            info.index = i +1
+            info.arg1 = self
+            info.func = TalentUIFrame.SetSelectedValueForDropDowns
+            info.justifyH = "LEFT"
+            UIDropDownMenu_AddButton(info,1)
+        end
+    end)
+    UIDropDownMenu_SetSelectedValue( editorFrame.GearSet.SelectionFrame.DropDown, "")
+
+    --Delete button
+    editorFrame.DeleteButton = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", addon.L["Delete"], 160, 25, 45, 20)
+    editorFrame.DeleteButton:SetScript("OnClick", function()
+        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.sv.Talents.SelectedTalentsProfile)
+        if(dialog) then
+            dialog.data = addon.sv.Talents.SelectedTalentsProfile
+        end 
+    end)
+
+    --Rename button
+    editorFrame.Rename = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", addon.L["Rename"], 160, 25, 45, 45)
+    editorFrame.Rename:SetScript("OnClick", function()
+        local dialog = StaticPopup_Show("SwitchSwitch_RenameProfile", addon.sv.Talents.SelectedTalentsProfile)
+        if(dialog) then
+            dialog.data = addon.sv.Talents.SelectedTalentsProfile
+        end 
+    end)
+
+
+    --Popup generation
+    StaticPopupDialogs["SwitchSwitch_RenameProfile"] =
+    {
+        text = addon.L["Rename profile"],
+        button1 = addon.L["Ok"],
+        button2 = addon.L["Cancel"],
+        timeout = 0,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,
+        hasEditBox = true,
+        exclusive = true,
+        enterClicksFirstButton = true,
+        OnAccept = function(self)
+            TalentUIFrame:OnRenameAccepted(self)
+        end,
+        EditBoxOnTextChanged = function (self) 
+            TalentUIFrame:OnRenameTextChanged(self)
+        end,
+        EditBoxOnEscapePressed = function(self)
+            self:GetParent():Hide();
+        end,
+    }
+end 
+
+function TalentUIFrame.SetSelectedValueForDropDowns(self, arg1, arg2, checked)
+    if(not checked) then
+        UIDropDownMenu_SetSelectedValue(arg1, self.value)
+        if(arg1.funcName == "equipedGear") then
+            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing]["gearSet"] = self.value
+            if (self.value == "") then
+                addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing]["gearSet"] = nil
+            end
+        end
+    end
+end
+
+--##########################################################################################################################
+--                                  Edit Frame Component handler
+--##########################################################################################################################
+function TalentUIFrame:OnRenameTextChanged(frame)
+    local data = frame:GetParent().editBox:GetText()
+
+    --Check if text is not nill or not empty
+    if(data ~= nil and data ~= '') then
+
+        if(data:lower() == addon.CustomProfileName:lower()) then
+            --Text is "custom" so disable the Create button and give a warning
+            frame:GetParent().text:SetText(addon.L["Rename profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
+            frame:GetParent().button1:Disable()
+        elseif(data:len() > 20) then
+            --Text is too long, disable create button and give a warning
+            frame:GetParent().text:SetText(addon.L["Rename profile"].. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
+            frame:GetParent().button1:Disable()
+        elseif(addon:DoesTalentProfileExist(data)) then
+            --Text is fine so enable everything
+            frame:GetParent().button1:Enable()
+            frame:GetParent().text:SetText(addon.L["Rename profile"] .. "\n\n|cFFFF0000" .. addon.L["Name already taken!"])
+        else
+            --Text is fine so enable everything
+            frame:GetParent().button1:Enable()
+            frame:GetParent().text:SetText(addon.L["Rename profile"])
+        end
+    else
+        --Empty so disable Create button
+        frame:GetParent().button1:Disable()
+        frame:GetParent().text:SetText(addon.L["Rename profile"])
+    end
+
+    --Rezise the frame
+    StaticPopup_Resize(frame:GetParent(), frame:GetParent().which)
+end
+
+function TalentUIFrame:OnRenameAccepted(frame)
+    local newName = frame:GetParent().editBox:GetText()
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][newName] = addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing]
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing] = nil
+    addon:Print(addon.L["Profile renamed correctly!"]);
+end
+
 --Creates the Frame inside the talent frame
 function TalentUIFrame:CreateTalentFrameUI()
+    self.CreateEditUI();
     --Create frame and hide it by default
     TalentUIFrame.UpperTalentsUI = CreateFrame("Frame", "SwitchSwitch_UpperTalentsUI", PlayerTalentFrameTalents)
     local UpperTalentsUI = TalentUIFrame.UpperTalentsUI
@@ -24,25 +219,60 @@ function TalentUIFrame:CreateTalentFrameUI()
     --Set scripts for the fram
     UpperTalentsUI:SetScript("OnUpdate", TalentUIFrame.UpdateUpperFrame)
 
+    --Create the edit button
+    UpperTalentsUI.EditButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Edit"], 80, nil, -10, -2, "SS_EditButton_TF") 
+    UpperTalentsUI.EditButton:SetScript("OnClick", function()
+        ToggleDropDownMenu(1, nil, TalentUIFrame.UpperTalentsUI.EditButtonContext)
+    end)
+    
+
+    --New botton
+    UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Save"], 80, nil, -95, -2) 
+    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp" , nil, nil, nil, addon.GlobalFrames.SavePVPTalents)end)
+    UpperTalentsUI.NewButton:Disable()
+
+    --Edit context menu
+    UpperTalentsUI.EditButtonContext = CreateFrame("FRAME", nil, UpperTalentsUI.EditButton, "UIDropDownMenuTemplate")
+    UpperTalentsUI.EditButtonContext:SetPoint("TOPLEFT", UpperTalentsUI.EditButton, "BOTTOMLEFT")
+    UpperTalentsUI.EditButtonContext.funcName = "editProfileSelection"
+    UIDropDownMenu_Initialize(UpperTalentsUI.EditButtonContext, function(self, level)
+        local i = 2
+        for pname, info in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = pname
+            info.index = i
+            if(addon.sv.Talents.SelectedTalentsProfile == pname) then
+                info.index = 1
+            else
+                i = i + 1
+            end
+            info.func = function(self) 
+                addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
+                addon.TalentUIFrame.ProfileEditorFrame:Hide()
+                addon.TalentUIFrame.ProfileEditorFrame:Show()
+            end
+            UIDropDownMenu_AddButton(info,1)
+        end
+    end, "MENU")
+
     --Create the new and save buttons
-    UpperTalentsUI.DeleteButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
+    --[[UpperTalentsUI.DeleteButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
     UpperTalentsUI.DeleteButton:Disable()
     UpperTalentsUI.DeleteButton:SetScript("OnClick", function()
         local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.sv.Talents.SelectedTalentsProfile)
         if(dialog) then
             dialog.data = addon.sv.Talents.SelectedTalentsProfile
         end 
-    end)
-    UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI.DeleteButton, UpperTalentsUI.DeleteButton, "TOPLEFT", addon.L["Save"], 80, nil, -5, 0) 
-    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp" , nil, nil, nil, addon.GlobalFrames.SavePVPTalents)end)
+    end)]]--
+    
     --Create Talent string
-    UpperTalentsUI.CurrentPorfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
-    UpperTalentsUI.CurrentPorfie:SetText(addon.L["Talents"] .. ":")
-    UpperTalentsUI.CurrentPorfie:SetPoint("LEFT")
+    UpperTalentsUI.CurrentProfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
+    UpperTalentsUI.CurrentProfie:SetText(addon.L["Talents"] .. ":")
+    UpperTalentsUI.CurrentProfie:SetPoint("LEFT")
 
     --Create Dropdown menu for talent groups
     UpperTalentsUI.DropDownTalents = CreateFrame("FRAME", "SwitchSwitch_UpperTalentsUI_Dropdown", UpperTalentsUI, "UIDropDownMenuTemplate")
-    UpperTalentsUI.DropDownTalents:SetPoint("LEFT", UpperTalentsUI.CurrentPorfie, "RIGHT", 0, -3)
+    UpperTalentsUI.DropDownTalents:SetPoint("LEFT", UpperTalentsUI.CurrentProfie, "RIGHT", 0, -3)
     --Setup the UIDropDownMenu and set the SelectedProgile vatiable
     UIDropDownMenu_SetWidth(UpperTalentsUI.DropDownTalents, 200)
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, TalentUIFrame.Initialize_Talents_List)
@@ -252,11 +482,11 @@ function TalentUIFrame.UpdateUpperFrame(self, elapsed)
         end
         
         if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
-            self.DeleteButton:Disable()
+            self.NewButton:Show()
             self.NewButton:Enable()
         else
-            self.DeleteButton:Enable()
             self.NewButton:Disable()
+            self.NewButton:Hide()
         end
     end
 end

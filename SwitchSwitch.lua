@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.4"
+addon.version = "1.45"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
@@ -147,7 +147,8 @@ function addon:CanChangeTalents()
         -- Dungeon preparation
         228128,
         -- Battleground Insight
-        248473
+        248473,
+        44521
     }
     local debuffsLookingFor =
     {
@@ -299,6 +300,13 @@ function addon:SetTalents(profileName)
     for milestoneID, essenceID in pairs(currentTalentPorfile.essences) do
         C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
     end
+
+    --Change gear set if available
+    if(currentTalentPorfile.gearSet ~= nil) then
+        addon:Debug("ID: ", currentTalentPorfile.gearSet)
+        C_EquipmentSet.UseEquipmentSet(currentTalentPorfile.gearSet)
+    end
+
 
     --Print and return
     addon:Print(addon.L["Changed talents to '%s'"]:format(profileName))
