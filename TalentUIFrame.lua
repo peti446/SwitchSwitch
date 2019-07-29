@@ -229,7 +229,6 @@ function TalentUIFrame:CreateTalentFrameUI()
     --New botton
     UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Save"], 80, nil, -95, -2) 
     UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp" , nil, nil, nil, addon.GlobalFrames.SavePVPTalents)end)
-    UpperTalentsUI.NewButton:Disable()
 
     --Edit context menu
     UpperTalentsUI.EditButtonContext = CreateFrame("FRAME", nil, UpperTalentsUI.EditButton, "UIDropDownMenuTemplate")
@@ -470,7 +469,6 @@ end
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
     if(self.LastPorfileUpdateName ~= addon.sv.Talents.SelectedTalentsProfile) then
-        addon:Debug("Updating Talent UI: " .. addon.sv.Talents.SelectedTalentsProfile)
         --Update the local variable to avoud updating every frame
         self.LastPorfileUpdateName = addon.sv.Talents.SelectedTalentsProfile
 
@@ -480,7 +478,6 @@ function TalentUIFrame.UpdateUpperFrame(self, elapsed)
         if(addon.sv.Talents.SelectedTalentsProfile ~= "") then
             UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
         end
-        
         if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
             self.NewButton:Show()
             self.NewButton:Enable()
