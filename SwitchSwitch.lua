@@ -40,14 +40,16 @@ function addon:PrintTable(tbl, indent)
     end
 end
 
+-------------------------------------------------------------------- Talent table edition
+
 --Checks if the talents Profile database contains the given Profile
 function addon:DoesTalentProfileExist(Profile)
     --If talent spec table does not exist create one
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
-        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
+    if(not addon:DoesCurrentProfilesTableExits() or Profile == nil) then
+        return false
     end
     --Iterate to find the profile (could use quick [profile] to see if it exits, but we want to compare allin lower (names are not case sentivies))
-    for k,v in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+    for k,v in pairs(addon:GetCurrentProfilesTable()) do
         if(k:lower() == Profile:lower()) then
             --Profile exists
             return true
@@ -56,6 +58,72 @@ function addon:DoesTalentProfileExist(Profile)
     --Profile does not exist
     return false
 end
+
+--Gets the table of a specific profile
+function addon:GetTalentTable(Profile)
+    if(addon:DoesTalentProfileExist(Profile)) then
+        return addon.GetCurrentProfilesTable()[Profile]
+    end
+    return nil;
+end
+
+--Creates a talent table (empty)
+function addon:CreateNewTalentTable(Profile) 
+    if(not addon:DoesCurrentProfilesTableExits()) then
+        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
+    end
+    if(not addon:DoesTalentProfileExist(Profile)) then
+        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][Profile] = {}
+    end
+end
+
+--Sets or creates a new table with the given table
+function addon:SetTalentTable(Profile, tableToSet)
+    addon:CreateNewTalentTable(Profile)
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][Profile] = tableToSet
+end
+
+--Deletes a profile table
+function addon:DeleteTalentTable(profile)
+    if(addon:DoesTalentProfileExist(profile)) then
+        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = nil
+        addon:Debug("Deleted")
+    end
+end
+
+-- Spec table
+
+--Check if the current spec talbe exits
+function addon:DoesCurrentProfilesTableExits()
+    if (addon:GetCurrentProfilesTable() == nil) then
+        return false
+    end
+    return true
+end
+
+--Gets the current global 
+function addon:GetCurrentProfilesTable()
+    return addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]
+end
+
+--Creates a current profile tables
+function addon:CreateCurrentProfilesTable()
+    if(addon:DoesCurrentProfilesTableExits()) then
+        return
+    end
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
+end
+--Sets the current spec table
+function addon:SetCurrentProfilesTable(tableInfo)
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = tableInfo
+end
+
+--Deletes the current table
+function addon:DeleteCurrentProfilesTable()
+    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = nil
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
 
 --Get the talent from the current active spec
 function addon:GetCurrentTalents(saveTalentsPVP)
@@ -192,7 +260,7 @@ function addon:ActivateTalentProfile(profileName)
     end
 
     --Check  if table exits
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
+    if(not addon:DoesTalentProfileExist(profileName)) then
         addon:Print(addon.L["Could not change talents to Profile '%s' as it does not exit"]:format(profileName))
         return
     end
@@ -267,7 +335,11 @@ function addon:SetTalents(profileName)
         LoadAddOn("Blizzard_TalentUI")
     end
 
-    local currentTalentPorfile = addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]
+    if(not addon:DoesTalentProfileExist(profileName)) then
+        return;
+    end
+
+    local currentTalentPorfile = addon:GetTalentTable(profileName)
 
     --Learn talents normal talents
     for i, talentTbl in ipairs(currentTalentPorfile.pva) do
@@ -319,43 +391,51 @@ end
 --Check if a given profile is the current talents
 function addon:IsCurrentTalentProfile(profileName)
     --Check if null or not existing
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table"
-        or addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName]) ~= "table") then
+    if(not addon:DoesTalentProfileExist(profileName)) then
         addon:Debug(string.format("Profile name does not exist [%s]", profileName))
         return false
     end
 
     local currentActiveTalents = addon:GetCurrentTalents()
-    --Check essences
-    for milestoneID, essenceID in pairs(currentActiveTalents.essences) do
-        if( addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].essences[milestoneID] == nil or essenceID ~=  addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].essences[milestoneID]) then
-            addon:Debug("Essences do not match");
-            return false   
+    local currentprofile = addon:GetTalentTable(profileName)
+
+    if(currentprofile.essences ~= nil) then
+        --Check essences
+        for milestoneID, essenceID in pairs(currentActiveTalents.essences) do
+            if(currentprofile.essences[milestoneID] == nil or essenceID ~= currentprofile.essences[milestoneID]) then
+                addon:Debug("Essences do not match");
+                return false   
+            end
         end
     end
 
     --Check pvp talents
     local currentPVPTalentsTable = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
-    for i, pvpTalentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pvp) do
-        --Check if we got the talent
-        local hasTalent = false
-        for k, talentID in ipairs(currentPVPTalentsTable) do
-            if(talentID == pvpTalentInfo.id) then
-                hasTalent = true;
+    if(currentprofile.pvp ~= nil) then
+        for i, pvpTalentInfo in ipairs(currentprofile.pvp) do
+            --Check if we got the talent
+            local hasTalent = false
+            for k, talentID in ipairs(currentPVPTalentsTable) do
+                if(talentID == pvpTalentInfo.id) then
+                    hasTalent = true;
+                end
+            end
+            --We dont have the talent so just return false
+            if(not hasTalent) then
+                addon:Debug("PVP tlanets does not match");
+                return false
             end
         end
-        --We dont have the talent so just return false
-        if(not hasTalent) then
-            addon:Debug("PVP tlanets does not match");
-            return false
-        end
     end
-    --Check normal talents
-    for i, talentInfo in ipairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName].pva) do
-        talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
-        if(not known) then
-            addon:Debug(string.format("Talent with the name %s is not leanred", name))
-            return false
+
+    if(currentprofile.pva ~= nil) then
+        --Check normal talents
+        for i, talentInfo in ipairs(currentprofile.pva) do
+            talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
+            if(not known) then
+                addon:Debug(string.format("Talent with the name %s is not leanred", name))
+                return false
+            end
         end
     end
     return true
@@ -364,12 +444,12 @@ end
 --Gets the profile that is active from all the saved profiles
 function addon:GetCurrentProfileFromSaved()
     --Check if null or not existing
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] == nil or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) ~= "table") then
+    if(not addon:DoesCurrentProfilesTableExits()) then
         addon:Debug("Current specialization has no profiles")
         return addon.CustomProfileName
     end
     --Iterate trough every talent profile
-    for name, TalentArray in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+    for name, TalentArray in pairs(addon:GetCurrentProfilesTable()) do
         if(addon:IsCurrentTalentProfile(name)) then
             --Return the currentprofilename
             return name

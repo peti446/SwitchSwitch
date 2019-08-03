@@ -23,22 +23,27 @@ function TalentUIFrame:CreateEditUI()
     editorFrame:HookScript("OnHide", function(self) 
         --Save all the data modified
         addon:Debug("Closed editor, saving data...")
-        if(not self.GearSet:GetChecked() and addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing ~= nil) then
-            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing].gearSet = nil
+        if(not self.GearSet:GetChecked() and addon:DoesTalentProfileExist(self.CurrentProfileEditing)) then
+            local tbl = addon:GetTalentTable(self.CurrentProfileEditing) 
+            tbl.gearSet = nil
+            addon:SetTalentTable(self.CurrentProfileEditing, tbl)
         end
     end)
     editorFrame:HookScript("OnShow", function(self) 
         --Update the data
         addon:Debug("Updating Edit frame data...")
-        self.InsideTitle:SetText(string.format(addon.L["Editing '%s'"], TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing or "ERROR"))
-        self.GearSet:SetChecked(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing].gearSet ~= nil or false)
-        if(self.GearSet:GetChecked()) then
-            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Show()
-        else
-            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Hide()
+        self.InsideTitle:SetText(string.format(addon.L["Editing '%s'"], self.CurrentProfileEditing or "ERROR"))
+        local tbl = addon:GetTalentTable(self.CurrentProfileEditing)
+        if(addon:DoesTalentProfileExist(self.CurrentProfileEditing) and tbl.gearSet ~= nil) then
+            self.GearSet:SetChecked(true)
+            self.GearSet.SelectionFrame:Show()
+            UIDropDownMenu_SetSelectedValue(self.GearSet.SelectionFrame.DropDown, tbl.gearSet)
+        else 
+            self.GearSet:SetChecked(false)
+            self.GearSet.SelectionFrame:Hide()
+            UIDropDownMenu_SetSelectedValue(self.GearSet.SelectionFrame.DropDown, "")
         end
-        UIDropDownMenu_SetSelectedValue(TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame.DropDown, addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing].gearSet or "")
-        UIDropDownMenu_Refresh(TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame.DropDown)
+        UIDropDownMenu_Refresh(self.GearSet.SelectionFrame.DropDown)
     end)
     editorFrame:Hide()
 
@@ -54,9 +59,9 @@ function TalentUIFrame:CreateEditUI()
     editorFrame.GearSet.text:SetWidth(190)
     editorFrame.GearSet:SetScript("OnClick", function(self)
         if(self:GetChecked()) then
-            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Show()
+           self.SelectionFrame:Show()
         else
-            addon.TalentUIFrame.ProfileEditorFrame.GearSet.SelectionFrame:Hide()
+            self.SelectionFrame:Hide()
         end
         end)
 
@@ -108,18 +113,18 @@ function TalentUIFrame:CreateEditUI()
     --Delete button
     editorFrame.DeleteButton = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", addon.L["Delete"], 160, 25, 45, 20)
     editorFrame.DeleteButton:SetScript("OnClick", function()
-        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.sv.Talents.SelectedTalentsProfile)
+        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
         if(dialog) then
-            dialog.data = addon.sv.Talents.SelectedTalentsProfile
+            dialog.data = addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing
         end 
     end)
 
     --Rename button
     editorFrame.Rename = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", addon.L["Rename"], 160, 25, 45, 45)
     editorFrame.Rename:SetScript("OnClick", function()
-        local dialog = StaticPopup_Show("SwitchSwitch_RenameProfile", addon.sv.Talents.SelectedTalentsProfile)
+        local dialog = StaticPopup_Show("SwitchSwitch_RenameProfile", addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
         if(dialog) then
-            dialog.data = addon.sv.Talents.SelectedTalentsProfile
+            dialog.data = addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing
         end 
     end)
 
@@ -147,16 +152,37 @@ function TalentUIFrame:CreateEditUI()
             self:GetParent():Hide();
         end,
     }
+
+    
+     --Create the confirim save popup
+     StaticPopupDialogs["SwitchSwitch_ConfirmDeleteprofile"] =
+     {
+          text = addon.L["You want to delete the profile '%s'?"],
+          button1 = addon.L["Delete"],
+          button2 = addon.L["Cancel"],
+          timeout = 0,
+          whileDead = true,
+          hideOnEscape = true,
+          preferredIndex = 3,
+          exclusive = true,
+          enterClicksFirstButton = true,
+          showAlert = true,
+          OnAccept = function(self, data)
+             TalentUIFrame:OnAcceptDeleteprofile(self, data)
+          end,
+     }
 end 
 
 function TalentUIFrame.SetSelectedValueForDropDowns(self, arg1, arg2, checked)
     if(not checked) then
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         if(arg1.funcName == "equipedGear") then
-            addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing]["gearSet"] = self.value
+            local tbl = addon:GetTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+            tbl["gearSet"] = self.value
             if (self.value == "") then
-                addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing]["gearSet"] = nil
+                tbl["gearSet"] = nil
             end
+            addon:SetTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing, tbl)
         end
     end
 end
@@ -198,9 +224,12 @@ function TalentUIFrame:OnRenameTextChanged(frame)
 end
 
 function TalentUIFrame:OnRenameAccepted(frame)
-    local newName = frame:GetParent().editBox:GetText()
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][newName] = addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing]
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing] = nil
+    local newName = frame.editBox:GetText()
+    addon:SetTalentTable(newName, addon:GetTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing))
+    addon:DeleteTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+    addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = newName
+    addon.TalentUIFrame.ProfileEditorFrame:Hide();
+    addon.TalentUIFrame.ProfileEditorFrame:Show();
     addon:Print(addon.L["Profile renamed correctly!"]);
 end
 
@@ -236,33 +265,25 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI.EditButtonContext.funcName = "editProfileSelection"
     UIDropDownMenu_Initialize(UpperTalentsUI.EditButtonContext, function(self, level)
         local i = 2
-        for pname, info in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
-            local info = UIDropDownMenu_CreateInfo()
-            info.text = pname
-            info.index = i
-            if(addon.sv.Talents.SelectedTalentsProfile == pname) then
-                info.index = 1
-            else
-                i = i + 1
+        if(addon:DoesCurrentProfilesTableExits()) then
+            for pname, info in pairs(addon:GetCurrentProfilesTable()) do
+                local info = UIDropDownMenu_CreateInfo()
+                info.text = pname
+                info.index = i
+                if(addon.sv.Talents.SelectedTalentsProfile == pname) then
+                    info.index = 1
+                else
+                    i = i + 1
+                end
+                info.func = function(self) 
+                    addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
+                    addon.TalentUIFrame.ProfileEditorFrame:Hide()
+                    addon.TalentUIFrame.ProfileEditorFrame:Show()
+                end
+                UIDropDownMenu_AddButton(info,1)
             end
-            info.func = function(self) 
-                addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
-                addon.TalentUIFrame.ProfileEditorFrame:Hide()
-                addon.TalentUIFrame.ProfileEditorFrame:Show()
-            end
-            UIDropDownMenu_AddButton(info,1)
         end
     end, "MENU")
-
-    --Create the new and save buttons
-    --[[UpperTalentsUI.DeleteButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Delete"], 80, nil, -10, -2)
-    UpperTalentsUI.DeleteButton:Disable()
-    UpperTalentsUI.DeleteButton:SetScript("OnClick", function()
-        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.sv.Talents.SelectedTalentsProfile)
-        if(dialog) then
-            dialog.data = addon.sv.Talents.SelectedTalentsProfile
-        end 
-    end)]]--
     
     --Create Talent string
     UpperTalentsUI.CurrentProfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
@@ -333,24 +354,6 @@ function TalentUIFrame:CreateTalentFrameUI()
             end
         end
     }
-
-     --Create the confirim save popup
-    StaticPopupDialogs["SwitchSwitch_ConfirmDeleteprofile"] =
-    {
-         text = addon.L["You want to delete the profile '%s'?"],
-         button1 = addon.L["Delete"],
-         button2 = addon.L["Cancel"],
-         timeout = 0,
-         whileDead = true,
-         hideOnEscape = true,
-         preferredIndex = 3,
-         exclusive = true,
-         enterClicksFirstButton = true,
-         showAlert = true,
-         OnAccept = function(self, data)
-            TalentUIFrame:OnAcceptDeleteprofile(self, data)
-         end,
-    }
 end
 
 --##########################################################################################################################
@@ -359,8 +362,8 @@ end
 function TalentUIFrame.Initialize_Talents_List(self, level, menuLists)
     local menuList = {}
     --Get all profile names and create the list for the dropdown menu
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
-        for TalentProfileName, data in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+    if(addon:GetCurrentProfilesTable()) then
+        for TalentProfileName, data in pairs(addon:GetCurrentProfilesTable()) do
             table.insert(menuList, {
                 text = TalentProfileName
             })
@@ -437,12 +440,7 @@ function TalentUIFrame:OnAceptNewprofile(frame)
     end
 
     --If talent spec table does not exist create one
-    if(not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) then
-        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
-    end
-
-    --Save the talents
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileName] = addon:GetCurrentTalents(savePVPTalents)
+    addon:SetTalentTable(profileName, addon:GetCurrentTalents(savePVPTalents))
     addon.sv.Talents.SelectedTalentsProfile = profileName
 
     --Let the user know that the profile has been created
@@ -451,17 +449,20 @@ end
 
 function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
     --Check if the Profile exists
-    if(not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] or type(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile]) ~= "table") then
+    if(not addon:DoesTalentProfileExist(profile)) then
         return
     end
 
     --Delete the Profile
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = nil
-    addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
+    addon:DeleteTalentTable(profile)
+    if(profile == addon.sv.Talents.SelectedTalentsProfile) then
+        addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
+    end
+    addon.TalentUIFrame.ProfileEditorFrame:Hide()
 end
 
 function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = addon:GetCurrentTalents(savePVP)
+    addon:SetTalentTable(profile, addon:GetCurrentTalents(savePVP))
     addon.sv.Talents.SelectedTalentsProfile = profile
     addon:Print(addon.L["Profile '%s' overwritten!"]:format(profile))
 end
@@ -512,8 +513,8 @@ end
 
 function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
     local returnNames = {};
-    if(addon.sv.Talents.TalentsProfiles ~= nil and addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
-    for name, _ in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+    if(addon.sv.Talents.TalentsProfiles ~= nil and addon:DoesCurrentProfilesTableExits()) then
+    for name, _ in pairs(addon:GetCurrentProfilesTable()) do
         if(name:find(currentString) ~= nil) then
             table.insert(returnNames, {
                 ["name"] = name,

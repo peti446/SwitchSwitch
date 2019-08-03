@@ -170,8 +170,8 @@ function ConfigFrame.SetUpButtons(self, level, menuList)
         }
     }
     --Get all profile names and create the list for the dropdown menu
-    if(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] ~= nil) then
-        for TalentProfileName, data in pairs(addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]) do
+    if(addon:DoesCurrentProfilesTableExits()) then
+        for TalentProfileName, data in pairs(addon:GetCurrentProfilesTable()) do
             table.insert(menuList, {
                 text = TalentProfileName
             })

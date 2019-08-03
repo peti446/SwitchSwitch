@@ -152,7 +152,7 @@ end
 
 function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
     --First check if the profile is valid and exists
-    if(not profileToActivate or profileToActivate == "" or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] or not addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profileToActivate]) then
+    if(not profileToActivate or profileToActivate == "" or not addon:DoesTalentProfileExist(profileToActivate)) then
         addon:Debug("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
