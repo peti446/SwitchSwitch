@@ -29,6 +29,7 @@ function TalentUIFrame:CreateEditUI()
             addon:SetTalentTable(self.CurrentProfileEditing, tbl)
         end
     end)
+    editorFrame:Hide()
     editorFrame:HookScript("OnShow", function(self) 
         --Update the data
         addon:Debug("Updating Edit frame data...")
@@ -38,14 +39,15 @@ function TalentUIFrame:CreateEditUI()
             self.GearSet:SetChecked(true)
             self.GearSet.SelectionFrame:Show()
             UIDropDownMenu_SetSelectedValue(self.GearSet.SelectionFrame.DropDown, tbl.gearSet)
+            local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(tbl.gearSet)
+            UIDropDownMenu_SetText(self.GearSet.SelectionFrame.DropDown, name)
         else 
             self.GearSet:SetChecked(false)
             self.GearSet.SelectionFrame:Hide()
             UIDropDownMenu_SetSelectedValue(self.GearSet.SelectionFrame.DropDown, "")
+            UIDropDownMenu_SetText(self.GearSet.SelectionFrame.DropDown, "None")
         end
-        UIDropDownMenu_Refresh(self.GearSet.SelectionFrame.DropDown)
     end)
-    editorFrame:Hide()
 
     --Title
     editorFrame.InsideTitle = editorFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeLeft")
