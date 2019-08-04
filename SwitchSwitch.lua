@@ -342,35 +342,44 @@ function addon:SetTalents(profileName)
     local currentTalentPorfile = addon:GetTalentTable(profileName)
 
     --Learn talents normal talents
-    for i, talentTbl in ipairs(currentTalentPorfile.pva) do
-        --Get the current talent info to see if the talent id changed
-        local talent = GetTalentInfo(talentTbl.tier, talentTbl.column, 1)
-        if talentTbl.tier > 0 and talentTbl.column > 0  then
-            LearnTalents(talent)
-            --If talent id changed let the user know that the talents might be wrong
-            if(select(1, talent) ~= talentTbl.id) then
-                addon:Print(addon.L["It seems like the talent from tier: '%s' and column: '%s' have been moved or changed, check you talents!"]:format(tostring(talentTbl.tier), tostring(talentTbl.column)))
+    if(currentTalentPorfile.pva ~= nil) then
+        for i, talentTbl in ipairs(currentTalentPorfile.pva) do
+            --Get the current talent info to see if the talent id changed
+            local talent = GetTalentInfo(talentTbl.tier, talentTbl.column, 1)
+            if talentTbl.tier > 0 and talentTbl.column > 0  then
+                LearnTalents(talent)
+                --If talent id changed let the user know that the talents might be wrong
+                if(select(1, talent) ~= talentTbl.id) then
+                    addon:Print(addon.L["It seems like the talent from tier: '%s' and column: '%s' have been moved or changed, check you talents!"]:format(tostring(talentTbl.tier), tostring(talentTbl.column)))
+                end
             end
         end
     end
-    --Leanr pvp talent
-    for i, pvpTalentTabl in ipairs(currentTalentPorfile.pvp) do
-        if(pvpTalentTabl.unlocked and pvpTalentTabl.id ~= nil) then
-            --Make sure the talent is not used anywhere else, set to random if used in anothet tier
-            for i2 = 1, 4 do
-                local pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(i2)
-                if(pvpTalentTabl.id == pvpTalentInfo.selectedTalentID and pvpTalentTabl.tier ~= i2) then
-                    --Get random talent
-                    LearnPvpTalent(pvpTalentInfo.availableTalentIDs[math.random(#pvpTalentInfo.availableTalentIDs)], i2)
+
+    if(currentTalentPorfile.pvp ~= nil) then
+        --Leanr pvp talent
+        for i, pvpTalentTabl in ipairs(currentTalentPorfile.pvp) do
+            if(pvpTalentTabl.unlocked and pvpTalentTabl.id ~= nil) then
+                --Make sure the talent is not used anywhere else, set to random if used in anothet tier
+                for i2 = 1, 4 do
+                    local pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(i2)
+                    if(pvpTalentTabl.id == pvpTalentInfo.selectedTalentID and pvpTalentTabl.tier ~= i2) then
+                        --Get random talent
+                        LearnPvpTalent(pvpTalentInfo.availableTalentIDs[math.random(#pvpTalentInfo.availableTalentIDs)], i2)
+                    end
                 end
+                --Lern the talent in the tier
+                LearnPvpTalent(pvpTalentTabl.id, pvpTalentTabl.tier)
             end
-            --Lern the talent in the tier
-            LearnPvpTalent(pvpTalentTabl.id, pvpTalentTabl.tier)
+        end 
+    end
+
+
+    if(currentTalentPorfile.essences ~= nil) then
+        --Learn essences
+        for milestoneID, essenceID in pairs(currentTalentPorfile.essences) do
+            C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
         end
-    end 
-    --Learn essences
-    for milestoneID, essenceID in pairs(currentTalentPorfile.essences) do
-        C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
     end
 
     --Change gear set if available
@@ -452,6 +461,7 @@ function addon:GetCurrentProfileFromSaved()
     for name, TalentArray in pairs(addon:GetCurrentProfilesTable()) do
         if(addon:IsCurrentTalentProfile(name)) then
             --Return the currentprofilename
+            addon:Debug("Detected:" .. name)
             return name
         end
     end
