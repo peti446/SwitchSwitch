@@ -88,6 +88,21 @@ function addon:eventHandler(event, arg1)
     elseif(event == "PLAYER_TALENT_UPDATE" or event == "AZERITE_ESSENCE_UPDATE") then
         if( not addon.G.SwitchingTalents) then
             addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
+            addon:Debug("Selected profile before equiping: " .. addon.sv.Talents.SelectedTalentsProfile)
+            if(addon.sv.Talents.SelectedTalentsProfile ~= addon.CustomProfileName and addon:DoesTalentProfileExist(addon.sv.Talents.SelectedTalentsProfile)) then
+                --Check if equiped the set if not equip
+                local tbl = addon:GetTalentTable(addon.sv.Talents.SelectedTalentsProfile)
+                if(tbl.gearSet ~= nil) then
+                    addon:Debug("Gear set:" .. tbl.gearSet)
+                    local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(tbl.gearSet)
+                    addon:Debug("Gear set " .. name .. " is ", isEquipped)
+                    if(not isEquipped) then
+                        C_EquipmentSet.UseEquipmentSet(tbl.gearSet)
+                    end
+                else
+                    addon:Debug("Gear set is nil")
+                end
+            end
         end
     elseif(event == "PLAYER_ENTERING_WORLD") then
         --Check if we actually switched map from last time
