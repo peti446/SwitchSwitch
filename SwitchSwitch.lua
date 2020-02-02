@@ -175,7 +175,7 @@ function addon:GetCurrentTalents(saveTalentsPVP)
         end
     end
     --Get Essence information
-    local MilestoneIDs = {115,116,117}
+    local MilestoneIDs = {115,116,117,119}
     for index, id in ipairs(MilestoneIDs) do
         local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
         if(milestonesInfo.unlocked) then
