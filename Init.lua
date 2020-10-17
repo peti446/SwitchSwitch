@@ -13,6 +13,7 @@ local function GetDefaultConfig()
         ["Version"] = addon.version,
         ["debug"] = false,
         ["autoUseItems"] = true,
+        ["SelectedTalentsProfile"] = "",
         ["SuggestionFramePoint"] =
         {
             ["point"] = "CENTER",
@@ -53,9 +54,16 @@ function addon:eventHandler(event, arg1)
             --Default talents table
             SwitchSwitchTalents =
             {
-                ["SelectedTalentsProfile"] = "",
                 ["Version"] = addon.version,
-                ["TalentsProfiles"] = {}
+            }
+        end
+
+        -- Global talents progile table
+        if(SwitchSwitchProfiles == nil) then
+            SwitchSwitchProfiles =
+            {
+                ["Version"] = addon.version,
+                ["Profiles"] = {}
             }
         end
 
@@ -66,11 +74,15 @@ function addon:eventHandler(event, arg1)
 
         --Add the global variables to the addon global
         addon.sv = {}
-        addon.sv.Talents = SwitchSwitchTalents
+        addon.sv.Talents = SwitchSwitchProfiles
+        --Deprected just here for the this version so old folks can update, after 1 months of initial release this is removed
+        -- TODO: REMOVE
+        addon.sv.DEPRECTED = SwitchSwitchTalents
         addon.sv.config = SwitchSwitchConfig
+    elseif(event == "PLAYER_LOGIN") then
         --Update the tables in case they are not updated
         addon:Update();
-    elseif(event == "PLAYER_LOGIN") then
+        
         --Load Commands
         addon.Commands:Init()
         --Load global frame
@@ -81,29 +93,12 @@ function addon:eventHandler(event, arg1)
             LoadAddOn("Blizzard_TalentUI")
         end
         --Check if talents is a Profile
-        addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
+        addon.sv.config.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
 
         --Unregister current event
         self:UnregisterEvent(event)
     elseif(event == "PLAYER_TALENT_UPDATE" or event == "AZERITE_ESSENCE_UPDATE") then
-        if( not addon.G.SwitchingTalents) then
-            addon.sv.Talents.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
-            addon:Debug("Selected profile before equiping: " .. addon.sv.Talents.SelectedTalentsProfile)
-            if(addon.sv.Talents.SelectedTalentsProfile ~= addon.CustomProfileName and addon:DoesTalentProfileExist(addon.sv.Talents.SelectedTalentsProfile)) then
-                --Check if equiped the set if not equip
-                local tbl = addon:GetTalentTable(addon.sv.Talents.SelectedTalentsProfile)
-                if(tbl.gearSet ~= nil) then
-                    addon:Debug("Gear set:" .. tbl.gearSet)
-                    local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(tbl.gearSet)
-                    addon:Debug("Gear set " .. name .. " is ", isEquipped)
-                    if(not isEquipped) then
-                        C_EquipmentSet.UseEquipmentSet(tbl.gearSet)
-                    end
-                else
-                    addon:Debug("Gear set is nil")
-                end
-            end
-        end
+        addon.sv.config.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
     elseif(event == "PLAYER_ENTERING_WORLD") then
         --Check if we actually switched map from last time
         local instanceID = select(8,GetInstanceInfo())
@@ -149,10 +144,14 @@ end
 function addon:Update()
     --Get the old version
     local oldConfigVersion = addon.sv.config.Version or addon.version
+    local oldDEPRECTEDVersion = addon.sv.DEPRECTED.Version or addon.version
     local oldTalentsVersion = addon.sv.Talents.Version or addon.version
     --Convert the string to numbers
     if(type(oldConfigVersion) == "string") then
         oldConfigVersion = tonumber(oldConfigVersion)
+    end
+    if(type(oldDEPRECTEDVersion) == "string") then
+        oldDEPRECTEDVersion = tonumber(oldDEPRECTEDVersion)
     end
     if(type(oldTalentsVersion) == "string") then
         oldTalentsVersion = tonumber(oldTalentsVersion)
@@ -160,49 +159,45 @@ function addon:Update()
     --Get current version in number
     local currentVersion = tonumber(addon.version)
 
+    --Update deprected table
+    if(oldDEPRECTEDVersion ~= currentVersion) then
+        -- New talents this means all old talents are not usefull anymore
+        if(oldDEPRECTEDVersion < 1.6) then
+            addon.sv.DEPRECTED.TalentsProfiles = nil
+        end
+    end
 
-    --Update talent table
+    --Update talents table
     if(oldTalentsVersion ~= currentVersion) then
-        --If the version is lower then the 1.1 (the version will be 1.0), the data will be in the wrong fformat so update it
-        if(oldTalentsVersion < 1.1) then
-            --No pvp talents are present so lets just get the current table and set it to pva and leave pvp empty
-            --Iterate over each spec and then talents set
-            for specID, talentSets in pairs(addon.sv.Talents.TalentsProfiles) do
-                for talentSetName, normalTalentInfoTbl in pairs(talentSets) do
-                    --By default the format of the normal talbe info will be the information of normal talents so just copy these to the pva fuield
-                    local newFormat = 
-                    {
-                        ["pva"] = addon:deepcopy(normalTalentInfoTbl),
-                        ["pvp"] = {}
-                    }
-                    --Updathe the table
-                    addon.sv.Talents.TalentsProfiles[specID][talentSetName] = newFormat
-                end
-            end
-        end
-
-        --If the version is lower then 1.4 the essence table is not included so add it
-        if(oldTalentsVersion < 1.4) then
-            for specID, talentSets in pairs(addon.sv.Talents.TalentsProfiles) do
-                for talentSetName, talentTable in pairs(talentSets) do
-                    --By default the format of the normal talbe info will be the information of normal talents so just copy these to the pva fuield
-                    local newFormat = addon:deepcopy(talentTable)
-                    newFormat["essences"] = {}
-                    --Updathe the table
-                    addon.sv.Talents.TalentsProfiles[specID][talentSetName] = newFormat
-                end
-            end
-        end
-
-        --Update the version
-        addon.sv.Talents.Version = addon.version
     end
 
     --Update config
     if(oldConfigVersion ~= currentVersion) then
-
-        addon.sv.config.Version = addon.version
+        --Current selected talents are not in normal config saved now
+        if(oldConfigVersion < 1.6) then
+            addon.sv.config.SelectedTalentsProfile = ""
+            if(oldDEPRECTEDVersion < 1.6) then
+                addon.sv.config.SelectedTalentsProfile =  addon.sv.DEPRECTED.SelectedTalentsProfile
+                addon.sv.DEPRECTED.SelectedTalentsProfile = nil
+            end
+            addon.sv.config.autoSuggest = 
+            {
+                ["pvp"] = "",
+                ["arena"] = "",
+                ["raid"] = "",
+                ["party"] = 
+                {
+                    ["HM"] = "",
+                    ["MM"] = ""                
+                }
+            }
+        end
     end
+
+    --Update versions
+    addon.sv.DEPRECTED.Version = addon.version
+    addon.sv.Talents.Version = addon.version
+    addon.sv.config.Version = addon.version
 end
 
 -- Event handling frame

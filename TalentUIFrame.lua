@@ -267,23 +267,21 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI.EditButtonContext.funcName = "editProfileSelection"
     UIDropDownMenu_Initialize(UpperTalentsUI.EditButtonContext, function(self, level)
         local i = 2
-        if(addon:DoesCurrentProfilesTableExits()) then
-            for pname, info in pairs(addon:GetCurrentProfilesTable()) do
-                local info = UIDropDownMenu_CreateInfo()
-                info.text = pname
-                info.index = i
-                if(addon.sv.Talents.SelectedTalentsProfile == pname) then
-                    info.index = 1
-                else
-                    i = i + 1
-                end
-                info.func = function(self) 
-                    addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
-                    addon.TalentUIFrame.ProfileEditorFrame:Hide()
-                    addon.TalentUIFrame.ProfileEditorFrame:Show()
-                end
-                UIDropDownMenu_AddButton(info,1)
+        for pname, info in pairs(addon:GetCurrentProfilesTable()) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text = pname
+            info.index = i
+            if(addon.sv.config.SelectedTalentsProfile == pname) then
+                info.index = 1
+            else
+                i = i + 1
             end
+            info.func = function(self) 
+                addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
+                addon.TalentUIFrame.ProfileEditorFrame:Hide()
+                addon.TalentUIFrame.ProfileEditorFrame:Show()
+            end
+            UIDropDownMenu_AddButton(info,1)
         end
     end, "MENU")
     
@@ -443,7 +441,7 @@ function TalentUIFrame:OnAceptNewprofile(frame)
 
     --If talent spec table does not exist create one
     addon:SetTalentTable(profileName, addon:GetCurrentTalents(savePVPTalents))
-    addon.sv.Talents.SelectedTalentsProfile = profileName
+    addon.sv.config.SelectedTalentsProfile = profileName
 
     --Let the user know that the profile has been created
     addon:Print(addon.L["Talent profile %s created!"]:format(profileName))
@@ -457,31 +455,31 @@ function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
 
     --Delete the Profile
     addon:DeleteTalentTable(profile)
-    if(profile == addon.sv.Talents.SelectedTalentsProfile) then
-        addon.sv.Talents.SelectedTalentsProfile = addon.CustomProfileName
+    if(profile == addon.sv.config.SelectedTalentsProfile) then
+        addon.sv.config.SelectedTalentsProfile = addon.CustomProfileName
     end
     addon.TalentUIFrame.ProfileEditorFrame:Hide()
 end
 
 function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
     addon:SetTalentTable(profile, addon:GetCurrentTalents(savePVP))
-    addon.sv.Talents.SelectedTalentsProfile = profile
+    addon.sv.config.SelectedTalentsProfile = profile
     addon:Print(addon.L["Profile '%s' overwritten!"]:format(profile))
 end
 
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
-    if(self.LastPorfileUpdateName ~= addon.sv.Talents.SelectedTalentsProfile) then
+    if(self.LastPorfileUpdateName ~= addon.sv.config.SelectedTalentsProfile) then
         --Update the local variable to avoud updating every frame
-        self.LastPorfileUpdateName = addon.sv.Talents.SelectedTalentsProfile
+        self.LastPorfileUpdateName = addon.sv.config.SelectedTalentsProfile
 
         --Update the UI elements
-        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.config.SelectedTalentsProfile)
 
-        if(addon.sv.Talents.SelectedTalentsProfile ~= "") then
-            UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.Talents.SelectedTalentsProfile)
+        if(addon.sv.config.SelectedTalentsProfile ~= "") then
+            UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.config.SelectedTalentsProfile)
         end
-        if(addon.sv.Talents.SelectedTalentsProfile == addon.CustomProfileName) then
+        if(addon.sv.config.SelectedTalentsProfile == addon.CustomProfileName) then
             self.NewButton:Show()
             self.NewButton:Enable()
         else
@@ -515,7 +513,6 @@ end
 
 function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
     local returnNames = {};
-    if(addon.sv.Talents.TalentsProfiles ~= nil and addon:DoesCurrentProfilesTableExits()) then
     for name, _ in pairs(addon:GetCurrentProfilesTable()) do
         if(name:find(currentString) ~= nil) then
             table.insert(returnNames, {
@@ -523,7 +520,6 @@ function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
                 ["priority"] = LE_AUTOCOMPLETE_PRIORITY_OTHER
             })
         end
-    end
     end
     return returnNames;
 end

@@ -170,14 +170,12 @@ function ConfigFrame.SetUpButtons(self, level, menuList)
         }
     }
     --Get all profile names and create the list for the dropdown menu
-    if(addon:DoesCurrentProfilesTableExits()) then
-        for TalentProfileName, data in pairs(addon:GetCurrentProfilesTable()) do
-            table.insert(menuList, {
-                text = TalentProfileName
-            })
-        end
+    for TalentProfileName, data in pairs(addon:GetCurrentProfilesTable()) do
+        table.insert(menuList, {
+            text = TalentProfileName
+        })
     end
-
+    
     --Make sure level is always set
     if(not level) then
         level = 1

@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.5"
+addon.version = "1.6"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
@@ -40,14 +40,30 @@ function addon:PrintTable(tbl, indent)
     end
 end
 
+function addon:HasHeartOfAzerothEquipped()
+    return GetInventoryItemID("player", INVSLOT_NECK) == 158075
+end
 -------------------------------------------------------------------- Talent table edition
+
+-- Functionts to ensure tables exits, call before checking anything on the tables
+function addon:EnsureTalentClassTableExits()
+    if(addon.sv.Talents.Profiles == nil) then
+        addon.sv.Talents.Profiles = {}
+    end
+    if(addon.sv.Talents.Profiles[select(3, UnitClass("player"))] == nil) then
+        addon.sv.Talents.Profiles[select(3, UnitClass("player"))] = {}
+    end
+end
+
+function addon:EnsureTablentSpecTableExits()
+    addon:EnsureTalentClassTableExits()
+    if(addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
+        addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))] = {}
+    end
+end
 
 --Checks if the talents Profile database contains the given Profile
 function addon:DoesTalentProfileExist(Profile)
-    --If talent spec table does not exist create one
-    if(not addon:DoesCurrentProfilesTableExits() or Profile == nil) then
-        return false
-    end
     --Iterate to find the profile (could use quick [profile] to see if it exits, but we want to compare allin lower (names are not case sentivies))
     for k,v in pairs(addon:GetCurrentProfilesTable()) do
         if(k:lower() == Profile:lower()) then
@@ -62,65 +78,28 @@ end
 --Gets the table of a specific profile
 function addon:GetTalentTable(Profile)
     if(addon:DoesTalentProfileExist(Profile)) then
-        return addon.GetCurrentProfilesTable()[Profile]
+        return addon.GetCurrentProfilesTable()[Profile:lower()]
     end
     return nil;
 end
 
---Creates a talent table (empty)
-function addon:CreateNewTalentTable(Profile) 
-    if(not addon:DoesCurrentProfilesTableExits()) then
-        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
-    end
-    if(not addon:DoesTalentProfileExist(Profile)) then
-        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][Profile] = {}
-    end
-end
-
 --Sets or creates a new table with the given table
 function addon:SetTalentTable(Profile, tableToSet)
-    addon:CreateNewTalentTable(Profile)
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][Profile] = tableToSet
+    addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = tableToSet
 end
 
 --Deletes a profile table
-function addon:DeleteTalentTable(profile)
-    if(addon:DoesTalentProfileExist(profile)) then
-        addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))][profile] = nil
+function addon:DeleteTalentTable(Profile)
+    if(addon:DoesTalentProfileExist(Profile)) then
+        addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = nil
         addon:Debug("Deleted")
     end
 end
 
--- Spec table
-
---Check if the current spec talbe exits
-function addon:DoesCurrentProfilesTableExits()
-    if (addon:GetCurrentProfilesTable() == nil) then
-        return false
-    end
-    return true
-end
-
 --Gets the current global 
 function addon:GetCurrentProfilesTable()
-    return addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))]
-end
-
---Creates a current profile tables
-function addon:CreateCurrentProfilesTable()
-    if(addon:DoesCurrentProfilesTableExits()) then
-        return
-    end
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = {}
-end
---Sets the current spec table
-function addon:SetCurrentProfilesTable(tableInfo)
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = tableInfo
-end
-
---Deletes the current table
-function addon:DeleteCurrentProfilesTable()
-    addon.sv.Talents.TalentsProfiles[select(1,GetSpecializationInfo(GetSpecialization()))] = nil
+    addon:EnsureTablentSpecTableExits()
+    return addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))]
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -136,7 +115,7 @@ function addon:GetCurrentTalents(saveTalentsPVP)
     {
         ["pva"] = {},
         ["pvp"] = {},
-        ["essences"] = {}
+        ["heart_of_azeroth_essences"] = {}
     }
     --Iterate over all tiers of talents normal
     for Tier = 1, GetMaxTalentTier() do
@@ -164,7 +143,7 @@ function addon:GetCurrentTalents(saveTalentsPVP)
     --Only save talents if requested
     if(saveTalentsPVP) then
         --Iterate over pvp talents
-        for Tier = 1, 4 do
+        for Tier = 1, 3 do
             pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
             talentSet["pvp"][Tier] =
             {
@@ -174,21 +153,18 @@ function addon:GetCurrentTalents(saveTalentsPVP)
             }
         end
     end
+
     --Get Essence information
-    local MilestoneIDs = {115,116,117,119}
-    for index, id in ipairs(MilestoneIDs) do
-        local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
-        if(milestonesInfo.unlocked) then
-            talentSet["essences"][milestonesInfo.ID] = C_AzeriteEssence.GetMilestoneEssence(id)
+    if(addon:HasHeartOfAzerothEquipped()) then
+        local MilestoneIDs = {115,116,117,119}
+        for index, id in ipairs(MilestoneIDs) do
+            local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
+            if(milestonesInfo.unlocked) then
+                talentSet["heart_of_azeroth_essences"][milestonesInfo.ID] = C_AzeriteEssence.GetMilestoneEssence(id)
+            end
         end
     end
-    --local milestonesInfo = C_AzeriteEssence.GetMilestones()
-    --for i, slotInfo in ipairs(milestonesInfo) do
-    --    if(slotInfo.unlocked) then
-    --        talentSet["essences"][slotInfo.ID] = C_AzeriteEssence.GetMilestoneEssence(slotInfo.ID)
-    --        addon:Debug("asdasdda", slotInfo.ID)
-    --    end
-    --end
+
     --Return talents
     return talentSet;
 end
@@ -328,7 +304,7 @@ end
 function addon:SetTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch
     addon.G.SwitchingTalents = true
-    addon:Print(addon.L["Changing talents"])
+    addon:Print(addon.L["Changing talents"] .. ":" .. profileName)
 
     --Check if the talent addon is up
     if(not IsAddOnLoaded("Blizzard_TalentUI")) then
@@ -375,9 +351,9 @@ function addon:SetTalents(profileName)
     end
 
 
-    if(currentTalentPorfile.essences ~= nil) then
+    if(currentTalentPorfile.heart_of_azeroth_essences ~= nil and addon:HasHeartOfAzerothEquipped()) then
         --Learn essences
-        for milestoneID, essenceID in pairs(currentTalentPorfile.essences) do
+        for milestoneID, essenceID in pairs(currentTalentPorfile.heart_of_azeroth_essences) do
             C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
         end
     end
@@ -385,16 +361,19 @@ function addon:SetTalents(profileName)
     --Change gear set if available
     if(currentTalentPorfile.gearSet ~= nil) then
         addon:Debug("ID: ", currentTalentPorfile.gearSet)
-        C_EquipmentSet.UseEquipmentSet(currentTalentPorfile.gearSet)
+        local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(currentTalentPorfile.gearSet)
+        if(not isEquipped) then
+            C_EquipmentSet.UseEquipmentSet(currentTalentPorfile.gearSet)
+        end
     end
 
 
     --Print and return
     addon:Print(addon.L["Changed talents to '%s'"]:format(profileName))
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
-    C_Timer.After(0.3,function() addon.G.SwitchingTalents = false end)
+    C_Timer.After(1.0,function() addon.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
-    addon.sv.Talents.SelectedTalentsProfile = profileName
+    addon.sv.config.SelectedTalentsProfile = profileName
 end
 
 --Check if a given profile is the current talents
@@ -408,10 +387,10 @@ function addon:IsCurrentTalentProfile(profileName)
     local currentActiveTalents = addon:GetCurrentTalents()
     local currentprofile = addon:GetTalentTable(profileName)
 
-    if(currentprofile.essences ~= nil) then
+    if(currentprofile.heart_of_azeroth_essences ~= nil and addon:HasHeartOfAzerothEquipped()) then
         --Check essences
-        for milestoneID, essenceID in pairs(currentActiveTalents.essences) do
-            if(currentprofile.essences[milestoneID] == nil or essenceID ~= currentprofile.essences[milestoneID]) then
+        for milestoneID, essenceID in pairs(currentActiveTalents.heart_of_azeroth_essences) do
+            if(currentprofile.heart_of_azeroth_essences[milestoneID] == nil or essenceID ~= currentprofile.heart_of_azeroth_essences[milestoneID]) then
                 addon:Debug("Essences do not match");
                 return false   
             end
@@ -452,11 +431,6 @@ end
 
 --Gets the profile that is active from all the saved profiles
 function addon:GetCurrentProfileFromSaved()
-    --Check if null or not existing
-    if(not addon:DoesCurrentProfilesTableExits()) then
-        addon:Debug("Current specialization has no profiles")
-        return addon.CustomProfileName
-    end
     --Iterate trough every talent profile
     for name, TalentArray in pairs(addon:GetCurrentProfilesTable()) do
         if(addon:IsCurrentTalentProfile(name)) then
