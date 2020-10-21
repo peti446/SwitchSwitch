@@ -97,6 +97,8 @@ function addon:eventHandler(event, arg1)
 
         --Unregister current event
         self:UnregisterEvent(event)
+        self:RegisterEvent("AZERITE_ESSENCE_UPDATE")
+        self:RegisterEvent("PLAYER_TALENT_UPDATE")
     elseif(event == "PLAYER_TALENT_UPDATE" or event == "AZERITE_ESSENCE_UPDATE") then
         addon.sv.config.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
     elseif(event == "PLAYER_ENTERING_WORLD") then
@@ -207,6 +209,4 @@ addon.event_frame:SetScript("OnEvent", addon.eventHandler)
 -- Register events
 addon.event_frame:RegisterEvent("ADDON_LOADED")
 addon.event_frame:RegisterEvent("PLAYER_LOGIN")
-addon.event_frame:RegisterEvent("PLAYER_TALENT_UPDATE")
 addon.event_frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-addon.event_frame:RegisterEvent("AZERITE_ESSENCE_UPDATE")
