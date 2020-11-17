@@ -92,8 +92,6 @@ function addon:eventHandler(event, arg1)
         if(not IsAddOnLoaded("Blizzard_TalentUI")) then
             LoadAddOn("Blizzard_TalentUI")
         end
-        --Check if talents is a Profile
-        addon.sv.config.SelectedTalentsProfile = addon:GetCurrentProfileFromSaved()
 
         --Unregister current event
         self:UnregisterEvent(event)

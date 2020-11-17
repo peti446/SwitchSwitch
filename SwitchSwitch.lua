@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.61"
+addon.version = "1.62"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
@@ -47,19 +47,29 @@ end
 
 -- Functionts to ensure tables exits, call before checking anything on the tables
 function addon:EnsureTalentClassTableExits()
+    local playerClass = select(3, UnitClass("player"))
+
     if(addon.sv.Talents.Profiles == nil) then
         addon.sv.Talents.Profiles = {}
     end
-    if(addon.sv.Talents.Profiles[select(3, UnitClass("player"))] == nil) then
-        addon.sv.Talents.Profiles[select(3, UnitClass("player"))] = {}
+    
+    if(playerClass) then
+        if(addon.sv.Talents.Profiles[playerClass] == nil) then
+            addon.sv.Talents.Profiles[playerClass] = {}
+        end
     end
 end
 
 function addon:EnsureTablentSpecTableExits()
     addon:EnsureTalentClassTableExits()
-    if(addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))] == nil) then
-        addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))] = {}
-    end
+
+	local playerClass = select(3, UnitClass("player"))
+    local playerSpec = select(1, GetSpecializationInfo(GetSpecialization()))
+    if (playerClass and playerSpec) then
+		if(addon.sv.Talents.Profiles[playerClass][playerSpec] == nil) then
+			addon.sv.Talents.Profiles[playerClass][playerSpec] = {}
+		end
+	end
 end
 
 --Checks if the talents Profile database contains the given Profile
@@ -85,7 +95,14 @@ end
 
 --Sets or creates a new table with the given table
 function addon:SetTalentTable(Profile, tableToSet)
-    addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = tableToSet
+    addon:EnsureTablentSpecTableExits()
+    
+    local playerClass = select(3, UnitClass("player"))
+    local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
+    
+    if(playerClass and playerSpec) then
+        addon.sv.Talents.Profiles[playerClass][playerSpec][Profile:lower()] = tableToSet
+    end
 end
 
 --Deletes a profile table
@@ -99,7 +116,14 @@ end
 --Gets the current global 
 function addon:GetCurrentProfilesTable()
     addon:EnsureTablentSpecTableExits()
-    return addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))]
+
+    local playerClass = select(3, UnitClass("player"))
+	local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
+    local playerTable = {}
+    if(playerClass and playerSpec) then
+        playerTable = addon.sv.Talents.Profiles[playerClass][playerSpec]
+    end
+    return playerTable
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
