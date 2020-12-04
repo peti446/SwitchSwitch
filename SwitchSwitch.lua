@@ -199,6 +199,11 @@ function addon:CanChangeTalents()
     if(IsResting()) then
         return true
     end
+    -- If in combat we cannot change so lets exit early
+   if(InCombatLockdown()) then
+        return false		
+   end
+	
     --All buffs ids for the tomes
     local buffLookingFor = 
     {
@@ -216,7 +221,13 @@ function addon:CanChangeTalents()
         228128,
         -- Battleground Insight
         248473,
-        44521
+        44521,
+	-- SL LVL 60
+	-- Refuge of the dammed
+	338907,
+	-- Still mind tomes
+	324029,
+	324028
     }
     local debuffsLookingFor =
     {
