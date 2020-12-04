@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.62"
+addon.version = "1.63"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
