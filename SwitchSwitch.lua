@@ -222,12 +222,12 @@ function addon:CanChangeTalents()
         -- Battleground Insight
         248473,
         44521,
-	-- SL LVL 60
-	-- Refuge of the dammed
-	338907,
-	-- Still mind tomes
-	324029,
-	324028
+        -- SL LVL 60
+        -- Refuge of the dammed
+        338907,
+        -- Still mind tomes
+        324029,
+        324028
     }
     local debuffsLookingFor =
     {
@@ -279,16 +279,22 @@ function addon:ActivateTalentProfile(profileName)
     --If we cannot change talents why even try?
     if(not addon:CanChangeTalents()) then
         if(addon.sv.config.autoUseItems) then
-            local tomesID = 
-            {
-                153647, -- Quit mind
-                141446, -- Tranquil mind crafted
-                143785, -- tranquil mind _ dalaran quest
-                143780  -- tranquil mind _ random
-            }
+            -- Now all tomes have level so lets add them based on character level
+            local tomesID = {}
             --Check for level to add the Clear mind tome
-            if (UnitLevel("player") <= 109) then
+            if (UnitLevel("player") <= 50) then
                 table.insert(tomesID, 141640) -- Clear mind
+                table.insert(tomesID, 141446) -- Tranquil mind crafted
+                table.insert(tomesID, 143785) -- tranquil mind _ dalaran quest
+                table.insert(tomesID, 143780)  -- tranquil mind _ random
+            end
+
+            if (UnitLevel("player") <= 59) then
+                table.insert(tomesID, 153647) -- Quit mind
+            end
+
+            if (UnitLevel("player") <= 60) then
+                table.insert(tomesID, 173049) -- Still mind
             end
 
             --Tomes that can be used
@@ -372,9 +378,9 @@ function addon:SetTalents(profileName)
         for i, pvpTalentTabl in ipairs(currentTalentPorfile.pvp) do
             if(pvpTalentTabl.unlocked and pvpTalentTabl.id ~= nil) then
                 --Make sure the talent is not used anywhere else, set to random if used in anothet tier
-                for i2 = 1, 4 do
+                for i2 = 0, 3 do
                     local pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(i2)
-                    if(pvpTalentTabl.id == pvpTalentInfo.selectedTalentID and pvpTalentTabl.tier ~= i2) then
+                    if(pvpTalentInfo ~= nil and pvpTalentTabl.id == pvpTalentInfo.selectedTalentID and pvpTalentTabl.tier ~= i2) then
                         --Get random talent
                         LearnPvpTalent(pvpTalentInfo.availableTalentIDs[math.random(#pvpTalentInfo.availableTalentIDs)], i2)
                     end
