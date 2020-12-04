@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.63"
+addon.version = "1.64"
 addon.CustomProfileName = "Custom"
 
 --##########################################################################################################################
@@ -42,6 +42,17 @@ end
 
 function addon:HasHeartOfAzerothEquipped()
     return GetInventoryItemID("player", INVSLOT_NECK) == 158075
+end
+
+-- String helpers
+function addon:findLastInString(str, value)
+    local i=str:match(".*"..value.."()")
+    if i==nil then return nil else return i-1 end
+end
+
+function addon:Repeats(s,c)
+    local _,n = s:gsub(c,"")
+    return n
 end
 -------------------------------------------------------------------- Talent table edition
 

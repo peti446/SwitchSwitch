@@ -75,9 +75,6 @@ function addon:eventHandler(event, arg1)
         --Add the global variables to the addon global
         addon.sv = {}
         addon.sv.Talents = SwitchSwitchProfiles
-        --Deprected just here for the this version so old folks can update, after 1 months of initial release this is removed
-        -- TODO: REMOVE
-        addon.sv.DEPRECTED = SwitchSwitchTalents
         addon.sv.config = SwitchSwitchConfig
     elseif(event == "PLAYER_LOGIN") then
         --Update the tables in case they are not updated
@@ -143,29 +140,32 @@ end
 
 function addon:Update()
     --Get the old version
-    local oldConfigVersion = addon.sv.config.Version or addon.version
-    local oldDEPRECTEDVersion = addon.sv.DEPRECTED.Version or addon.version
-    local oldTalentsVersion = addon.sv.Talents.Version or addon.version
+    local oldConfigVersion = addon.version
+    if(addon.sv.config ~= nil and type(addon.sv.config.Version) == "string") then
+        oldConfigVersion = addon.sv.config.Version
+    end
+
+    local oldTalentsVersion = addon.version
+    if(addon.sv.Talents ~= nil and type(addon.sv.Talents.Version) == "string") then
+        oldConfigVersion = addon.sv.config.Version
+    end
+
+    --Check special format
+    if(addon:Repeats(oldConfigVersion, "%.") == 2) then
+        local index = addon:findLastInString(oldConfigVersion, "%.")
+        oldConfigVersion = string.sub( oldConfigVersion, 1, index-1) .. string.sub( oldConfigVersion, index+1)
+    end
+
+    if(addon:Repeats(oldTalentsVersion, "%.") == 2) then
+        local index = addon:findLastInString(oldTalentsVersion, "%.")
+        oldTalentsVersion = string.sub( oldTalentsVersion, 1, index-1) .. string.sub( oldTalentsVersion, index+1)
+    end
+
     --Convert the string to numbers
-    if(type(oldConfigVersion) == "string") then
-        oldConfigVersion = tonumber(oldConfigVersion)
-    end
-    if(type(oldDEPRECTEDVersion) == "string") then
-        oldDEPRECTEDVersion = tonumber(oldDEPRECTEDVersion)
-    end
-    if(type(oldTalentsVersion) == "string") then
-        oldTalentsVersion = tonumber(oldTalentsVersion)
-    end
+    oldConfigVersion = tonumber(oldConfigVersion)
+    oldTalentsVersion = tonumber(oldTalentsVersion)
     --Get current version in number
     local currentVersion = tonumber(addon.version)
-
-    --Update deprected table
-    if(oldDEPRECTEDVersion ~= currentVersion) then
-        -- New talents this means all old talents are not usefull anymore
-        if(oldDEPRECTEDVersion < 1.6) then
-            addon.sv.DEPRECTED.TalentsProfiles = nil
-        end
-    end
 
     --Update talents table
     if(oldTalentsVersion ~= currentVersion) then
@@ -176,10 +176,6 @@ function addon:Update()
         --Current selected talents are not in normal config saved now
         if(oldConfigVersion < 1.6) then
             addon.sv.config.SelectedTalentsProfile = ""
-            if(oldDEPRECTEDVersion < 1.6) then
-                addon.sv.config.SelectedTalentsProfile =  addon.sv.DEPRECTED.SelectedTalentsProfile
-                addon.sv.DEPRECTED.SelectedTalentsProfile = nil
-            end
             addon.sv.config.autoSuggest = 
             {
                 ["pvp"] = "",
@@ -194,8 +190,6 @@ function addon:Update()
         end
     end
 
-    --Update versions
-    addon.sv.DEPRECTED.Version = addon.version
     addon.sv.Talents.Version = addon.version
     addon.sv.config.Version = addon.version
 end
