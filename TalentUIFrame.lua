@@ -271,7 +271,7 @@ function TalentUIFrame:CreateTalentFrameUI()
             local info = UIDropDownMenu_CreateInfo()
             info.text = pname
             info.index = i
-            if(addon.sv.config.SelectedTalentsProfile == pname) then
+            if(addon.sv.config.SelectedTalentsProfile == pname:lower()) then
                 info.index = 1
             else
                 i = i + 1
@@ -441,7 +441,7 @@ function TalentUIFrame:OnAceptNewprofile(frame)
 
     --If talent spec table does not exist create one
     addon:SetTalentTable(profileName, addon:GetCurrentTalents(savePVPTalents))
-    addon.sv.config.SelectedTalentsProfile = profileName
+    addon.sv.config.SelectedTalentsProfile = profileName:lower()
 
     --Let the user know that the profile has been created
     addon:Print(addon.L["Talent profile %s created!"]:format(profileName))
@@ -455,7 +455,7 @@ function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
 
     --Delete the Profile
     addon:DeleteTalentTable(profile)
-    if(profile == addon.sv.config.SelectedTalentsProfile) then
+    if(profile:lower() == addon.sv.config.SelectedTalentsProfile) then
         addon.sv.config.SelectedTalentsProfile = addon.CustomProfileName
     end
     addon.TalentUIFrame.ProfileEditorFrame:Hide()
@@ -463,28 +463,39 @@ end
 
 function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
     addon:SetTalentTable(profile, addon:GetCurrentTalents(savePVP))
-    addon.sv.config.SelectedTalentsProfile = profile
+    addon.sv.config.SelectedTalentsProfile = profile:lower()
     addon:Print(addon.L["Profile '%s' overwritten!"]:format(profile))
 end
 
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
-    if(self.LastPorfileUpdateName ~= addon.sv.config.SelectedTalentsProfile) then
+    self.LastUpdateTimerPassed = (self.LastUpdateTimerPassed or 1) + elapsed
+    if(self.LastPorfileUpdateName ~= addon.sv.config.SelectedTalentsProfile or self.LastUpdateTimerPassed >= 1) then
         --Update the local variable to avoud updating every frame
         self.LastPorfileUpdateName = addon.sv.config.SelectedTalentsProfile
-
+        self.LastUpdateTimerPassed = 0
         --Update the UI elements
         UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.config.SelectedTalentsProfile)
 
         if(addon.sv.config.SelectedTalentsProfile ~= "") then
             UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.config.SelectedTalentsProfile)
         end
+        -- Save button 
         if(addon.sv.config.SelectedTalentsProfile == addon.CustomProfileName) then
             self.NewButton:Show()
             self.NewButton:Enable()
         else
             self.NewButton:Disable()
             self.NewButton:Hide()
+        end
+
+        -- Edit button
+        if(addon:CountCurrentTalentsProfile() == 0) then
+            self.EditButton:Disable()
+            self.EditButton:Hide()
+        else
+            self.EditButton:Show()
+            self.EditButton:Enable()
         end
     end
 end

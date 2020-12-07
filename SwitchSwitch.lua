@@ -6,7 +6,7 @@ local _, addon = ...
 addon.G = {}
 addon.G.SwitchingTalents = false
 addon.version = "1.64"
-addon.CustomProfileName = "Custom"
+addon.CustomProfileName = "custom"
 
 --##########################################################################################################################
 --                                  Helper Functions
@@ -135,6 +135,17 @@ function addon:GetCurrentProfilesTable()
         playerTable = addon.sv.Talents.Profiles[playerClass][playerSpec]
     end
     return playerTable
+end
+
+function addon:CountCurrentTalentsProfile()
+    local tbl = addon:GetCurrentProfilesTable()
+    local count = 0
+    
+    for _ in pairs(tbl) do
+        count = count + 1
+    end
+    
+    return count
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -425,7 +436,7 @@ function addon:SetTalents(profileName)
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
     C_Timer.After(1.0,function() addon.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
-    addon.sv.config.SelectedTalentsProfile = profileName
+    addon.sv.config.SelectedTalentsProfile = profileName:lower()
 end
 
 --Check if a given profile is the current talents
@@ -488,7 +499,7 @@ function addon:GetCurrentProfileFromSaved()
         if(addon:IsCurrentTalentProfile(name)) then
             --Return the currentprofilename
             addon:Debug("Detected:" .. name)
-            return name
+            return name:lower()
         end
     end
     addon:Debug("No profiles match current talnets")
