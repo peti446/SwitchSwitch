@@ -5,7 +5,7 @@ local _, addon = ...
 
 addon.G = {}
 addon.G.SwitchingTalents = false
-addon.version = "1.65"
+addon.version = "1.66"
 addon.CustomProfileName = "custom"
 
 --##########################################################################################################################
@@ -249,7 +249,8 @@ function addon:CanChangeTalents()
         338907,
         -- Still mind tomes
         324029,
-        324028
+        324028,
+        321923,
     }
     local debuffsLookingFor =
     {
