@@ -271,7 +271,7 @@ function TalentUIFrame:CreateTalentFrameUI()
             local info = UIDropDownMenu_CreateInfo()
             info.text = pname
             info.index = i
-            if(SwitchSwitch.sv.config.SelectedTalentsProfile == pname:lower()) then
+            if(SwitchSwitch.dbpc.char.SelectedTalentsProfile == pname:lower()) then
                 info.index = 1
             else
                 i = i + 1
@@ -441,7 +441,7 @@ function TalentUIFrame:OnAceptNewprofile(frame)
 
     --If talent spec table does not exist create one
     SwitchSwitch:SetTalentTable(profileName, SwitchSwitch:GetCurrentTalents(savePVPTalents))
-    SwitchSwitch.sv.config.SelectedTalentsProfile = profileName:lower()
+    SwitchSwitch.dbpc.char.SelectedTalentsProfile = profileName:lower()
 
     --Let the user know that the profile has been created
     SwitchSwitch:Print(L["Talent profile %s created!"]:format(profileName))
@@ -455,33 +455,33 @@ function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
 
     --Delete the Profile
     SwitchSwitch:DeleteTalentTable(profile)
-    if(profile:lower() == SwitchSwitch.sv.config.SelectedTalentsProfile) then
-        SwitchSwitch.sv.config.SelectedTalentsProfile = SwitchSwitch.CustomProfileName
+    if(profile:lower() == SwitchSwitch.dbpc.char.SelectedTalentsProfile) then
+        SwitchSwitch.dbpc.char.SelectedTalentsProfile = SwitchSwitch.CustomProfileName
     end
     SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Hide()
 end
 
 function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
     SwitchSwitch:SetTalentTable(profile, SwitchSwitch:GetCurrentTalents(savePVP))
-    SwitchSwitch.sv.config.SelectedTalentsProfile = profile:lower()
+    SwitchSwitch.dbpc.char.SelectedTalentsProfile = profile:lower()
     SwitchSwitch:Print(L["Profile '%s' overwritten!"]:format(profile))
 end
 
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
     self.LastUpdateTimerPassed = (self.LastUpdateTimerPassed or 1) + elapsed
-    if(self.LastProfileUpdateName ~= SwitchSwitch.sv.config.SelectedTalentsProfile or self.LastUpdateTimerPassed >= 1) then
+    if(self.LastProfileUpdateName ~= SwitchSwitch.dbpc.char.SelectedTalentsProfile or self.LastUpdateTimerPassed >= 1) then
         --Update the local variable to avoud updating every frame
-        self.LastProfileUpdateName = SwitchSwitch.sv.config.SelectedTalentsProfile
+        self.LastProfileUpdateName = SwitchSwitch.dbpc.char.SelectedTalentsProfile
         self.LastUpdateTimerPassed = 0
         --Update the UI elements
-        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, SwitchSwitch.sv.config.SelectedTalentsProfile)
+        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, SwitchSwitch.dbpc.char.SelectedTalentsProfile)
 
-        if(SwitchSwitch.sv.config.SelectedTalentsProfile ~= "") then
-            UIDropDownMenu_SetText(self.DropDownTalents, SwitchSwitch.sv.config.SelectedTalentsProfile)
+        if(SwitchSwitch.dbpc.char.SelectedTalentsProfile ~= "") then
+            UIDropDownMenu_SetText(self.DropDownTalents, SwitchSwitch.dbpc.char.SelectedTalentsProfile)
         end
         -- Save button 
-        if(SwitchSwitch.sv.config.SelectedTalentsProfile == SwitchSwitch.CustomProfileName) then
+        if(SwitchSwitch.dbpc.char.SelectedTalentsProfile == SwitchSwitch.CustomProfileName) then
             self.NewButton:Show()
             self.NewButton:Enable()
         else

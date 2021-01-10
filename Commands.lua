@@ -27,7 +27,7 @@ end
 
 function Commands:ResetFrameLocation(frame)
 	if(frame == "suggestion") then
-		SwitchSwitch.sv.config.SuggestionFramePoint =
+		SwitchSwitch.dbpc.char.SuggestionFramePoint =
 		{
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",

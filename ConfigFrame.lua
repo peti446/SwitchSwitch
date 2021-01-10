@@ -27,13 +27,13 @@ local function CreateConfigFrame()
     frame.DebugModeCB:SetPoint("TOPLEFT", frame.GeneralText, "BOTTOMLEFT", 2, -5)
     frame.DebugModeCB.text:SetText(L["Debug mode"])
     frame.DebugModeCB.text:SetFontObject("GameFontWhite")
-    frame.DebugModeCB:SetScript("OnClick", function(self) SwitchSwitch.sv.config.debug = self:GetChecked()  end)
+    frame.DebugModeCB:SetScript("OnClick", function(self) SwitchSwitch.dbpc.char.debug = self:GetChecked()  end)
 
     frame.autoUseItemsCB = CreateFrame("CheckButton", nil, frame, "UICheckButtonTemplate")
     frame.autoUseItemsCB:SetPoint("TOPLEFT", frame.DebugModeCB, "BOTTOMLEFT")
     frame.autoUseItemsCB.text:SetText(L["Prompact to use Tome to change talents?"])
     frame.autoUseItemsCB.text:SetFontObject("GameFontWhite")
-    frame.autoUseItemsCB:SetScript("OnClick", function(self) SwitchSwitch.sv.config.autoUseItems = self:GetChecked()  end)
+    frame.autoUseItemsCB:SetScript("OnClick", function(self) SwitchSwitch.dbpc.char.autoUseItems = self:GetChecked()  end)
 
     frame.autoUseItemsCDText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
     frame.autoUseItemsCDText:SetText(L["Autofade timer for auto-change frame"]..":")
@@ -54,9 +54,9 @@ local function CreateConfigFrame()
     frame.autoUseItemsCDSlider.Text2:SetText(L["(0 to disable auto-fade)"])
     frame.autoUseItemsCDSlider:SetScript("OnValueChanged", function(self,value, userInput)
         frame.autoUseItemsCDSlider.Text:SetText(string.format("%.f", value))
-        SwitchSwitch.sv.config.maxTimeSuggestionFrame = tonumber(string.format("%.f", value))
+        SwitchSwitch.dbpc.char.maxTimeSuggestionFrame = tonumber(string.format("%.f", value))
     end)
-    frame.autoUseItemsCDSlider:SetValue(SwitchSwitch.sv.config.maxTimeSuggestionFrame)
+    frame.autoUseItemsCDSlider:SetValue(SwitchSwitch.dbpc.char.maxTimeSuggestionFrame)
 
     frame.ProfilesConfigText = frame:CreateFontString(nil, "ARTWORK", "GameFontNormalLargeLeft")
     frame.ProfilesConfigText:SetText(L["Profiles for instance auto-change:"])
@@ -132,19 +132,19 @@ local function CreateConfigFrame()
 
     --Set on shown script
     frame:SetScript("OnShow", function(self)
-        self.autoUseItemsCDSlider:SetValue(SwitchSwitch.sv.config.maxTimeSuggestionFrame)
-        self.autoUseItemsCB:SetChecked(SwitchSwitch.sv.config.autoUseItems)
-        self.DebugModeCB:SetChecked(SwitchSwitch.sv.config.debug)
-        UIDropDownMenu_SetSelectedValue(self.ArenaText.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.arena)
-        UIDropDownMenu_SetSelectedValue(self.BattlegroundText.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.pvp)
-        UIDropDownMenu_SetSelectedValue(self.RaidText.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.raid)
-        UIDropDownMenu_SetSelectedValue(self.Party.HC.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.party.HM)
-        UIDropDownMenu_SetSelectedValue(self.Party.MM.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.party.MM)
-        UIDropDownMenu_SetText(self.ArenaText.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.arena ~= "" and SwitchSwitch.sv.config.autoSuggest.arena or "None")
-        UIDropDownMenu_SetText(self.BattlegroundText.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.pvp ~= "" and SwitchSwitch.sv.config.autoSuggest.pvp or "None")
-        UIDropDownMenu_SetText(self.RaidText.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.raid ~= "" and SwitchSwitch.sv.config.autoSuggest.raid or "None")
-        UIDropDownMenu_SetText(self.Party.HC.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.party.HM ~= "" and SwitchSwitch.sv.config.autoSuggest.party.HM or "None")
-        UIDropDownMenu_SetText(self.Party.MM.DropDownMenu, SwitchSwitch.sv.config.autoSuggest.party.MM ~= "" and SwitchSwitch.sv.config.autoSuggest.party.MM or "None")
+        self.autoUseItemsCDSlider:SetValue(SwitchSwitch.dbpc.char.maxTimeSuggestionFrame)
+        self.autoUseItemsCB:SetChecked(SwitchSwitch.dbpc.char.autoUseItems)
+        self.DebugModeCB:SetChecked(SwitchSwitch.dbpc.char.debug)
+        UIDropDownMenu_SetSelectedValue(self.ArenaText.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.arena)
+        UIDropDownMenu_SetSelectedValue(self.BattlegroundText.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.pvp)
+        UIDropDownMenu_SetSelectedValue(self.RaidText.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.raid)
+        UIDropDownMenu_SetSelectedValue(self.Party.HC.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.party.HM)
+        UIDropDownMenu_SetSelectedValue(self.Party.MM.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.party.MM)
+        UIDropDownMenu_SetText(self.ArenaText.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.arena ~= "" and SwitchSwitch.dbpc.char.autoSuggest.arena or "None")
+        UIDropDownMenu_SetText(self.BattlegroundText.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.pvp ~= "" and SwitchSwitch.dbpc.char.autoSuggest.pvp or "None")
+        UIDropDownMenu_SetText(self.RaidText.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.raid ~= "" and SwitchSwitch.dbpc.char.autoSuggest.raid or "None")
+        UIDropDownMenu_SetText(self.Party.HC.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.party.HM ~= "" and SwitchSwitch.dbpc.char.autoSuggest.party.HM or "None")
+        UIDropDownMenu_SetText(self.Party.MM.DropDownMenu, SwitchSwitch.dbpc.char.autoSuggest.party.MM ~= "" and SwitchSwitch.dbpc.char.autoSuggest.party.MM or "None")
         
     end)
 
@@ -197,15 +197,15 @@ function ConfigFrame.SetSelectedValueAutoChange(self, arg1, arg2, checked)
     if(not checked) then
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         if(arg1.funcName == "arena") then
-            SwitchSwitch.sv.config.autoSuggest.arena = self.value
+            SwitchSwitch.dbpc.char.autoSuggest.arena = self.value
         elseif(arg1.funcName == "bg") then
-            SwitchSwitch.sv.config.autoSuggest.pvp = self.value
+            SwitchSwitch.dbpc.char.autoSuggest.pvp = self.value
         elseif(arg1.funcName == "raid") then
-            SwitchSwitch.sv.config.autoSuggest.raid = self.value
+            SwitchSwitch.dbpc.char.autoSuggest.raid = self.value
         elseif(arg1.funcName == "partyhc") then
-            SwitchSwitch.sv.config.autoSuggest.party.HM = self.value
+            SwitchSwitch.dbpc.char.autoSuggest.party.HM = self.value
         elseif(arg1.funcName == "partymm") then
-            SwitchSwitch.sv.config.autoSuggest.party.MM = self.value
+            SwitchSwitch.dbpc.char.autoSuggest.party.MM = self.value
         end
     end
 end

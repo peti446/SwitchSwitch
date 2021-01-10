@@ -59,7 +59,7 @@ end
 local function CreateSuggestionFrame()
     --Frame for auto profile sugestor in instance
     local frame = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
-    frame:SetPoint(SwitchSwitch.sv.config.SuggestionFramePoint.point, UIParent, SwitchSwitch.sv.config.SuggestionFramePoint.relativePoint, SwitchSwitch.sv.config.SuggestionFramePoint.frameX, SwitchSwitch.sv.config.SuggestionFramePoint.frameY)
+    frame:SetPoint(SwitchSwitch.dbpc.char.SuggestionFramePoint.point, UIParent, SwitchSwitch.dbpc.char.SuggestionFramePoint.relativePoint, SwitchSwitch.dbpc.char.SuggestionFramePoint.frameX, SwitchSwitch.dbpc.char.SuggestionFramePoint.frameY)
     frame:SetSize(300, 100)
     --Add the first text tp notify the user what talent we ar about to change
     frame.InfoText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite") 
@@ -101,10 +101,10 @@ local function CreateSuggestionFrame()
     frame:SetScript("OnDragStop", function(self)
             self:StopMovingOrSizing();
             point1, _, relativePoint1, xOfs, yOfs = self:GetPoint(1);
-            SwitchSwitch.sv.config.SuggestionFramePoint.point = point1;
-            SwitchSwitch.sv.config.SuggestionFramePoint.relativePoint = relativePoint1;
-            SwitchSwitch.sv.config.SuggestionFramePoint.frameX = xOfs;
-            SwitchSwitch.sv.config.SuggestionFramePoint.frameY = yOfs;
+            SwitchSwitch.dbpc.char.SuggestionFramePoint.point = point1;
+            SwitchSwitch.dbpc.char.SuggestionFramePoint.relativePoint = relativePoint1;
+            SwitchSwitch.dbpc.char.SuggestionFramePoint.frameX = xOfs;
+            SwitchSwitch.dbpc.char.SuggestionFramePoint.frameY = yOfs;
     end);
 
     -- Add update to the frame so it can dissaper after a certain time
@@ -112,7 +112,7 @@ local function CreateSuggestionFrame()
         self.ElapsedTime = 0
         self.InfoText:SetText(L["Would you like to change you talents to %s?"]:format(self.ChangeProfileButton.Profile))
         --If no time is given then hide the text
-        if(SwitchSwitch.sv.config.maxTimeSuggestionFrame == 0) then
+        if(SwitchSwitch.dbpc.char.maxTimeSuggestionFrame == 0) then
             self.RemainingText:Hide()
         else 
             self.RemainingText:Show()
@@ -120,14 +120,14 @@ local function CreateSuggestionFrame()
     end)
     frame:SetScript("OnUpdate", function(self, elapsed)
         --If the max time is 0 then not update anything
-        if(SwitchSwitch.sv.config.maxTimeSuggestionFrame == 0) then
+        if(SwitchSwitch.dbpc.char.maxTimeSuggestionFrame == 0) then
             return
         end
         --Update elapsed time and string
         self.ElapsedTime = self.ElapsedTime + elapsed
-        self.RemainingText:SetText(L["Frame will close after %s seconds..."]:format(string.format("%.0f",SwitchSwitch.sv.config.maxTimeSuggestionFrame - self.ElapsedTime)))
+        self.RemainingText:SetText(L["Frame will close after %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.maxTimeSuggestionFrame - self.ElapsedTime)))
         --If the time given passed hide
-        if(self.ElapsedTime >= SwitchSwitch.sv.config.maxTimeSuggestionFrame) then
+        if(self.ElapsedTime >= SwitchSwitch.dbpc.char.maxTimeSuggestionFrame) then
             self:Hide()
         end
     end)

@@ -19,7 +19,7 @@ namespace[4] = LibDBIcon
 
 SwitchSwitch.G = {}
 SwitchSwitch.G.SwitchingTalents = false
-SwitchSwitch.version = "1.68"
+SwitchSwitch.InternalVersion = 2.0
 SwitchSwitch.CustomProfileName = "custom"
 
 --##########################################################################################################################
@@ -27,7 +27,7 @@ SwitchSwitch.CustomProfileName = "custom"
 --##########################################################################################################################
 -- Function to print a debug message
 function SwitchSwitch:DebugPrint(...)
-    if(SwitchSwitch.sv.config.debug) then
+    if(type(SwitchSwitch.db) ~= "table" or self.dbpc.char.debug) then
         SwitchSwitch:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
     end
 end
@@ -54,10 +54,6 @@ function SwitchSwitch:PrintTable(tbl, indent)
     end
 end
 
---SwitchSwitch:PrintTable(addon)
---SwitchSwitch:Print("Lol")
-SwitchSwitch:PrintTable(Ace)
-
 function SwitchSwitch:HasHeartOfAzerothEquipped()
     return GetInventoryItemID("player", INVSLOT_NECK) == 158075
 end
@@ -78,13 +74,13 @@ end
 function SwitchSwitch:EnsureTalentClassTableExits()
     local playerClass = select(3, UnitClass("player"))
 
-    if(SwitchSwitch.sv.Talents.Profiles == nil) then
-        SwitchSwitch.sv.Talents.Profiles = {}
+    if(SwitchSwitch.db.global.TalentProfiles == nil) then
+        SwitchSwitch.db.global.TalentProfiles = {}
     end
     
     if(playerClass) then
-        if(SwitchSwitch.sv.Talents.Profiles[playerClass] == nil) then
-            SwitchSwitch.sv.Talents.Profiles[playerClass] = {}
+        if(SwitchSwitch.db.global.TalentProfiles[playerClass] == nil) then
+            SwitchSwitch.db.global.TalentProfiles[playerClass] = {}
         end
     end
 end
@@ -95,8 +91,8 @@ function SwitchSwitch:EnsureTablentSpecTableExits()
 	local playerClass = select(3, UnitClass("player"))
     local playerSpec = select(1, GetSpecializationInfo(GetSpecialization()))
     if (playerClass and playerSpec) then
-		if(SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec] == nil) then
-			SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec] = {}
+		if(SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec] == nil) then
+			SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec] = {}
 		end
 	end
 end
@@ -130,14 +126,14 @@ function SwitchSwitch:SetTalentTable(Profile, tableToSet)
     local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
     
     if(playerClass and playerSpec) then
-        SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec][Profile:lower()] = tableToSet
+        SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec][Profile:lower()] = tableToSet
     end
 end
 
 --Deletes a profile table
 function SwitchSwitch:DeleteTalentTable(Profile)
     if(SwitchSwitch:DoesTalentProfileExist(Profile)) then
-        SwitchSwitch.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = nil
+        SwitchSwitch.db.global.TalentProfiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = nil
         SwitchSwitch:DebugPrint("Deleted")
     end
 end
@@ -150,7 +146,7 @@ function SwitchSwitch:GetCurrentProfilesTable()
 	local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
     local playerTable = {}
     if(playerClass and playerSpec) then
-        playerTable = SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec]
+        playerTable = SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec]
     end
     return playerTable
 end
@@ -321,7 +317,7 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
 
     --If we cannot change talents why even try?
     if(not SwitchSwitch:CanChangeTalents()) then
-        if(SwitchSwitch.sv.config.autoUseItems) then
+        if(self.dbpc.char.autoUseItems) then
             -- Now all tomes have level so lets add them based on character level
             local tomesID = {}
             --Check for level to add the Clear mind tome
@@ -457,7 +453,7 @@ function SwitchSwitch:SetTalents(profileName)
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
     C_Timer.After(1.0,function() SwitchSwitch.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
-    SwitchSwitch.sv.config.SelectedTalentsProfile = profileName:lower()
+    self.dbpc.char.SelectedTalentsProfile = profileName:lower()
 end
 
 --Check if a given profile is the current talents
