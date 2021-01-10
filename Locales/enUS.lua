@@ -54,3 +54,6 @@ L["Rename"] = true
 L["Rename profile"] = true
 L["Gear set to auto-equip:"] = true
 L["Auto equip gear set with this talent profile?"] = true
+L["Current Profile"] = true
+L["Show config pane"] = true
+l["Click"] = true
