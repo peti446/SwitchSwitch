@@ -6,9 +6,14 @@
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: SwitchSwitchTalents, SwitchSwitchConfig
 ## SavedVariables: SwitchSwitchProfiles
+## X-Curse-Project-ID: 299998
 
-localization/Loc.Core.lua
+embeds_libs.xml
+embeds_locales.xml
+
 SwitchSwitch.lua
+
+MinimapIcon.lua
 TalentUIFrame.lua
 GlobalFrames.lua
 ConfigFrame.lua

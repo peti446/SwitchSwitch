@@ -1,41 +1,41 @@
 --############################################
 -- Namespace
 --############################################
-local _, addon = ...
+local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
 --Set up frame helper gobal tables
-addon.TalentUIFrame = {}
-local TalentUIFrame = addon.TalentUIFrame
+SwitchSwitch.TalentUIFrame = {}
+local TalentUIFrame = SwitchSwitch.TalentUIFrame
 
 --##########################################################################################################################
 --                                  Init
 --##########################################################################################################################
 --Creates the edit frame
 function TalentUIFrame:CreateEditUI()
-    addon.TalentUIFrame.ProfileEditorFrame = CreateFrame("Frame", "SwitchSwitch_TalentFrameEditor", PlayerTalentFrame, "UIPanelDialogTemplate")
-    local editorFrame =  addon.TalentUIFrame.ProfileEditorFrame
+    SwitchSwitch.TalentUIFrame.ProfileEditorFrame = CreateFrame("Frame", "SwitchSwitch_TalentFrameEditor", PlayerTalentFrame, "UIPanelDialogTemplate")
+    local editorFrame =  SwitchSwitch.TalentUIFrame.ProfileEditorFrame
     
     --Editor frame config
     editorFrame:SetWidth(250)
     editorFrame:SetPoint("TOPLEFT", PlayerTalentFrame, "TOPRIGHT")
     editorFrame:SetPoint("BOTTOMLEFT", PlayerTalentFrame, "BOTTOMRIGHT")
-    editorFrame.Title:SetText(addon.L["Talent Profile Editor"])
+    editorFrame.Title:SetText(L["Talent Profile Editor"])
     editorFrame:HookScript("OnHide", function(self) 
         --Save all the data modified
-        addon:Debug("Closed editor, saving data...")
-        if(not self.GearSet:GetChecked() and addon:DoesTalentProfileExist(self.CurrentProfileEditing)) then
-            local tbl = addon:GetTalentTable(self.CurrentProfileEditing) 
+        SwitchSwitch:DebugPrint("Closed editor, saving data...")
+        if(not self.GearSet:GetChecked() and SwitchSwitch:DoesTalentProfileExist(self.CurrentProfileEditing)) then
+            local tbl = SwitchSwitch:GetTalentTable(self.CurrentProfileEditing) 
             tbl.gearSet = nil
-            addon:SetTalentTable(self.CurrentProfileEditing, tbl)
+            SwitchSwitch:SetTalentTable(self.CurrentProfileEditing, tbl)
         end
     end)
     editorFrame:Hide()
     editorFrame:HookScript("OnShow", function(self) 
         --Update the data
-        addon:Debug("Updating Edit frame data...")
-        self.InsideTitle:SetText(string.format(addon.L["Editing '%s'"], self.CurrentProfileEditing or "ERROR"))
-        local tbl = addon:GetTalentTable(self.CurrentProfileEditing)
-        if(addon:DoesTalentProfileExist(self.CurrentProfileEditing) and tbl.gearSet ~= nil) then
+        SwitchSwitch:DebugPrint("Updating Edit frame data...")
+        self.InsideTitle:SetText(string.format(L["Editing '%s'"], self.CurrentProfileEditing or "ERROR"))
+        local tbl = SwitchSwitch:GetTalentTable(self.CurrentProfileEditing)
+        if(SwitchSwitch:DoesTalentProfileExist(self.CurrentProfileEditing) and tbl.gearSet ~= nil) then
             self.GearSet:SetChecked(true)
             self.GearSet.SelectionFrame:Show()
             UIDropDownMenu_SetSelectedValue(self.GearSet.SelectionFrame.DropDown, tbl.gearSet)
@@ -56,7 +56,7 @@ function TalentUIFrame:CreateEditUI()
     --Selection of gear set
     editorFrame.GearSet = CreateFrame("CheckButton", nil, editorFrame, "UICheckButtonTemplate")
     editorFrame.GearSet:SetPoint("TOPLEFT", editorFrame.InsideTitle, "BOTTOMLEFT", -20, -10)
-    editorFrame.GearSet.text:SetText(addon.L["Auto equip gear set with this talent profile?"])
+    editorFrame.GearSet.text:SetText(L["Auto equip gear set with this talent profile?"])
     editorFrame.GearSet.text:SetFontObject("GameFontWhite")
     editorFrame.GearSet.text:SetWidth(190)
     editorFrame.GearSet:SetScript("OnClick", function(self)
@@ -78,7 +78,7 @@ function TalentUIFrame:CreateEditUI()
 
     --Text information
     editorFrame.GearSet.SelectionFrame.Text = editorFrame.GearSet.SelectionFrame:CreateFontString(nil, "ARTWORK", "GameFontWhite")
-    editorFrame.GearSet.SelectionFrame.Text:SetText(addon.L["Gear set to auto-equip:"])
+    editorFrame.GearSet.SelectionFrame.Text:SetText(L["Gear set to auto-equip:"])
     editorFrame.GearSet.SelectionFrame.Text:SetPoint("TOPLEFT", editorFrame.GearSet.SelectionFrame, "TOPLEFT")
     editorFrame.GearSet.SelectionFrame.Text:SetWidth(210)
     editorFrame.GearSet.SelectionFrame.Text:SetJustifyH("LEFT")
@@ -113,20 +113,20 @@ function TalentUIFrame:CreateEditUI()
     UIDropDownMenu_SetSelectedValue( editorFrame.GearSet.SelectionFrame.DropDown, "")
 
     --Delete button
-    editorFrame.DeleteButton = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", addon.L["Delete"], 160, 25, 45, 20)
+    editorFrame.DeleteButton = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", L["Delete"], 160, 25, 45, 20)
     editorFrame.DeleteButton:SetScript("OnClick", function()
-        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmDeleteprofile", SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
         if(dialog) then
-            dialog.data = addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing
+            dialog.data = SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing
         end 
     end)
 
     --Rename button
-    editorFrame.Rename = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", addon.L["Rename"], 160, 25, 45, 45)
+    editorFrame.Rename = TalentUIFrame:CreateButton("BOTTOMLEFT", editorFrame, editorFrame, "BOTTOMLEFT", L["Rename"], 160, 25, 45, 45)
     editorFrame.Rename:SetScript("OnClick", function()
-        local dialog = StaticPopup_Show("SwitchSwitch_RenameProfile", addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+        local dialog = StaticPopup_Show("SwitchSwitch_RenameProfile", SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
         if(dialog) then
-            dialog.data = addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing
+            dialog.data = SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing
         end 
     end)
 
@@ -134,9 +134,9 @@ function TalentUIFrame:CreateEditUI()
     --Popup generation
     StaticPopupDialogs["SwitchSwitch_RenameProfile"] =
     {
-        text = addon.L["Rename profile"],
-        button1 = addon.L["Ok"],
-        button2 = addon.L["Cancel"],
+        text = L["Rename profile"],
+        button1 = L["Ok"],
+        button2 = L["Cancel"],
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
@@ -159,9 +159,9 @@ function TalentUIFrame:CreateEditUI()
      --Create the confirim save popup
      StaticPopupDialogs["SwitchSwitch_ConfirmDeleteprofile"] =
      {
-          text = addon.L["You want to delete the profile '%s'?"],
-          button1 = addon.L["Delete"],
-          button2 = addon.L["Cancel"],
+          text = L["You want to delete the profile '%s'?"],
+          button1 = L["Delete"],
+          button2 = L["Cancel"],
           timeout = 0,
           whileDead = true,
           hideOnEscape = true,
@@ -179,12 +179,12 @@ function TalentUIFrame.SetSelectedValueForDropDowns(self, arg1, arg2, checked)
     if(not checked) then
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         if(arg1.funcName == "equipedGear") then
-            local tbl = addon:GetTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+            local tbl = SwitchSwitch:GetTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
             tbl["gearSet"] = self.value
             if (self.value == "") then
                 tbl["gearSet"] = nil
             end
-            addon:SetTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing, tbl)
+            SwitchSwitch:SetTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing, tbl)
         end
     end
 end
@@ -198,27 +198,27 @@ function TalentUIFrame:OnRenameTextChanged(frame)
     --Check if text is not nill or not empty
     if(data ~= nil and data ~= '') then
 
-        if(data:lower() == addon.CustomProfileName:lower()) then
+        if(data:lower() == SwitchSwitch.CustomProfileName:lower()) then
             --Text is "custom" so disable the Create button and give a warning
-            frame:GetParent().text:SetText(addon.L["Rename profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
+            frame:GetParent().text:SetText(L["Rename profile"] .. "\n\n|cFFFF0000" .. L["'Custom' cannot be used as name!"])
             frame:GetParent().button1:Disable()
         elseif(data:len() > 20) then
             --Text is too long, disable create button and give a warning
-            frame:GetParent().text:SetText(addon.L["Rename profile"].. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
+            frame:GetParent().text:SetText(L["Rename profile"].. "\n\n|cFFFF0000" .. L["Name too long!"])
             frame:GetParent().button1:Disable()
-        elseif(addon:DoesTalentProfileExist(data)) then
+        elseif(SwitchSwitch:DoesTalentProfileExist(data)) then
             --Text is fine so enable everything
             frame:GetParent().button1:Enable()
-            frame:GetParent().text:SetText(addon.L["Rename profile"] .. "\n\n|cFFFF0000" .. addon.L["Name already taken!"])
+            frame:GetParent().text:SetText(L["Rename profile"] .. "\n\n|cFFFF0000" .. L["Name already taken!"])
         else
             --Text is fine so enable everything
             frame:GetParent().button1:Enable()
-            frame:GetParent().text:SetText(addon.L["Rename profile"])
+            frame:GetParent().text:SetText(L["Rename profile"])
         end
     else
         --Empty so disable Create button
         frame:GetParent().button1:Disable()
-        frame:GetParent().text:SetText(addon.L["Rename profile"])
+        frame:GetParent().text:SetText(L["Rename profile"])
     end
 
     --Rezise the frame
@@ -227,12 +227,12 @@ end
 
 function TalentUIFrame:OnRenameAccepted(frame)
     local newName = frame.editBox:GetText()
-    addon:SetTalentTable(newName, addon:GetTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing))
-    addon:DeleteTalentTable(addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
-    addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = newName
-    addon.TalentUIFrame.ProfileEditorFrame:Hide();
-    addon.TalentUIFrame.ProfileEditorFrame:Show();
-    addon:Print(addon.L["Profile renamed correctly!"]);
+    SwitchSwitch:SetTalentTable(newName, SwitchSwitch:GetTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing))
+    SwitchSwitch:DeleteTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+    SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = newName
+    SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Hide();
+    SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Show();
+    SwitchSwitch:Print(L["Profile renamed correctly!"]);
 end
 
 --Creates the Frame inside the talent frame
@@ -251,15 +251,15 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI:SetScript("OnUpdate", TalentUIFrame.UpdateUpperFrame)
 
     --Create the edit button
-    UpperTalentsUI.EditButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Edit"], 80, nil, -10, -2, "SS_EditButton_TF") 
+    UpperTalentsUI.EditButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", L["Edit"], 80, nil, -10, -2, "SS_EditButton_TF") 
     UpperTalentsUI.EditButton:SetScript("OnClick", function()
         ToggleDropDownMenu(1, nil, TalentUIFrame.UpperTalentsUI.EditButtonContext)
     end)
     
 
     --New botton
-    UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", addon.L["Save"], 80, nil, -95, -2) 
-    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp" , nil, nil, nil, addon.GlobalFrames.SavePVPTalents)end)
+    UpperTalentsUI.NewButton = TalentUIFrame:CreateButton("TOPRIGHT", UpperTalentsUI, UpperTalentsUI, "TOPRIGHT", L["Save"], 80, nil, -95, -2) 
+    UpperTalentsUI.NewButton:SetScript("OnClick", function() StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp" , nil, nil, nil, SwitchSwitch.GlobalFrames.SavePVPTalents)end)
 
     --Edit context menu
     UpperTalentsUI.EditButtonContext = CreateFrame("FRAME", nil, UpperTalentsUI.EditButton, "UIDropDownMenuTemplate")
@@ -267,19 +267,19 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI.EditButtonContext.funcName = "editProfileSelection"
     UIDropDownMenu_Initialize(UpperTalentsUI.EditButtonContext, function(self, level)
         local i = 2
-        for pname, info in pairs(addon:GetCurrentProfilesTable()) do
+        for pname, info in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
             local info = UIDropDownMenu_CreateInfo()
             info.text = pname
             info.index = i
-            if(addon.sv.config.SelectedTalentsProfile == pname:lower()) then
+            if(SwitchSwitch.sv.config.SelectedTalentsProfile == pname:lower()) then
                 info.index = 1
             else
                 i = i + 1
             end
             info.func = function(self) 
-                addon.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
-                addon.TalentUIFrame.ProfileEditorFrame:Hide()
-                addon.TalentUIFrame.ProfileEditorFrame:Show()
+                SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = self.value
+                SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Hide()
+                SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Show()
             end
             UIDropDownMenu_AddButton(info,1)
         end
@@ -287,7 +287,7 @@ function TalentUIFrame:CreateTalentFrameUI()
     
     --Create Talent string
     UpperTalentsUI.CurrentProfie = UpperTalentsUI:CreateFontString(nil, "ARTWORK", "GameFontNormalLeft")
-    UpperTalentsUI.CurrentProfie:SetText(addon.L["Talents"] .. ":")
+    UpperTalentsUI.CurrentProfie:SetText(L["Talents"] .. ":")
     UpperTalentsUI.CurrentProfie:SetPoint("LEFT")
 
     --Create Dropdown menu for talent groups
@@ -300,9 +300,9 @@ function TalentUIFrame:CreateTalentFrameUI()
     --Create new Static popup dialog
     StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
     {
-        text = addon.L["Create/Ovewrite a profile"],
-        button1 = addon.L["Save"],
-        button2 = addon.L["Cancel"],
+        text = L["Create/Ovewrite a profile"],
+        button1 = L["Save"],
+        button2 = L["Cancel"],
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
@@ -334,9 +334,9 @@ function TalentUIFrame:CreateTalentFrameUI()
     --Create the confirim save popup
     StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
     {
-        text = addon.L["Saving will override '%s' configuration"],
-        button1 = addon.L["Save"],
-        button2 = addon.L["Cancel"],
+        text = L["Saving will override '%s' configuration"],
+        button1 = L["Save"],
+        button2 = L["Cancel"],
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
@@ -348,7 +348,7 @@ function TalentUIFrame:CreateTalentFrameUI()
             TalentUIFrame:OnAcceptOverwrrite(self, data.profile, data.savePVP)
         end,
         OnCancel = function(self, data)
-            local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", nil, nil, nil, addon.GlobalFrames.SavePVPTalents)
+            local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", nil, nil, nil, SwitchSwitch.GlobalFrames.SavePVPTalents)
             if(dialog) then
                 dialog.editBox:SetText(data.profile)
             end
@@ -362,8 +362,8 @@ end
 function TalentUIFrame.Initialize_Talents_List(self, level, menuLists)
     local menuList = {}
     --Get all profile names and create the list for the dropdown menu
-    if(addon:GetCurrentProfilesTable()) then
-        for TalentProfileName, data in pairs(addon:GetCurrentProfilesTable()) do
+    if(SwitchSwitch:GetCurrentProfilesTable()) then
+        for TalentProfileName, data in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
             table.insert(menuList, {
                 text = TalentProfileName
             })
@@ -391,7 +391,7 @@ end
 function TalentUIFrame.SetDropDownValue(self, arg1, arg2, checked)
     if (not checked) then
         --Change Talents!
-        addon:ActivateTalentProfile(self.value)
+        SwitchSwitch:ActivateTalentProfile(self.value)
     end
 end
 
@@ -401,23 +401,23 @@ function TalentUIFrame:NewProfileOnTextChange(frame)
     --Check if text is not nill or not empty
     if(data ~= nil and data ~= '') then
 
-        if(data:lower() == addon.CustomProfileName:lower()) then
+        if(data:lower() == SwitchSwitch.CustomProfileName:lower()) then
             --Text is "custom" so disable the Create button and give a warning
-            frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["'Custom' cannot be used as name!"])
+            frame:GetParent().text:SetText(L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. L["'Custom' cannot be used as name!"])
             frame:GetParent().button1:Disable()
         elseif(data:len() > 20) then
             --Text is too long, disable create button and give a warning
-            frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. addon.L["Name too long!"])
+            frame:GetParent().text:SetText(L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. L["Name too long!"])
             frame:GetParent().button1:Disable()
         else
             --Text is fine so enable everything
             frame:GetParent().button1:Enable()
-            frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
+            frame:GetParent().text:SetText(L["Create/Ovewrite a profile"])
         end
     else
         --Empty so disable Create button
         frame:GetParent().button1:Disable()
-        frame:GetParent().text:SetText(addon.L["Create/Ovewrite a profile"])
+        frame:GetParent().text:SetText(L["Create/Ovewrite a profile"])
     end
     --Rezise the frame
     StaticPopup_Resize(frame:GetParent(), frame:GetParent().which)
@@ -427,7 +427,7 @@ function TalentUIFrame:OnAceptNewprofile(frame)
     local profileName = frame.editBox:GetText()
     local savePVPTalents = frame.insertedFrame:GetChecked();
     --Check if the profile exits if so, change the text
-    if(addon:DoesTalentProfileExist(profileName)) then
+    if(SwitchSwitch:DoesTalentProfileExist(profileName)) then
         frame.button1:Disable()
         local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTalemtsSavePopUp", profileName)
         if(dialog) then
@@ -440,48 +440,48 @@ function TalentUIFrame:OnAceptNewprofile(frame)
     end
 
     --If talent spec table does not exist create one
-    addon:SetTalentTable(profileName, addon:GetCurrentTalents(savePVPTalents))
-    addon.sv.config.SelectedTalentsProfile = profileName:lower()
+    SwitchSwitch:SetTalentTable(profileName, SwitchSwitch:GetCurrentTalents(savePVPTalents))
+    SwitchSwitch.sv.config.SelectedTalentsProfile = profileName:lower()
 
     --Let the user know that the profile has been created
-    addon:Print(addon.L["Talent profile %s created!"]:format(profileName))
+    SwitchSwitch:Print(L["Talent profile %s created!"]:format(profileName))
 end
 
 function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
     --Check if the Profile exists
-    if(not addon:DoesTalentProfileExist(profile)) then
+    if(not SwitchSwitch:DoesTalentProfileExist(profile)) then
         return
     end
 
     --Delete the Profile
-    addon:DeleteTalentTable(profile)
-    if(profile:lower() == addon.sv.config.SelectedTalentsProfile) then
-        addon.sv.config.SelectedTalentsProfile = addon.CustomProfileName
+    SwitchSwitch:DeleteTalentTable(profile)
+    if(profile:lower() == SwitchSwitch.sv.config.SelectedTalentsProfile) then
+        SwitchSwitch.sv.config.SelectedTalentsProfile = SwitchSwitch.CustomProfileName
     end
-    addon.TalentUIFrame.ProfileEditorFrame:Hide()
+    SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Hide()
 end
 
 function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
-    addon:SetTalentTable(profile, addon:GetCurrentTalents(savePVP))
-    addon.sv.config.SelectedTalentsProfile = profile:lower()
-    addon:Print(addon.L["Profile '%s' overwritten!"]:format(profile))
+    SwitchSwitch:SetTalentTable(profile, SwitchSwitch:GetCurrentTalents(savePVP))
+    SwitchSwitch.sv.config.SelectedTalentsProfile = profile:lower()
+    SwitchSwitch:Print(L["Profile '%s' overwritten!"]:format(profile))
 end
 
 function TalentUIFrame.UpdateUpperFrame(self, elapsed)
     --Just to make sure we dont update all every frame, as 90% of the time it will not change
     self.LastUpdateTimerPassed = (self.LastUpdateTimerPassed or 1) + elapsed
-    if(self.LastProfileUpdateName ~= addon.sv.config.SelectedTalentsProfile or self.LastUpdateTimerPassed >= 1) then
+    if(self.LastProfileUpdateName ~= SwitchSwitch.sv.config.SelectedTalentsProfile or self.LastUpdateTimerPassed >= 1) then
         --Update the local variable to avoud updating every frame
-        self.LastProfileUpdateName = addon.sv.config.SelectedTalentsProfile
+        self.LastProfileUpdateName = SwitchSwitch.sv.config.SelectedTalentsProfile
         self.LastUpdateTimerPassed = 0
         --Update the UI elements
-        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, addon.sv.config.SelectedTalentsProfile)
+        UIDropDownMenu_SetSelectedValue(self.DropDownTalents, SwitchSwitch.sv.config.SelectedTalentsProfile)
 
-        if(addon.sv.config.SelectedTalentsProfile ~= "") then
-            UIDropDownMenu_SetText(self.DropDownTalents, addon.sv.config.SelectedTalentsProfile)
+        if(SwitchSwitch.sv.config.SelectedTalentsProfile ~= "") then
+            UIDropDownMenu_SetText(self.DropDownTalents, SwitchSwitch.sv.config.SelectedTalentsProfile)
         end
         -- Save button 
-        if(addon.sv.config.SelectedTalentsProfile == addon.CustomProfileName) then
+        if(SwitchSwitch.sv.config.SelectedTalentsProfile == SwitchSwitch.CustomProfileName) then
             self.NewButton:Show()
             self.NewButton:Enable()
         else
@@ -490,7 +490,7 @@ function TalentUIFrame.UpdateUpperFrame(self, elapsed)
         end
 
         -- Edit button
-        if(addon:CountCurrentTalentsProfile() == 0) then
+        if(SwitchSwitch:CountCurrentTalentsProfile() == 0) then
             self.EditButton:Disable()
             self.EditButton:Hide()
         else
@@ -524,7 +524,7 @@ end
 
 function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
     local returnNames = {};
-    for name, _ in pairs(addon:GetCurrentProfilesTable()) do
+    for name, _ in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
         if(name:find(currentString) ~= nil) then
             table.insert(returnNames, {
                 ["name"] = name,

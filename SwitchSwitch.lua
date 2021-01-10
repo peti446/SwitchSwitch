@@ -1,92 +1,110 @@
 --############################################
 -- Namespace
 --############################################
-local _, addon = ...
+local namespace = select(2, ...)
 
-addon.G = {}
-addon.G.SwitchingTalents = false
-addon.version = "1.68"
-addon.CustomProfileName = "custom"
+--############################################
+-- Addon Setup & Lib Setup
+--############################################
+local SwitchSwitch = LibStub("AceAddon-3.0"):NewAddon("SwitchSwitch", "AceEvent-3.0", "AceTimer-3.0", "AceSerializer-3.0", "AceComm-3.0", "AceBucket-3.0")
+local L = LibStub("AceLocale-3.0"):GetLocale("SwitchSwitch")
+local AceGUI = LibStub("AceGUI-3.0")
+local LibDBIcon = LibStub("LibDBIcon-1.0")
+
+-- The namespace table is passed to all files so we add anything we want global to it
+namespace[1] = SwitchSwitch
+namespace[2] = L
+namespace[3] = AceGUI
+namespace[4] = LibDBIcon
+
+SwitchSwitch.G = {}
+SwitchSwitch.G.SwitchingTalents = false
+SwitchSwitch.version = "1.68"
+SwitchSwitch.CustomProfileName = "custom"
 
 --##########################################################################################################################
 --                                  Helper Functions
 --##########################################################################################################################
 -- Function to print a debug message
-function addon:Debug(...)
-    if(addon.sv.config.debug) then
-        addon:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
+function SwitchSwitch:DebugPrint(...)
+    if(SwitchSwitch.sv.config.debug) then
+        SwitchSwitch:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
     end
 end
 
 -- Function to print a message to the chat.
-function addon:Print(...)
+function SwitchSwitch:Print(...)
     local msg = string.join(" ","|cFF029CFC[SwitchSwitch]|r", tostringall(... or "nil"));
     DEFAULT_CHAT_FRAME:AddMessage(msg);
 end
 
 --Print a table, if the value of a key is a talbe recursivly call the function again
-function addon:PrintTable(tbl, indent)
+function SwitchSwitch:PrintTable(tbl, indent)
     if not indent then indent = 0 end
     if type(tbl) == 'table' then
         for k, v in pairs(tbl) do
             formatting = string.rep("  ", indent) .. k .. ": "
             if type(v) == "table" then
-              addon:Print(formatting)
-              addon:PrintTable(v, indent+1)
+              SwitchSwitch:Print(formatting)
+              SwitchSwitch:PrintTable(v, indent+1)
             else
-                addon:Print(formatting .. tostring(v))
+                SwitchSwitch:Print(formatting .. tostring(v))
             end
         end
     end
 end
 
-function addon:HasHeartOfAzerothEquipped()
+--SwitchSwitch:PrintTable(addon)
+--SwitchSwitch:Print("Lol")
+SwitchSwitch:PrintTable(Ace)
+
+function SwitchSwitch:HasHeartOfAzerothEquipped()
     return GetInventoryItemID("player", INVSLOT_NECK) == 158075
 end
 
 -- String helpers
-function addon:findLastInString(str, value)
+function SwitchSwitch:findLastInString(str, value)
     local i=str:match(".*"..value.."()")
     if i==nil then return nil else return i-1 end
 end
 
-function addon:Repeats(s,c)
+function SwitchSwitch:Repeats(s,c)
     local _,n = s:gsub(c,"")
     return n
 end
 -------------------------------------------------------------------- Talent table edition
 
 -- Functionts to ensure tables exits, call before checking anything on the tables
-function addon:EnsureTalentClassTableExits()
+function SwitchSwitch:EnsureTalentClassTableExits()
     local playerClass = select(3, UnitClass("player"))
 
-    if(addon.sv.Talents.Profiles == nil) then
-        addon.sv.Talents.Profiles = {}
+    if(SwitchSwitch.sv.Talents.Profiles == nil) then
+        SwitchSwitch.sv.Talents.Profiles = {}
     end
     
     if(playerClass) then
-        if(addon.sv.Talents.Profiles[playerClass] == nil) then
-            addon.sv.Talents.Profiles[playerClass] = {}
+        if(SwitchSwitch.sv.Talents.Profiles[playerClass] == nil) then
+            SwitchSwitch.sv.Talents.Profiles[playerClass] = {}
         end
     end
 end
 
-function addon:EnsureTablentSpecTableExits()
-    addon:EnsureTalentClassTableExits()
+function SwitchSwitch:EnsureTablentSpecTableExits()
+    SwitchSwitch:EnsureTalentClassTableExits()
 
 	local playerClass = select(3, UnitClass("player"))
     local playerSpec = select(1, GetSpecializationInfo(GetSpecialization()))
     if (playerClass and playerSpec) then
-		if(addon.sv.Talents.Profiles[playerClass][playerSpec] == nil) then
-			addon.sv.Talents.Profiles[playerClass][playerSpec] = {}
+		if(SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec] == nil) then
+			SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec] = {}
 		end
 	end
 end
 
 --Checks if the talents Profile database contains the given Profile
-function addon:DoesTalentProfileExist(Profile)
+function SwitchSwitch:DoesTalentProfileExist(Profile)
     --Iterate to find the profile (could use quick [profile] to see if it exits, but we want to compare allin lower (names are not case sentivies))
-    for k,v in pairs(addon:GetCurrentProfilesTable()) do
+    for k,v in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
         if(k:lower() == Profile:lower()) then
             --Profile exists
             return true
@@ -97,48 +115,48 @@ function addon:DoesTalentProfileExist(Profile)
 end
 
 --Gets the table of a specific profile
-function addon:GetTalentTable(Profile)
-    if(addon:DoesTalentProfileExist(Profile)) then
-        return addon.GetCurrentProfilesTable()[Profile:lower()]
+function SwitchSwitch:GetTalentTable(Profile)
+    if(SwitchSwitch:DoesTalentProfileExist(Profile)) then
+        return SwitchSwitch.GetCurrentProfilesTable()[Profile:lower()]
     end
     return nil;
 end
 
 --Sets or creates a new table with the given table
-function addon:SetTalentTable(Profile, tableToSet)
-    addon:EnsureTablentSpecTableExits()
+function SwitchSwitch:SetTalentTable(Profile, tableToSet)
+    SwitchSwitch:EnsureTablentSpecTableExits()
     
     local playerClass = select(3, UnitClass("player"))
     local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
     
     if(playerClass and playerSpec) then
-        addon.sv.Talents.Profiles[playerClass][playerSpec][Profile:lower()] = tableToSet
+        SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec][Profile:lower()] = tableToSet
     end
 end
 
 --Deletes a profile table
-function addon:DeleteTalentTable(Profile)
-    if(addon:DoesTalentProfileExist(Profile)) then
-        addon.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = nil
-        addon:Debug("Deleted")
+function SwitchSwitch:DeleteTalentTable(Profile)
+    if(SwitchSwitch:DoesTalentProfileExist(Profile)) then
+        SwitchSwitch.sv.Talents.Profiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = nil
+        SwitchSwitch:DebugPrint("Deleted")
     end
 end
 
 --Gets the current global 
-function addon:GetCurrentProfilesTable()
-    addon:EnsureTablentSpecTableExits()
+function SwitchSwitch:GetCurrentProfilesTable()
+    SwitchSwitch:EnsureTablentSpecTableExits()
 
     local playerClass = select(3, UnitClass("player"))
 	local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
     local playerTable = {}
     if(playerClass and playerSpec) then
-        playerTable = addon.sv.Talents.Profiles[playerClass][playerSpec]
+        playerTable = SwitchSwitch.sv.Talents.Profiles[playerClass][playerSpec]
     end
     return playerTable
 end
 
-function addon:CountCurrentTalentsProfile()
-    local tbl = addon:GetCurrentProfilesTable()
+function SwitchSwitch:CountCurrentTalentsProfile()
+    local tbl = SwitchSwitch:GetCurrentProfilesTable()
     local count = 0
     
     for _ in pairs(tbl) do
@@ -151,7 +169,7 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 --Get the talent from the current active spec
-function addon:GetCurrentTalents(saveTalentsPVP)
+function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
     --If not provided save talents will be true
     if(saveTalentsPVP == nil) then
         saveTalentsPVP = true;
@@ -201,7 +219,7 @@ function addon:GetCurrentTalents(saveTalentsPVP)
     end
 
     --Get Essence information
-    if(addon:HasHeartOfAzerothEquipped()) then
+    if(SwitchSwitch:HasHeartOfAzerothEquipped()) then
         local MilestoneIDs = {115,116,117,119}
         for index, id in ipairs(MilestoneIDs) do
             local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
@@ -216,7 +234,7 @@ function addon:GetCurrentTalents(saveTalentsPVP)
 end
 
 --Check if we can switch talents
-function addon:CanChangeTalents()
+function SwitchSwitch:CanChangeTalents()
     --Quick return if resting for better performance
     if(IsResting()) then
         return true
@@ -282,28 +300,28 @@ function addon:CanChangeTalents()
     return false
 end
 
-function addon:ActivateTalentProfile(profileName)
+function SwitchSwitch:ActivateTalentProfile(profileName)
 
     if(UnitAffectingCombat("Player")) then
-        addon:Debug("Player is in combat.")
+        SwitchSwitch:DebugPrint("Player is in combat.")
         return
     end
 
     --Check if profileName is not null
     if(not profileName or type(profileName) ~= "string") then
-        addon:Debug("Given profile name is null")
+        SwitchSwitch:DebugPrint("Given profile name is null")
         return
     end
 
     --Check  if table exits
-    if(not addon:DoesTalentProfileExist(profileName)) then
-        addon:Print(addon.L["Could not change talents to Profile '%s' as it does not exit"]:format(profileName))
+    if(not SwitchSwitch:DoesTalentProfileExist(profileName)) then
+        SwitchSwitch:Print(L["Could not change talents to Profile '%s' as it does not exit"]:format(profileName))
         return
     end
 
     --If we cannot change talents why even try?
-    if(not addon:CanChangeTalents()) then
-        if(addon.sv.config.autoUseItems) then
+    if(not SwitchSwitch:CanChangeTalents()) then
+        if(SwitchSwitch.sv.config.autoUseItems) then
             -- Now all tomes have level so lets add them based on character level
             local tomesID = {}
             --Check for level to add the Clear mind tome
@@ -345,7 +363,7 @@ function addon:ActivateTalentProfile(profileName)
             --Check if we found an item if not return false
             if(not itemIDToUse) then
                 --No item found so return
-                addon:Print(addon.L["Could not find a Tome to use and change talents"])
+                SwitchSwitch:Print(L["Could not find a Tome to use and change talents"])
                 return
             end
 
@@ -353,35 +371,35 @@ function addon:ActivateTalentProfile(profileName)
             --Got an item so open the popup to ask to use it!
             local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, bagID .. " " .. slot)
             if(dialog) then
-                addon:Debug("Setting data to ask for tome usage to: " .. profileName)
+                SwitchSwitch:DebugPrint("Setting data to ask for tome usage to: " .. profileName)
                 dialog.data2 = profileName
             end
         else
             --No check for usage so just return
-            addon:Print(addon.L["Could not change talents as you are not in a rested area, or dont have the buff"])
+            SwitchSwitch:Print(L["Could not change talents as you are not in a rested area, or dont have the buff"])
         end
         return
     end
 
     --Function to set talents
-    addon:SetTalents(profileName)
+    SwitchSwitch:SetTalents(profileName)
 end
 --Helper function to avoid needing to copy-caste every time...
-function addon:SetTalents(profileName)
+function SwitchSwitch:SetTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch
-    addon.G.SwitchingTalents = true
-    addon:Print(addon.L["Changing talents"] .. ":" .. profileName)
+    SwitchSwitch.G.SwitchingTalents = true
+    SwitchSwitch:Print(L["Changing talents"] .. ":" .. profileName)
 
     --Check if the talent addon is up
     if(not IsAddOnLoaded("Blizzard_TalentUI")) then
         LoadAddOn("Blizzard_TalentUI")
     end
 
-    if(not addon:DoesTalentProfileExist(profileName)) then
+    if(not SwitchSwitch:DoesTalentProfileExist(profileName)) then
         return;
     end
 
-    local currentTalentProfile = addon:GetTalentTable(profileName)
+    local currentTalentProfile = SwitchSwitch:GetTalentTable(profileName)
 
     --Learn talents normal talents
     if(currentTalentProfile.pva ~= nil) then
@@ -392,7 +410,7 @@ function addon:SetTalents(profileName)
                 LearnTalents(talent)
                 --If talent id changed let the user know that the talents might be wrong
                 if(select(1, talent) ~= talentTbl.id) then
-                    addon:Print(addon.L["It seems like the talent from tier: '%s' and column: '%s' have been moved or changed, check you talents!"]:format(tostring(talentTbl.tier), tostring(talentTbl.column)))
+                    SwitchSwitch:Print(L["It seems like the talent from tier: '%s' and column: '%s' have been moved or changed, check you talents!"]:format(tostring(talentTbl.tier), tostring(talentTbl.column)))
                 end
             end
         end
@@ -417,7 +435,7 @@ function addon:SetTalents(profileName)
     end
 
 
-    if(currentTalentProfile.heart_of_azeroth_essences ~= nil and addon:HasHeartOfAzerothEquipped()) then
+    if(currentTalentProfile.heart_of_azeroth_essences ~= nil and SwitchSwitch:HasHeartOfAzerothEquipped()) then
         --Learn essences
         for milestoneID, essenceID in pairs(currentTalentProfile.heart_of_azeroth_essences) do
             C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
@@ -426,7 +444,7 @@ function addon:SetTalents(profileName)
 
     --Change gear set if available
     if(currentTalentProfile.gearSet ~= nil) then
-        addon:Debug("ID: ", currentTalentProfile.gearSet)
+        SwitchSwitch:DebugPrint("ID: ", currentTalentProfile.gearSet)
         local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(currentTalentProfile.gearSet)
         if(not isEquipped) then
             C_EquipmentSet.UseEquipmentSet(currentTalentProfile.gearSet)
@@ -435,29 +453,29 @@ function addon:SetTalents(profileName)
 
 
     --Print and return
-    addon:Print(addon.L["Changed talents to '%s'"]:format(profileName))
+    SwitchSwitch:Print(L["Changed talents to '%s'"]:format(profileName))
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
-    C_Timer.After(1.0,function() addon.G.SwitchingTalents = false end)
+    C_Timer.After(1.0,function() SwitchSwitch.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
-    addon.sv.config.SelectedTalentsProfile = profileName:lower()
+    SwitchSwitch.sv.config.SelectedTalentsProfile = profileName:lower()
 end
 
 --Check if a given profile is the current talents
-function addon:IsCurrentTalentProfile(profileName)
+function SwitchSwitch:IsCurrentTalentProfile(profileName)
     --Check if null or not existing
-    if(not addon:DoesTalentProfileExist(profileName)) then
-        addon:Debug(string.format("Profile name does not exist [%s]", profileName))
+    if(not SwitchSwitch:DoesTalentProfileExist(profileName)) then
+        SwitchSwitch:DebugPrint(string.format("Profile name does not exist [%s]", profileName))
         return false
     end
 
-    local currentActiveTalents = addon:GetCurrentTalents()
-    local currentprofile = addon:GetTalentTable(profileName)
+    local currentActiveTalents = SwitchSwitch:GetCurrentTalents()
+    local currentprofile = SwitchSwitch:GetTalentTable(profileName)
 
-    if(currentprofile.heart_of_azeroth_essences ~= nil and addon:HasHeartOfAzerothEquipped()) then
+    if(currentprofile.heart_of_azeroth_essences ~= nil and SwitchSwitch:HasHeartOfAzerothEquipped()) then
         --Check essences
         for milestoneID, essenceID in pairs(currentActiveTalents.heart_of_azeroth_essences) do
             if(currentprofile.heart_of_azeroth_essences[milestoneID] == nil or essenceID ~= currentprofile.heart_of_azeroth_essences[milestoneID]) then
-                addon:Debug("Essences do not match");
+                SwitchSwitch:DebugPrint("Essences do not match");
                 return false   
             end
         end
@@ -476,7 +494,7 @@ function addon:IsCurrentTalentProfile(profileName)
             end
             --We dont have the talent so just return false
             if(not hasTalent) then
-                addon:Debug("PVP tlanets does not match");
+                SwitchSwitch:DebugPrint("PVP tlanets does not match");
                 return false
             end
         end
@@ -487,7 +505,7 @@ function addon:IsCurrentTalentProfile(profileName)
         for i, talentInfo in ipairs(currentprofile.pva) do
             talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
             if(not known) then
-                addon:Debug(string.format("Talent with the name %s is not leanred", name))
+                SwitchSwitch:DebugPrint(string.format("Talent with the name %s is not leanred", name))
                 return false
             end
         end
@@ -496,37 +514,37 @@ function addon:IsCurrentTalentProfile(profileName)
 end
 
 --Gets the profile that is active from all the saved profiles
-function addon:GetCurrentProfileFromSaved()
+function SwitchSwitch:GetCurrentProfileFromSaved()
     --Iterate trough every talent profile
-    for name, TalentArray in pairs(addon:GetCurrentProfilesTable()) do
-        if(addon:IsCurrentTalentProfile(name)) then
+    for name, TalentArray in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
+        if(SwitchSwitch:IsCurrentTalentProfile(name)) then
             --Return the currentprofilename
-            addon:Debug("Detected:" .. name)
+            SwitchSwitch:DebugPrint("Detected:" .. name)
             return name:lower()
         end
     end
-    addon:Debug("No profiles match current talnets")
+    SwitchSwitch:DebugPrint("No profiles match current talnets")
     --Return the custom profile name
-    return addon.CustomProfileName
+    return SwitchSwitch.CustomProfileName
 end
 --Lua helper functions
 --creates a deep copy of the table
-function addon:deepcopy(orig)
+function SwitchSwitch:deepcopy(orig)
     local orig_type = type(orig)
     local copy
     if orig_type == 'table' then
         copy = {}
         for orig_key, orig_value in next, orig, nil do
-            copy[addon:deepcopy(orig_key)] = addon:deepcopy(orig_value)
+            copy[SwitchSwitch:deepcopy(orig_key)] = SwitchSwitch:deepcopy(orig_value)
         end
-        setmetatable(copy, addon:deepcopy(getmetatable(orig)))
+        setmetatable(copy, SwitchSwitch:deepcopy(getmetatable(orig)))
     else -- number, string, boolean, etc
         copy = orig
     end
     return copy
 end
 
-function addon:tablelength(T)
+function SwitchSwitch:tablelength(T)
     local count = 0
     for _ in pairs(T) do count = count + 1 end
     return count

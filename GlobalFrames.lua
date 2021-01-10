@@ -1,11 +1,11 @@
 --############################################
 -- Namespace
 --############################################
-local _, addon = ...
+local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
 --Set up frame helper gobal tables
-addon.GlobalFrames = {}
-local GlobalFrames = addon.GlobalFrames
+SwitchSwitch.GlobalFrames = {}
+local GlobalFrames = SwitchSwitch.GlobalFrames
 
 
 --##########################################################################################################################
@@ -13,16 +13,16 @@ local GlobalFrames = addon.GlobalFrames
 --##########################################################################################################################
 function GlobalFrames:Init()
     GlobalFrames.SavePVPTalents = CreateFrame("CheckButton", "SS_CheckboxSavePVPTalents", UIParent, "UICheckButtonTemplate")
-    GlobalFrames.SavePVPTalents.text:SetText(addon.L["Save pvp talents?"])
+    GlobalFrames.SavePVPTalents.text:SetText(L["Save pvp talents?"])
     GlobalFrames.SavePVPTalents:SetChecked(true)
     GlobalFrames.SavePVPTalents:Hide()
 
     --Popup to notify the user if they want the addon to automaticly use a tome
     StaticPopupDialogs["SwitchSwitch_ConfirmTomeUsage"] =
     {
-        text = addon.L["Do you want to use a tome to change talents?"],
-        button1 = addon.L["Yes"],
-        button2 = addon.L["No"],
+        text = L["Do you want to use a tome to change talents?"],
+        button1 = L["Yes"],
+        button2 = L["No"],
         timeout = 0,
         whileDead = true,
         hideOnEscape = true,
@@ -49,8 +49,8 @@ function GlobalFrames:Init()
          end,
          OnAccept = function(self, data, data2)
             --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
-            addon:Debug("Changing talents after 1 seconds to " .. data2)
-            C_Timer.After(1, function() addon:ActivateTalentProfile(data2) end)
+            SwitchSwitch:DebugPrint("Changing talents after 1 seconds to " .. data2)
+            C_Timer.After(1, function() SwitchSwitch:ActivateTalentProfile(data2) end)
             self.sbutton:Hide()
         end,
     }
@@ -59,7 +59,7 @@ end
 local function CreateSuggestionFrame()
     --Frame for auto profile sugestor in instance
     local frame = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
-    frame:SetPoint(addon.sv.config.SuggestionFramePoint.point, UIParent, addon.sv.config.SuggestionFramePoint.relativePoint, addon.sv.config.SuggestionFramePoint.frameX, addon.sv.config.SuggestionFramePoint.frameY)
+    frame:SetPoint(SwitchSwitch.sv.config.SuggestionFramePoint.point, UIParent, SwitchSwitch.sv.config.SuggestionFramePoint.relativePoint, SwitchSwitch.sv.config.SuggestionFramePoint.frameX, SwitchSwitch.sv.config.SuggestionFramePoint.frameY)
     frame:SetSize(300, 100)
     --Add the first text tp notify the user what talent we ar about to change
     frame.InfoText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite") 
@@ -76,20 +76,20 @@ local function CreateSuggestionFrame()
     frame.ChangeProfileButton = CreateFrame("BUTTON", "SS_SuggestionFrameChangeButton", frame, "UIPanelButtonTemplate")
     frame.ChangeProfileButton:SetPoint("LEFT", frame, "LEFT", 10, -5)
     frame.ChangeProfileButton:SetSize(125, 40)
-    frame.ChangeProfileButton:SetText(addon.L["Change!"])
+    frame.ChangeProfileButton:SetText(L["Change!"])
     --Cancel button to close the frame up
     frame.CancelButton = CreateFrame("BUTTON", "SS_SuggestionCancelButton", frame, "UIPanelButtonTemplate")
     frame.CancelButton:SetPoint("RIGHT", frame, "RIGHT", -10, -5)
     frame.CancelButton:SetSize(125, 40)
-    frame.CancelButton:SetText(addon.L["Cancel"])
+    frame.CancelButton:SetText(L["Cancel"])
 
     --Set the buttons functions
     --Cancel button
     frame.CancelButton:SetScript("OnClick", function(self)  self:GetParent():Hide() end)
     --Change button
     frame.ChangeProfileButton:SetScript("OnClick", function(self)
-        addon:Debug("Clicked change talents to recomended: " .. self.Profile)
-        addon:ActivateTalentProfile(self.Profile)
+        SwitchSwitch:DebugPrint("Clicked change talents to recomended: " .. self.Profile)
+        SwitchSwitch:ActivateTalentProfile(self.Profile)
         self:GetParent():Hide()
     end)
 
@@ -101,18 +101,18 @@ local function CreateSuggestionFrame()
     frame:SetScript("OnDragStop", function(self)
             self:StopMovingOrSizing();
             point1, _, relativePoint1, xOfs, yOfs = self:GetPoint(1);
-            addon.sv.config.SuggestionFramePoint.point = point1;
-            addon.sv.config.SuggestionFramePoint.relativePoint = relativePoint1;
-            addon.sv.config.SuggestionFramePoint.frameX = xOfs;
-            addon.sv.config.SuggestionFramePoint.frameY = yOfs;
+            SwitchSwitch.sv.config.SuggestionFramePoint.point = point1;
+            SwitchSwitch.sv.config.SuggestionFramePoint.relativePoint = relativePoint1;
+            SwitchSwitch.sv.config.SuggestionFramePoint.frameX = xOfs;
+            SwitchSwitch.sv.config.SuggestionFramePoint.frameY = yOfs;
     end);
 
     -- Add update to the frame so it can dissaper after a certain time
     frame:SetScript("OnShow", function(self)
         self.ElapsedTime = 0
-        self.InfoText:SetText(addon.L["Would you like to change you talents to %s?"]:format(self.ChangeProfileButton.Profile))
+        self.InfoText:SetText(L["Would you like to change you talents to %s?"]:format(self.ChangeProfileButton.Profile))
         --If no time is given then hide the text
-        if(addon.sv.config.maxTimeSuggestionFrame == 0) then
+        if(SwitchSwitch.sv.config.maxTimeSuggestionFrame == 0) then
             self.RemainingText:Hide()
         else 
             self.RemainingText:Show()
@@ -120,14 +120,14 @@ local function CreateSuggestionFrame()
     end)
     frame:SetScript("OnUpdate", function(self, elapsed)
         --If the max time is 0 then not update anything
-        if(addon.sv.config.maxTimeSuggestionFrame == 0) then
+        if(SwitchSwitch.sv.config.maxTimeSuggestionFrame == 0) then
             return
         end
         --Update elapsed time and string
         self.ElapsedTime = self.ElapsedTime + elapsed
-        self.RemainingText:SetText(addon.L["Frame will close after %s seconds..."]:format(string.format("%.0f",addon.sv.config.maxTimeSuggestionFrame - self.ElapsedTime)))
+        self.RemainingText:SetText(L["Frame will close after %s seconds..."]:format(string.format("%.0f",SwitchSwitch.sv.config.maxTimeSuggestionFrame - self.ElapsedTime)))
         --If the time given passed hide
-        if(self.ElapsedTime >= addon.sv.config.maxTimeSuggestionFrame) then
+        if(self.ElapsedTime >= SwitchSwitch.sv.config.maxTimeSuggestionFrame) then
             self:Hide()
         end
     end)
@@ -141,7 +141,7 @@ local function CreateSuggestionFrame()
     end)
 
     --Debuging text
-    addon:Debug("Created Suggestion frame!")
+    SwitchSwitch:DebugPrint("Created Suggestion frame!")
 
     --Hide the frame by default
     frame:Hide()
@@ -152,11 +152,11 @@ end
 
 function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
     --First check if the profile is valid and exists
-    if(not profileToActivate or profileToActivate == "" or not addon:DoesTalentProfileExist(profileToActivate)) then
-        addon:Debug("Could not open 'Sugestion frame' as either the profile is null or does not exist")
+    if(not profileToActivate or profileToActivate == "" or not SwitchSwitch:DoesTalentProfileExist(profileToActivate)) then
+        SwitchSwitch:DebugPrint("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
-    addon:Debug("Showing Toggle suggestion frame with profile: " .. profileToActivate)
+    SwitchSwitch:DebugPrint("Showing Toggle suggestion frame with profile: " .. profileToActivate)
     --Set the frame or create it, set data and show the frame.
     GlobalFrames.ProfileSuggestion = GlobalFrames.ProfileSuggestion or CreateSuggestionFrame()
     GlobalFrames.ProfileSuggestion.ChangeProfileButton.Profile = profileToActivate

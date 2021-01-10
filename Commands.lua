@@ -1,33 +1,33 @@
 --############################################
 -- Namespace
 --############################################
-local _, addon = ...
+local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
-addon.Commands = {}
+SwitchSwitch.Commands = {}
 
-local Commands = addon.Commands
+local Commands = SwitchSwitch.Commands
 
 --##########################################################################################################################
 --                                  Commands Fnctions
 --##########################################################################################################################
 function Commands:Help()
-    addon:Print("--------- |cff00F3FF"..addon.L["List of commands"]..":|r ---------");
-    addon:Print("|cff188E01/ss help|r - " .. addon.L["Shows all commands"] .. ".");
-    addon:Print("|cff188E01/ss config|r - " .. addon.L["Shows the config frame"] .. ".");
-	addon:Print("|cff188E01/ss load <profileName>|r - " .. addon.L["Loads a talent profile"] .. ".");
-	addon:Print("|cff188E01/ss resetFrame suggestion|r - " .. addon.L["Resets the suggestion frame location"] .. ".");
-	addon:Print("-------------------------------------");
+    SwitchSwitch:Print("--------- |cff00F3FF"..L["List of commands"]..":|r ---------");
+    SwitchSwitch:Print("|cff188E01/ss help|r - " .. L["Shows all commands"] .. ".");
+    SwitchSwitch:Print("|cff188E01/ss config|r - " .. L["Shows the config frame"] .. ".");
+	SwitchSwitch:Print("|cff188E01/ss load <profileName>|r - " .. L["Loads a talent profile"] .. ".");
+	SwitchSwitch:Print("|cff188E01/ss resetFrame suggestion|r - " .. L["Resets the suggestion frame location"] .. ".");
+	SwitchSwitch:Print("-------------------------------------");
 end
 
 function Commands:LoadProfileCMD(...)
-	addon:Debug("Changing talents to: " .. ...)
-	addon:ActivateTalentProfile(string.join(" ", tostringall(...)))
+	SwitchSwitch:DebugPrint("Changing talents to: " .. ...)
+	SwitchSwitch:ActivateTalentProfile(string.join(" ", tostringall(...)))
 end
 
 
 function Commands:ResetFrameLocation(frame)
 	if(frame == "suggestion") then
-		addon.sv.config.SuggestionFramePoint =
+		SwitchSwitch.sv.config.SuggestionFramePoint =
 		{
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",
@@ -42,7 +42,7 @@ end
 --##########################################################################################################################
 local CommandList =
 {
-	["config"] = addon.ConfigFrame.ToggleFrame,
+	["config"] = SwitchSwitch.ConfigFrame.ToggleFrame,
 	["help"] = Commands.Help,
 	["load"] = Commands.LoadProfileCMD,
 	["resetFrame"] = Commands.ResetFrameLocation
