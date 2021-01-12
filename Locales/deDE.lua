@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("SwitchSwitch", "deDE", true)
+local L = LibStub("AceLocale-3.0"):NewLocale("SwitchSwitch", "deDE", false, true)
 
 L["(0 to disable auto-fade)"] = "(0 zum deaktivieren)"
 L["Arenas"] = "Arenen"
