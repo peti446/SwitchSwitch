@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("SwitchSwitch", "enUS", true, --[====[Silence]====]- true)
+local L = LibStub("AceLocale-3.0"):NewLocale("SwitchSwitch", "enUS", true, true)
 
 -- Set default Localization (English)
 L["List of commands"] = true

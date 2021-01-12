@@ -1,5 +1,5 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("SwitchSwitch", "deDE", false, true)
-
+if L then
 L["(0 to disable auto-fade)"] = "(0 zum deaktivieren)"
 L["Arenas"] = "Arenen"
 L["Autofade timer for auto-change frame"] = "Zeit bis zum Ausblenden des Popups f\195\188r den automatischen Wechsel"
@@ -44,3 +44,4 @@ L["Talents"] = "Talente"
 L["Would you like to change you talents to %s?"] = "M\195\182chtest du deine Talente zu %s \195\164ndern?"
 L["Yes"] = "Ja"
 L["You want to delete the profile '%s'?"] = "Willst du das Profil '%s' l\195\182schen?"
+end
