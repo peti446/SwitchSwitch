@@ -27,7 +27,7 @@ SwitchSwitch.CustomProfileName = "custom"
 --##########################################################################################################################
 -- Function to print a debug message
 function SwitchSwitch:DebugPrint(...)
-    if(type(SwitchSwitch.db) ~= "table" or self.dbpc.char.debug) then
+    if(type(self.dbpc) ~= "table" or self.dbpc.char.debug) then
         SwitchSwitch:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
     end
 end

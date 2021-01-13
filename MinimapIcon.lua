@@ -22,12 +22,21 @@ function LDBSwitchSwitch:OnTooltipShow()
 end
 
 function LDBSwitchSwitch:OnClick(button, down)
-    SwitchSwitch.ConfigFrame:ToggleFrame()
+    SwitchSwitch:TogleMainFrame()
 end
 
 function SwitchSwitch:InitMinimapIcon()
     if(AlreadyRegistered == false) then
         mmIcon:Register("SwitchSwitch", LDBSwitchSwitch, self.dbpc.char)
         AlreadyRegistered = true
+    end
+end
+
+function SwitchSwitch:SetMinimapIconVisible(visible)
+    if(visible) then
+        if(not AlreadyRegistered) then self:InitMinimapIcon() end
+        mmIcon:Show("SwitchSwitch")
+    else
+        mmIcon:Hide("SwitchSwitch")
     end
 end

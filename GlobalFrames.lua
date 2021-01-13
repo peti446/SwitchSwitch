@@ -16,50 +16,12 @@ function GlobalFrames:Init()
     GlobalFrames.SavePVPTalents.text:SetText(L["Save pvp talents?"])
     GlobalFrames.SavePVPTalents:SetChecked(true)
     GlobalFrames.SavePVPTalents:Hide()
-
-    --Popup to notify the user if they want the addon to automaticly use a tome
-    StaticPopupDialogs["SwitchSwitch_ConfirmTomeUsage"] =
-    {
-        text = L["Do you want to use a tome to change talents?"],
-        button1 = L["Yes"],
-        button2 = L["No"],
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-        exclusive = true,
-        enterClicksFirstButton = true,
-        OnShow = function(self, data) 
-            --Wellll as there is no build-in way to have secure button as part of a static popuop we need to replace the buttons shig
-            -- so we do
-            if(self.sbutton == nil) then
-                self.sbutton = CreateFrame("Button", "SS_ButtonUseTomePopup", self, "UIPanelButtonTemplate, SecureActionButtonTemplate");
-                self.sbutton:SetAttribute("type", "item");
-                self.sbutton:SetAttribute("item", data)
-                self.sbutton:SetParent(self)
-                self.sbutton:ClearAllPoints()
-                self.sbutton:SetPoint(self.button1:GetPoint())
-                self.sbutton:SetWidth(self.button1:GetWidth())
-                self.sbutton:SetHeight(self.button1:GetHeight())
-                self.sbutton:SetText(self.button1:GetText())
-                self.sbutton:SetScript("PostClick", function() self.button1:Click() end)
-            end
-            self.sbutton:Show()
-            self.button1:Hide()
-         end,
-         OnAccept = function(self, data, data2)
-            --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
-            SwitchSwitch:DebugPrint("Changing talents after 1 seconds to " .. data2)
-            C_Timer.After(1, function() SwitchSwitch:ActivateTalentProfile(data2) end)
-            self.sbutton:Hide()
-        end,
-    }
 end
 
 local function CreateSuggestionFrame()
     --Frame for auto profile sugestor in instance
     local frame = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
-    frame:SetPoint(SwitchSwitch.dbpc.char.SuggestionFramePoint.point, UIParent, SwitchSwitch.dbpc.char.SuggestionFramePoint.relativePoint, SwitchSwitch.dbpc.char.SuggestionFramePoint.frameX, SwitchSwitch.dbpc.char.SuggestionFramePoint.frameY)
+    frame:SetPoint(SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.point, UIParent, SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.relativePoint, SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameX, SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameY)
     frame:SetSize(300, 100)
     --Add the first text tp notify the user what talent we ar about to change
     frame.InfoText = frame:CreateFontString(nil, "ARTWORK", "GameFontWhite") 
@@ -101,10 +63,10 @@ local function CreateSuggestionFrame()
     frame:SetScript("OnDragStop", function(self)
             self:StopMovingOrSizing();
             point1, _, relativePoint1, xOfs, yOfs = self:GetPoint(1);
-            SwitchSwitch.dbpc.char.SuggestionFramePoint.point = point1;
-            SwitchSwitch.dbpc.char.SuggestionFramePoint.relativePoint = relativePoint1;
-            SwitchSwitch.dbpc.char.SuggestionFramePoint.frameX = xOfs;
-            SwitchSwitch.dbpc.char.SuggestionFramePoint.frameY = yOfs;
+            SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.point = point1;
+            SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.relativePoint = relativePoint1;
+            SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameX = xOfs;
+            SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameY = yOfs;
     end);
 
     -- Add update to the frame so it can dissaper after a certain time
@@ -112,7 +74,7 @@ local function CreateSuggestionFrame()
         self.ElapsedTime = 0
         self.InfoText:SetText(L["Would you like to change you talents to %s?"]:format(self.ChangeProfileButton.Profile))
         --If no time is given then hide the text
-        if(SwitchSwitch.dbpc.char.maxTimeSuggestionFrame == 0) then
+        if(SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime == 0) then
             self.RemainingText:Hide()
         else 
             self.RemainingText:Show()
@@ -120,14 +82,14 @@ local function CreateSuggestionFrame()
     end)
     frame:SetScript("OnUpdate", function(self, elapsed)
         --If the max time is 0 then not update anything
-        if(SwitchSwitch.dbpc.char.maxTimeSuggestionFrame == 0) then
+        if(SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime == 0) then
             return
         end
         --Update elapsed time and string
         self.ElapsedTime = self.ElapsedTime + elapsed
-        self.RemainingText:SetText(L["Frame will close after %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.maxTimeSuggestionFrame - self.ElapsedTime)))
+        self.RemainingText:SetText(L["Frame will close after %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime - self.ElapsedTime)))
         --If the time given passed hide
-        if(self.ElapsedTime >= SwitchSwitch.dbpc.char.maxTimeSuggestionFrame) then
+        if(self.ElapsedTime >= SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime) then
             self:Hide()
         end
     end)

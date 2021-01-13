@@ -27,7 +27,7 @@ end
 
 function Commands:ResetFrameLocation(frame)
 	if(frame == "suggestion") then
-		SwitchSwitch.dbpc.char.SuggestionFramePoint =
+		SwitchSwitch.dbpc.char.talentsSuggestionFrame.point =
 		{
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",
@@ -42,7 +42,7 @@ end
 --##########################################################################################################################
 local CommandList =
 {
-	["config"] = SwitchSwitch.ConfigFrame.ToggleFrame,
+	["config"] = SwitchSwitch.ShowMainFrame_Config,
 	["help"] = Commands.Help,
 	["load"] = Commands.LoadProfileCMD,
 	["resetFrame"] = Commands.ResetFrameLocation
@@ -70,7 +70,7 @@ local function HandleSlashCommands(str)
 			if (path[arg]) then
 				if (type(path[arg]) == "function") then				
 					-- all remaining args passed to our function
-					path[arg](addon, select(id + 1, unpack(args)))
+					path[arg](SwitchSwitch, select(id + 1, unpack(args)))
 					return
 				elseif (type(path[arg]) == "table") then				
 					path = path[arg] -- another sub-table found!

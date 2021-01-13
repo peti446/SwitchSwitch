@@ -12,32 +12,23 @@ local dbpcDefaults =
     char = {
         ["Version"] = SwitchSwitch.InternalVersion,
         ["debug"] = false,
-        ["autoUseItems"] = true,
-        ["SelectedTalentsProfile"] = "",
-        ["SuggestionFramePoint"] =
+        ["autoUseTomes"] = true,
+        ["talentsSuggestionFrame"] =
         {
-            ["point"] = "CENTER",
-            ["relativePoint"] = "CENTER",
-            ["frameX"] = 0,
-            ["frameY"] = 0
-        },
-        ["maxTimeSuggestionFrame"] = 15,
-        ["autoSuggest"] = 
-        {
-            ["pvp"] = "",
-            ["arena"] = "",
-            ["raid"] = "",
-            ["party"] = 
+            ["location"] =
             {
-                ["HM"] = "",
-                ["MM"] = ""                
-            }
+                ["point"] = "CENTER",
+                ["relativePoint"] = "CENTER",
+                ["frameX"] = 0,
+                ["frameY"] = 0
+            },
+            ["enabled"] = true,
+            ["fadeTime"] = 15
         },
         ["minimap"] = 
         { 
             ["hide"] = false,
         }
-
     },
 }
 
@@ -176,12 +167,11 @@ function SwitchSwitch:Update()
             self:Print("You just updated form a pre 2.0 version to 2.0. You might need to reset the saved variables if lua errors happen")
             self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
             self.dbpc.char.debug = self.DEPRECTED_OLD_VERSION_CHAR_CONF.debug
-            self.dbpc.char.autoUseItems = self.DEPRECTED_OLD_VERSION_CHAR_CONF.autoUseItems
-            self.dbpc.char.SelectedTalentsProfile = self.DEPRECTED_OLD_VERSION_CHAR_CONF.SelectedTalentsProfile
-            self.dbpc.char.maxTimeSuggestionFrame = self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame
+            self.dbpc.char.autoUseTomes = self.DEPRECTED_OLD_VERSION_CHAR_CONF.autoUseItems
+            self.dbpc.char.talentsSuggestionFrame.fadeTime = math.min(60,math.max(10, self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame))
+            self.dbpc.char.talentsSuggestionFrame.enabled = self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame > 0
             -- Tables need deep copy
-            self.dbpc.char.SuggestionFramePoint = deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
-            self.dbpc.char.autoSuggest = deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.autoSuggest)
+            self.dbpc.char.talentsSuggestionFrame.location = deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
             -- We set this to nill as we dont want to import again
             self.DEPRECTED_OLD_VERSION_CHAR_CONF = {}
             SwitchSwitchConfig = {}

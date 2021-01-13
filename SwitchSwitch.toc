@@ -11,10 +11,15 @@
 embeds_libs.xml
 embeds_locales.xml
 SwitchSwitch.lua
+Frames/DialogBoxes.lua
+Frames/Main/MainFrame.lua
+Frames/Main/MenuItems/Profiles.lua
+Frames/Main/MenuItems/ExportImport.lua
+Frames/Main/MenuItems/Options.lua
+
 GobalEvents.lua
 MinimapIcon.lua
 TalentUIFrame.lua
 GlobalFrames.lua
-ConfigFrame.lua
 Commands.lua
 Init.lua
