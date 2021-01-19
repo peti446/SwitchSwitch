@@ -52,6 +52,7 @@ function SwitchSwitch:OnInitialize()
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE"}, 0.5, "PLAYER_TALENT_UPDATE")
     
     -- #######################################################################################################
@@ -69,8 +70,6 @@ function SwitchSwitch:OnEnable()
 
     --Load Commands
     SwitchSwitch.Commands:Init()
-    --Load global frame
-    SwitchSwitch.GlobalFrames:Init()
     
     --Init the minimap
     SwitchSwitch:InitMinimapIcon()
@@ -106,26 +105,6 @@ local function GetVersionNumber(str)
     return str
 end
 
-local function deepcopy(o, seen)
-    seen = seen or {}
-    if o == nil then return nil end
-    if seen[o] then return seen[o] end
-  
-    local no
-    if type(o) == 'table' then
-      no = {}
-      seen[o] = no
-  
-      for k, v in next, o, nil do
-        no[deepcopy(k, seen)] = deepcopy(v, seen)
-      end
-      setmetatable(no, deepcopy(getmetatable(o), seen))
-    else -- number, string, boolean, etc
-      no = o
-    end
-    return no
-end
-
 function SwitchSwitch:Update()
     --Get old version string
     local globalConfigVersion = GetVersionNumber(self.db.global.Version)
@@ -152,7 +131,7 @@ function SwitchSwitch:Update()
             self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
             self:Print("You just updated form a pre 2.0 version to 2.0. You might need to reset the saved variables if lua errors happen")
             self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
-            self.db.global.TalentProfiles = deepcopy(self.DEPRECTED_OLD_VERSION_PROFILES.Profiles)
+            self.db.global.TalentProfiles = self:deepcopy(self.DEPRECTED_OLD_VERSION_PROFILES.Profiles)
             -- We set this to nill as we dont want to import again
             self.DEPRECTED_OLD_VERSION_PROFILES = {}
             SwitchSwitchProfiles = {}
@@ -171,7 +150,7 @@ function SwitchSwitch:Update()
             self.dbpc.char.talentsSuggestionFrame.fadeTime = math.min(60,math.max(10, self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame))
             self.dbpc.char.talentsSuggestionFrame.enabled = self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame > 0
             -- Tables need deep copy
-            self.dbpc.char.talentsSuggestionFrame.location = deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
+            self.dbpc.char.talentsSuggestionFrame.location = self:deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
             -- We set this to nill as we dont want to import again
             self.DEPRECTED_OLD_VERSION_CHAR_CONF = {}
             SwitchSwitchConfig = {}

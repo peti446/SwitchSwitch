@@ -5,8 +5,41 @@ local LastInstanceID = -1
 
 function SwitchSwitch:ADDON_LOADED(event, arg1)
     if(arg1 == "Blizzard_TalentUI") then
+        self:PLAYER_SPECIALIZATION_CHANGED()
         SwitchSwitch.TalentUIFrame:CreateTalentFrameUI()
         return
+    end
+end
+
+function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
+    if(not IsAddOnLoaded("Blizzard_TalentUI")) then
+        LoadAddOn("Blizzard_TalentUI")
+        return
+    end
+    
+    if(type(SwitchSwitch.TalentsData) ~= "table") then
+        SwitchSwitch.TalentsData = {}
+    end
+
+    local playerSpec = SwitchSwitch:GetCurrentSpec()
+    SwitchSwitch.TalentsData[playerSpec] = {}
+    local spec = GetActiveSpecGroup()
+    for row=1,MAX_TALENT_TIERS do
+        SwitchSwitch.TalentsData[playerSpec][row] = {}
+        local tierAvailable, selectedTalent, tierUnlockLevel = GetTalentTierInfo(row, spec)
+
+        SwitchSwitch.TalentsData[playerSpec][row]["requiredLevel"] = tierUnlockLevel
+        SwitchSwitch.TalentsData[playerSpec][row]["data"] = {}
+        for column=1,NUM_TALENT_COLUMNS do
+            local talentID, name, texture, selected, available, spellID, unknown, row, column, known, grantedByAura = GetTalentInfo(row, column, spec)
+            SwitchSwitch.TalentsData[playerSpec][row]["data"][column] = 
+            {
+                ["talentID"] = talentID,
+                ["textureID"] = texture,
+                ["spellID"] = spellID,
+                ["name"] = name
+            }
+        end
     end
 end
 
@@ -41,7 +74,7 @@ function SwitchSwitch:PLAYER_ENTERING_WORLD()
         if(profileNameToUse ~= nil and profileNameToUse ~= "") then
             if(not SwitchSwitch:IsCurrentTalentProfile(profileNameToUse)) then 
                 SwitchSwitch:DebugPrint("Atuo suggest changing to profile: " .. profileNameToUse)
-                SwitchSwitch.GlobalFrames:ToggleSuggestionFrame(profileNameToUse)
+                SwitchSwitch:ToggleSuggestionFrame(profileNameToUse)
             else
                 SwitchSwitch:DebugPrint("Profile " .. profileNameToUse .. " is already in use.")
             end
@@ -52,5 +85,5 @@ function SwitchSwitch:PLAYER_ENTERING_WORLD()
 end
 
 function SwitchSwitch:PLAYER_TALENT_UPDATE()
-    self.dbpc.char.SelectedTalentsProfile = SwitchSwitch:GetCurrentProfileFromSaved()
+    SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch:GetCurrentProfileFromSaved()
 end

@@ -21,6 +21,7 @@ SwitchSwitch.G = {}
 SwitchSwitch.G.SwitchingTalents = false
 SwitchSwitch.InternalVersion = 2.0
 SwitchSwitch.CustomProfileName = "custom"
+SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.CustomProfileName
 
 --##########################################################################################################################
 --                                  Helper Functions
@@ -28,7 +29,22 @@ SwitchSwitch.CustomProfileName = "custom"
 -- Function to print a debug message
 function SwitchSwitch:DebugPrint(...)
     if(type(self.dbpc) ~= "table" or self.dbpc.char.debug) then
-        SwitchSwitch:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
+        self:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
+    end
+end
+
+function SwitchSwitch:DebugPrintTable(tbl, indent)
+    if not indent then indent = 0 end
+    if type(tbl) == 'table' then
+        for k, v in pairs(tbl) do
+            formatting = string.rep("  ", indent) .. k .. ": "
+            if type(v) == "table" then
+                self:Print(formatting)
+                self:PrintTableDebug(v, indent+1)
+            else
+                self:DebugPrint(formatting .. tostring(v))
+            end
+        end
     end
 end
 
@@ -45,13 +61,21 @@ function SwitchSwitch:PrintTable(tbl, indent)
         for k, v in pairs(tbl) do
             formatting = string.rep("  ", indent) .. k .. ": "
             if type(v) == "table" then
-              SwitchSwitch:Print(formatting)
-              SwitchSwitch:PrintTable(v, indent+1)
+                self:Print(formatting)
+                self:PrintTable(v, indent+1)
             else
-                SwitchSwitch:Print(formatting .. tostring(v))
+                self:Print(formatting .. tostring(v))
             end
         end
     end
+end
+
+function SwitchSwitch:GetCurrentSpec()
+    return select(1, GetSpecializationInfo(GetSpecialization()))
+end
+
+function SwitchSwitch:GetPlayerClass()
+    return select(3, UnitClass("player"))
 end
 
 function SwitchSwitch:HasHeartOfAzerothEquipped()
@@ -68,98 +92,163 @@ function SwitchSwitch:Repeats(s,c)
     local _,n = s:gsub(c,"")
     return n
 end
+
+function SwitchSwitch:deepcopy(o, seen)
+    seen = seen or {}
+    if o == nil then return nil end
+    if seen[o] then return seen[o] end
+  
+    local no
+    if type(o) == 'table' then
+      no = {}
+      seen[o] = no
+  
+      for k, v in next, o, nil do
+        no[self:deepcopy(k, seen)] = self:deepcopy(v, seen)
+      end
+      setmetatable(no, self:deepcopy(getmetatable(o), seen))
+    else -- number, string, boolean, etc
+      no = o
+    end
+    return no
+end
+
+function SwitchSwitch:tablelength(T)
+    local count = 0
+    for _ in pairs(T) do count = count + 1 end
+    return count
+end
+
 -------------------------------------------------------------------- Talent table edition
-
--- Functionts to ensure tables exits, call before checking anything on the tables
-function SwitchSwitch:EnsureTalentClassTableExits()
-    local playerClass = select(3, UnitClass("player"))
-
-    if(SwitchSwitch.db.global.TalentProfiles == nil) then
-        SwitchSwitch.db.global.TalentProfiles = {}
+function SwitchSwitch:DoesClassProfilesTableExits(class)
+    if(class == nil) then
+        return false
     end
-    
-    if(playerClass) then
-        if(SwitchSwitch.db.global.TalentProfiles[playerClass] == nil) then
-            SwitchSwitch.db.global.TalentProfiles[playerClass] = {}
+
+    if(self.db.global.TalentProfiles[class] == nil) then
+        return false
+    end
+
+    return true
+end
+
+function SwitchSwitch:DoesSpecProfilesTableExits(class, spec)
+    if(not self:DoesClassProfilesTableExits(class)) then
+        return false
+    end
+
+    if(spec == nil) then
+        return false
+    end
+
+    if(self.db.global.TalentProfiles[class][spec] == nil) then
+        return false
+    end
+
+    return true
+end
+
+function SwitchSwitch:GetProfilesTable(class, spec)
+    local profileTable = {}
+    local class = class or self:GetPlayerClass()
+    local spec = spec or self:GetCurrentSpec()
+
+    if(spec ~= nil and class ~= nil) then
+        if(not self:DoesClassProfilesTableExits(class)) then
+            self.db.global.TalentProfiles[class] = {}
         end
+    
+        if(not self:DoesSpecProfilesTableExits(class, spec)) then
+            self.db.global.TalentProfiles[class][spec] = {}
+        end
+    
+        profileTable = self.db.global.TalentProfiles[class][spec]
     end
+
+    return profileTable
 end
 
-function SwitchSwitch:EnsureTablentSpecTableExits()
-    SwitchSwitch:EnsureTalentClassTableExits()
-
-	local playerClass = select(3, UnitClass("player"))
-    local playerSpec = select(1, GetSpecializationInfo(GetSpecialization()))
-    if (playerClass and playerSpec) then
-		if(SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec] == nil) then
-			SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec] = {}
-		end
-	end
+function SwitchSwitch:GetCurrentSpecProfilesTable()
+    return self:GetProfilesTable()
 end
 
---Checks if the talents Profile database contains the given Profile
-function SwitchSwitch:DoesTalentProfileExist(Profile)
-    --Iterate to find the profile (could use quick [profile] to see if it exits, but we want to compare allin lower (names are not case sentivies))
-    for k,v in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
-        if(k:lower() == Profile:lower()) then
-            --Profile exists
+function SwitchSwitch:DoesProfileExits(name, class, spec)
+    -- When iterating we want to also lower both sides this will help with collisions where the user might type it upper or lower case mixed
+    if(name == nil) then
+        return false
+    end
+
+    local name = name:lower()
+    for k,v in pairs(self:GetProfilesTable(class, spec)) do
+        if(k:lower() == name) then
             return true
         end
     end
-    --Profile does not exist
+
     return false
 end
 
---Gets the table of a specific profile
-function SwitchSwitch:GetTalentTable(Profile)
-    if(SwitchSwitch:DoesTalentProfileExist(Profile)) then
-        return SwitchSwitch.GetCurrentProfilesTable()[Profile:lower()]
+function SwitchSwitch:GetProfileData(name, class, spec)
+    if(name == nil) then
+        return nil  
     end
-    return nil;
+
+    local spec = spec or self:GetCurrentSpec()
+    local class = class or self:GetPlayerClass()
+    local t = self:GetProfilesTable(class, spec)
+    local name = name:lower()
+
+    if(not self:DoesProfileExits(name, class, spec)) then
+        t[name] = {}
+    end
+
+    return t[name]
 end
 
---Sets or creates a new table with the given table
-function SwitchSwitch:SetTalentTable(Profile, tableToSet)
-    SwitchSwitch:EnsureTablentSpecTableExits()
-    
-    local playerClass = select(3, UnitClass("player"))
-    local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
-    
-    if(playerClass and playerSpec) then
-        SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec][Profile:lower()] = tableToSet
+function SwitchSwitch:SetProfileData(name, newTable, class, spec)
+    if(neme ~= nil) then
+        return
     end
+
+    local spec = spec or self:GetCurrentSpec()
+    local class = class or self:GetPlayerClass()
+    local t = self:GetProfilesTable(class, spec)
+    local name = name:lower()
+    t[name] = newTable
 end
 
---Deletes a profile table
-function SwitchSwitch:DeleteTalentTable(Profile)
-    if(SwitchSwitch:DoesTalentProfileExist(Profile)) then
-        SwitchSwitch.db.global.TalentProfiles[select(3, UnitClass("player"))][select(1,GetSpecializationInfo(GetSpecialization()))][Profile:lower()] = nil
-        SwitchSwitch:DebugPrint("Deleted")
+function SwitchSwitch:DeleteProfileData(name, class, spec)
+    if(self:DoesProfileExits(name, class, spec)) then
+        local name = name:lower()
+
+        self:SetProfileData(name, nil, class, spec)
+        self:DebugPrint("Deleted")
+
+        if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
+            SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.CustomProfileName:lower()
+        end
+        
+        return true
     end
+    return false
 end
 
---Gets the current global 
-function SwitchSwitch:GetCurrentProfilesTable()
-    SwitchSwitch:EnsureTablentSpecTableExits()
+function SwitchSwitch:RenameProfile(name, newName, class, spec)
+    if(self:DoesProfileExits(name, calss, spec)) then
+        local name = name:lower()
+        local newName = newName:lower()
 
-    local playerClass = select(3, UnitClass("player"))
-	local playerSpec = select(1,GetSpecializationInfo(GetSpecialization()))
-    local playerTable = {}
-    if(playerClass and playerSpec) then
-        playerTable = SwitchSwitch.db.global.TalentProfiles[playerClass][playerSpec]
+        self:SetProfileData(newName, self:GetProfileData(name, class, spec), class, spec)
+        self:DeleteProfileData(name, class, spec)
+    
+        if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
+            SwitchSwitch.CurrentActiveTalentsProfile = newName
+        end
+        
+        return true
     end
-    return playerTable
-end
 
-function SwitchSwitch:CountCurrentTalentsProfile()
-    local tbl = SwitchSwitch:GetCurrentProfilesTable()
-    local count = 0
-    
-    for _ in pairs(tbl) do
-        count = count + 1
-    end
-    
-    return count
+    return false
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
@@ -310,7 +399,7 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
     end
 
     --Check  if table exits
-    if(not SwitchSwitch:DoesTalentProfileExist(profileName)) then
+    if(not SwitchSwitch:DoesProfileExits(profileName)) then
         SwitchSwitch:Print(L["Could not change talents to Profile '%s' as it does not exit"]:format(profileName))
         return
     end
@@ -391,11 +480,11 @@ function SwitchSwitch:SetTalents(profileName)
         LoadAddOn("Blizzard_TalentUI")
     end
 
-    if(not SwitchSwitch:DoesTalentProfileExist(profileName)) then
+    if(not SwitchSwitch:DoesProfileExits(profileName)) then
         return;
     end
 
-    local currentTalentProfile = SwitchSwitch:GetTalentTable(profileName)
+    local currentTalentProfile = SwitchSwitch:GetProfileData(profileName)
 
     --Learn talents normal talents
     if(currentTalentProfile.pva ~= nil) then
@@ -453,19 +542,19 @@ function SwitchSwitch:SetTalents(profileName)
     --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
     C_Timer.After(1.0,function() SwitchSwitch.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
-    self.dbpc.char.SelectedTalentsProfile = profileName:lower()
+    SwitchSwitch.CurrentActiveTalentsProfile = profileName:lower()
 end
 
 --Check if a given profile is the current talents
 function SwitchSwitch:IsCurrentTalentProfile(profileName)
     --Check if null or not existing
-    if(not SwitchSwitch:DoesTalentProfileExist(profileName)) then
+    if(not SwitchSwitch:DoesProfileExits(profileName)) then
         SwitchSwitch:DebugPrint(string.format("Profile name does not exist [%s]", profileName))
         return false
     end
 
     local currentActiveTalents = SwitchSwitch:GetCurrentTalents()
-    local currentprofile = SwitchSwitch:GetTalentTable(profileName)
+    local currentprofile = SwitchSwitch:GetProfileData(profileName)
 
     if(currentprofile.heart_of_azeroth_essences ~= nil and SwitchSwitch:HasHeartOfAzerothEquipped()) then
         --Check essences
@@ -512,7 +601,7 @@ end
 --Gets the profile that is active from all the saved profiles
 function SwitchSwitch:GetCurrentProfileFromSaved()
     --Iterate trough every talent profile
-    for name, TalentArray in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
+    for name, TalentArray in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
         if(SwitchSwitch:IsCurrentTalentProfile(name)) then
             --Return the currentprofilename
             SwitchSwitch:DebugPrint("Detected:" .. name)
@@ -523,25 +612,3 @@ function SwitchSwitch:GetCurrentProfileFromSaved()
     --Return the custom profile name
     return SwitchSwitch.CustomProfileName
 end
---Lua helper functions
---creates a deep copy of the table
-function SwitchSwitch:deepcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in next, orig, nil do
-            copy[SwitchSwitch:deepcopy(orig_key)] = SwitchSwitch:deepcopy(orig_value)
-        end
-        setmetatable(copy, SwitchSwitch:deepcopy(getmetatable(orig)))
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
-
-function SwitchSwitch:tablelength(T)
-    local count = 0
-    for _ in pairs(T) do count = count + 1 end
-    return count
-  end

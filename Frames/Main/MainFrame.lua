@@ -84,8 +84,9 @@ function SwitchSwitch:GetMainFrame()
     frame:SetStatusText("Created by: " .. AuthorList .. " Version: " .. GetAddOnMetadata("SwitchSwitch", "Version"))
     frame:SetLayout("Flow")
     frame:SetCallback("OnClose", OnMainFrameClosed)
-    frame:SetHeight(500)
-    frame:SetWidth(650)
+    frame:SetHeight(570)
+    frame:SetWidth(870)
+    frame.frame:SetMinResize(870, 570)
     frame:PauseLayout()
 
     --Set up menu  side

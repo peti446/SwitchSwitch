@@ -2,22 +2,11 @@
 -- Namespace
 --############################################
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
-
---Set up frame helper gobal tables
-SwitchSwitch.GlobalFrames = {}
-local GlobalFrames = SwitchSwitch.GlobalFrames
-
+local SuggestionFrame
 
 --##########################################################################################################################
 --                                  Frames Init
 --##########################################################################################################################
-function GlobalFrames:Init()
-    GlobalFrames.SavePVPTalents = CreateFrame("CheckButton", "SS_CheckboxSavePVPTalents", UIParent, "UICheckButtonTemplate")
-    GlobalFrames.SavePVPTalents.text:SetText(L["Save pvp talents?"])
-    GlobalFrames.SavePVPTalents:SetChecked(true)
-    GlobalFrames.SavePVPTalents:Hide()
-end
-
 local function CreateSuggestionFrame()
     --Frame for auto profile sugestor in instance
     local frame = CreateFrame("FRAME", "SS_SuggestionFrame", UIParent, "InsetFrameTemplate3")
@@ -112,15 +101,15 @@ local function CreateSuggestionFrame()
 end
 
 
-function GlobalFrames:ToggleSuggestionFrame(profileToActivate)
+function SwitchSwitch:ToggleSuggestionFrame(profileToActivate)
     --First check if the profile is valid and exists
-    if(not profileToActivate or profileToActivate == "" or not SwitchSwitch:DoesTalentProfileExist(profileToActivate)) then
-        SwitchSwitch:DebugPrint("Could not open 'Sugestion frame' as either the profile is null or does not exist")
+    if(not profileToActivate or profileToActivate == "" or not self:DoesProfileExits(profileToActivate)) then
+        self:DebugPrint("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
-    SwitchSwitch:DebugPrint("Showing Toggle suggestion frame with profile: " .. profileToActivate)
+    self:DebugPrint("Showing Toggle suggestion frame with profile: " .. profileToActivate)
     --Set the frame or create it, set data and show the frame.
-    GlobalFrames.ProfileSuggestion = GlobalFrames.ProfileSuggestion or CreateSuggestionFrame()
-    GlobalFrames.ProfileSuggestion.ChangeProfileButton.Profile = profileToActivate
-    GlobalFrames.ProfileSuggestion:Show()
+    SuggestionFrame = SuggestionFrame or CreateSuggestionFrame()
+    SuggestionFrame.ChangeProfileButton.Profile = profileToActivate
+    SuggestionFrame:Show()
 end

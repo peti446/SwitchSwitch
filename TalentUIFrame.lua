@@ -23,10 +23,10 @@ function TalentUIFrame:CreateEditUI()
     editorFrame:HookScript("OnHide", function(self) 
         --Save all the data modified
         SwitchSwitch:DebugPrint("Closed editor, saving data...")
-        if(not self.GearSet:GetChecked() and SwitchSwitch:DoesTalentProfileExist(self.CurrentProfileEditing)) then
-            local tbl = SwitchSwitch:GetTalentTable(self.CurrentProfileEditing) 
+        if(not self.GearSet:GetChecked() and SwitchSwitch:DoesProfileExits(self.CurrentProfileEditing)) then
+            local tbl = SwitchSwitch:GetProfileData(self.CurrentProfileEditing) 
             tbl.gearSet = nil
-            SwitchSwitch:SetTalentTable(self.CurrentProfileEditing, tbl)
+            SwitchSwitch:SetProfileData(self.CurrentProfileEditing, tbl)
         end
     end)
     editorFrame:Hide()
@@ -34,8 +34,8 @@ function TalentUIFrame:CreateEditUI()
         --Update the data
         SwitchSwitch:DebugPrint("Updating Edit frame data...")
         self.InsideTitle:SetText(string.format(L["Editing '%s'"], self.CurrentProfileEditing or "ERROR"))
-        local tbl = SwitchSwitch:GetTalentTable(self.CurrentProfileEditing)
-        if(SwitchSwitch:DoesTalentProfileExist(self.CurrentProfileEditing) and tbl.gearSet ~= nil) then
+        local tbl = SwitchSwitch:GetProfileData(self.CurrentProfileEditing)
+        if(SwitchSwitch:DoesProfileExits(self.CurrentProfileEditing) and tbl.gearSet ~= nil) then
             self.GearSet:SetChecked(true)
             self.GearSet.SelectionFrame:Show()
             UIDropDownMenu_SetSelectedValue(self.GearSet.SelectionFrame.DropDown, tbl.gearSet)
@@ -154,37 +154,18 @@ function TalentUIFrame:CreateEditUI()
             self:GetParent():Hide();
         end,
     }
-
-    
-     --Create the confirim save popup
-     StaticPopupDialogs["SwitchSwitch_ConfirmDeleteprofile"] =
-     {
-          text = L["You want to delete the profile '%s'?"],
-          button1 = L["Delete"],
-          button2 = L["Cancel"],
-          timeout = 0,
-          whileDead = true,
-          hideOnEscape = true,
-          preferredIndex = 3,
-          exclusive = true,
-          enterClicksFirstButton = true,
-          showAlert = true,
-          OnAccept = function(self, data)
-             TalentUIFrame:OnAcceptDeleteprofile(self, data)
-          end,
-     }
 end 
 
 function TalentUIFrame.SetSelectedValueForDropDowns(self, arg1, arg2, checked)
     if(not checked) then
         UIDropDownMenu_SetSelectedValue(arg1, self.value)
         if(arg1.funcName == "equipedGear") then
-            local tbl = SwitchSwitch:GetTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+            local tbl = SwitchSwitch:GetProfileData(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
             tbl["gearSet"] = self.value
             if (self.value == "") then
                 tbl["gearSet"] = nil
             end
-            SwitchSwitch:SetTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing, tbl)
+            SwitchSwitch:SetProfileData(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing, tbl)
         end
     end
 end
@@ -206,7 +187,7 @@ function TalentUIFrame:OnRenameTextChanged(frame)
             --Text is too long, disable create button and give a warning
             frame:GetParent().text:SetText(L["Rename profile"].. "\n\n|cFFFF0000" .. L["Name too long!"])
             frame:GetParent().button1:Disable()
-        elseif(SwitchSwitch:DoesTalentProfileExist(data)) then
+        elseif(SwitchSwitch:DoesProfileExits(data)) then
             --Text is fine so enable everything
             frame:GetParent().button1:Enable()
             frame:GetParent().text:SetText(L["Rename profile"] .. "\n\n|cFFFF0000" .. L["Name already taken!"])
@@ -227,8 +208,8 @@ end
 
 function TalentUIFrame:OnRenameAccepted(frame)
     local newName = frame.editBox:GetText()
-    SwitchSwitch:SetTalentTable(newName, SwitchSwitch:GetTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing))
-    SwitchSwitch:DeleteTalentTable(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
+    SwitchSwitch:SetProfileData(newName, SwitchSwitch:GetProfileData(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing))
+    SwitchSwitch:DeleteProfileData(SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing)
     SwitchSwitch.TalentUIFrame.ProfileEditorFrame.CurrentProfileEditing = newName
     SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Hide();
     SwitchSwitch.TalentUIFrame.ProfileEditorFrame:Show();
@@ -267,7 +248,7 @@ function TalentUIFrame:CreateTalentFrameUI()
     UpperTalentsUI.EditButtonContext.funcName = "editProfileSelection"
     UIDropDownMenu_Initialize(UpperTalentsUI.EditButtonContext, function(self, level)
         local i = 2
-        for pname, info in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
+        for pname, info in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
             local info = UIDropDownMenu_CreateInfo()
             info.text = pname
             info.index = i
@@ -298,62 +279,7 @@ function TalentUIFrame:CreateTalentFrameUI()
     UIDropDownMenu_Initialize(UpperTalentsUI.DropDownTalents, TalentUIFrame.Initialize_Talents_List)
 
     --Create new Static popup dialog
-    StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
-    {
-        text = L["Create/Ovewrite a profile"],
-        button1 = L["Save"],
-        button2 = L["Cancel"],
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-        hasEditBox = true,
-        exclusive = true,
-        enterClicksFirstButton = true,
-        autoCompleteSource = TalentUIFrame.GetAutoCompleatProfiles,
-        autoCompleteArgs = {},
-        OnShow = function(self) 
-            --Add the check box to ignore pvp talent
-            self.insertedFrame:SetParent(self)
-            self.editBox:ClearAllPoints()
-            self.editBox:SetPoint("TOP", self, "TOP", 0, -38);
-            self.insertedFrame:ClearAllPoints()
-            self.insertedFrame:SetPoint("BOTTOM", self, "BOTTOM", -self.insertedFrame.text:GetWidth()*0.5, 40)
-            self.insertedFrame:Show()
-         end,
-        OnAccept = function(self)
-            TalentUIFrame:OnAceptNewprofile(self)
-        end,
-        EditBoxOnTextChanged = function (self) 
-            TalentUIFrame:NewProfileOnTextChange(self)
-        end,
-        EditBoxOnEscapePressed = function(self)
-            self:GetParent():Hide();
-        end,
-    }
-    --Create the confirim save popup
-    StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
-    {
-        text = L["Saving will override '%s' configuration"],
-        button1 = L["Save"],
-        button2 = L["Cancel"],
-        timeout = 0,
-        whileDead = true,
-        hideOnEscape = true,
-        preferredIndex = 3,
-        exclusive = true,
-        enterClicksFirstButton = true,
-        showAlert = true,
-        OnAccept = function(self, data)
-            TalentUIFrame:OnAcceptOverwrrite(self, data.profile, data.savePVP)
-        end,
-        OnCancel = function(self, data)
-            local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp", nil, nil, nil, SwitchSwitch.GlobalFrames.SavePVPTalents)
-            if(dialog) then
-                dialog.editBox:SetText(data.profile)
-            end
-        end
-    }
+    
 end
 
 --##########################################################################################################################
@@ -362,8 +288,8 @@ end
 function TalentUIFrame.Initialize_Talents_List(self, level, menuLists)
     local menuList = {}
     --Get all profile names and create the list for the dropdown menu
-    if(SwitchSwitch:GetCurrentProfilesTable()) then
-        for TalentProfileName, data in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
+    if(SwitchSwitch:GetCurrentSpecProfilesTable()) then
+        for TalentProfileName, data in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
             table.insert(menuList, {
                 text = TalentProfileName
             })
@@ -395,66 +321,15 @@ function TalentUIFrame.SetDropDownValue(self, arg1, arg2, checked)
     end
 end
 
-function TalentUIFrame:NewProfileOnTextChange(frame) 
-    local data = frame:GetParent().editBox:GetText()
-
-    --Check if text is not nill or not empty
-    if(data ~= nil and data ~= '') then
-
-        if(data:lower() == SwitchSwitch.CustomProfileName:lower()) then
-            --Text is "custom" so disable the Create button and give a warning
-            frame:GetParent().text:SetText(L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. L["'Custom' cannot be used as name!"])
-            frame:GetParent().button1:Disable()
-        elseif(data:len() > 20) then
-            --Text is too long, disable create button and give a warning
-            frame:GetParent().text:SetText(L["Create/Ovewrite a profile"] .. "\n\n|cFFFF0000" .. L["Name too long!"])
-            frame:GetParent().button1:Disable()
-        else
-            --Text is fine so enable everything
-            frame:GetParent().button1:Enable()
-            frame:GetParent().text:SetText(L["Create/Ovewrite a profile"])
-        end
-    else
-        --Empty so disable Create button
-        frame:GetParent().button1:Disable()
-        frame:GetParent().text:SetText(L["Create/Ovewrite a profile"])
-    end
-    --Rezise the frame
-    StaticPopup_Resize(frame:GetParent(), frame:GetParent().which)
-end
-
-function TalentUIFrame:OnAceptNewprofile(frame)
-    local profileName = frame.editBox:GetText()
-    local savePVPTalents = frame.insertedFrame:GetChecked();
-    --Check if the profile exits if so, change the text
-    if(SwitchSwitch:DoesTalentProfileExist(profileName)) then
-        frame.button1:Disable()
-        local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTalemtsSavePopUp", profileName)
-        if(dialog) then
-            dialog.data = {
-                ["profile"] = profileName,
-                ["savePVP"] = savePVPTalents
-            }
-        end
-        return
-    end
-
-    --If talent spec table does not exist create one
-    SwitchSwitch:SetTalentTable(profileName, SwitchSwitch:GetCurrentTalents(savePVPTalents))
-    SwitchSwitch.dbpc.char.SelectedTalentsProfile = profileName:lower()
-
-    --Let the user know that the profile has been created
-    SwitchSwitch:Print(L["Talent profile %s created!"]:format(profileName))
-end
 
 function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
     --Check if the Profile exists
-    if(not SwitchSwitch:DoesTalentProfileExist(profile)) then
+    if(not SwitchSwitch:DoesProfileExits(profile)) then
         return
     end
 
     --Delete the Profile
-    SwitchSwitch:DeleteTalentTable(profile)
+    SwitchSwitch:DeleteProfileData(profile)
     if(profile:lower() == SwitchSwitch.dbpc.char.SelectedTalentsProfile) then
         SwitchSwitch.dbpc.char.SelectedTalentsProfile = SwitchSwitch.CustomProfileName
     end
@@ -462,7 +337,7 @@ function TalentUIFrame:OnAcceptDeleteprofile(frame, profile)
 end
 
 function TalentUIFrame:OnAcceptOverwrrite(frame, profile, savePVP)
-    SwitchSwitch:SetTalentTable(profile, SwitchSwitch:GetCurrentTalents(savePVP))
+    SwitchSwitch:SetProfileData(profile, SwitchSwitch:GetCurrentTalents(savePVP))
     SwitchSwitch.dbpc.char.SelectedTalentsProfile = profile:lower()
     SwitchSwitch:Print(L["Profile '%s' overwritten!"]:format(profile))
 end
@@ -490,7 +365,7 @@ function TalentUIFrame.UpdateUpperFrame(self, elapsed)
         end
 
         -- Edit button
-        if(SwitchSwitch:CountCurrentTalentsProfile() == 0) then
+        if(--[[SwitchSwitch:CountCurrentTalentsProfile() == 0]] false) then
             self.EditButton:Disable()
             self.EditButton:Hide()
         else
@@ -524,7 +399,7 @@ end
 
 function TalentUIFrame.GetAutoCompleatProfiles(currentString, ...)
     local returnNames = {};
-    for name, _ in pairs(SwitchSwitch:GetCurrentProfilesTable()) do
+    for name, _ in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
         if(name:find(currentString) ~= nil) then
             table.insert(returnNames, {
                 ["name"] = name,

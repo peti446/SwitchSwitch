@@ -2,7 +2,7 @@
 ## Title: SwitchSwitch
 ## Author: Geloch, Riukka (Sanguino - EU Horde)
 ## Version: 2.0
-## Notes: Allows you to creater talents profiles and switch between them quickly, also you can configure it to ask you in X situation if you want to switch to another talent set.
+## Notes: Allows you to creater talents profiles and switch between them quickly and automaticly.
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: SwitchSwitchConfig, SwitchSwitchDBPC
 ## SavedVariables: SwitchSwitchProfiles, SwitchSwitchDB
@@ -11,7 +11,9 @@
 embeds_libs.xml
 embeds_locales.xml
 SwitchSwitch.lua
+Widgets/TalentRow.lua
 Frames/DialogBoxes.lua
+Frames/ProfileSuggestionFrame.lua
 Frames/Main/MainFrame.lua
 Frames/Main/MenuItems/Profiles.lua
 Frames/Main/MenuItems/ExportImport.lua
@@ -20,6 +22,5 @@ Frames/Main/MenuItems/Options.lua
 GobalEvents.lua
 MinimapIcon.lua
 TalentUIFrame.lua
-GlobalFrames.lua
 Commands.lua
 Init.lua
