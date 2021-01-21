@@ -53,7 +53,7 @@ function SwitchSwitch:OnInitialize()
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-    self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE"}, 0.5, "PLAYER_TALENT_UPDATE")
+    self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE", "PLAYER_SPECIALIZATION_CHANGED"}, 0.75, "PLAYER_TALENT_UPDATE")
     
     -- #######################################################################################################
     -- UPDATE FROM < 2.0 - DEPRECTED SOON

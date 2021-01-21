@@ -6,7 +6,7 @@ local LastInstanceID = -1
 function SwitchSwitch:ADDON_LOADED(event, arg1)
     if(arg1 == "Blizzard_TalentUI") then
         self:PLAYER_SPECIALIZATION_CHANGED()
-        SwitchSwitch.TalentUIFrame:CreateTalentFrameUI()
+        self:HookScript(PlayerTalentFrame, "OnShow", "EmbedUIIntoTalentFrame")
         return
     end
 end
@@ -85,5 +85,7 @@ function SwitchSwitch:PLAYER_ENTERING_WORLD()
 end
 
 function SwitchSwitch:PLAYER_TALENT_UPDATE()
-    SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch:GetCurrentProfileFromSaved()
+    self.CurrentActiveTalentsProfile = self:GetCurrentProfileFromSaved()
+    self:RefreshTalentUI()
+    self:RefreshProfilesEditorPage()
 end

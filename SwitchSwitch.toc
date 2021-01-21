@@ -11,16 +11,8 @@
 embeds_libs.xml
 embeds_locales.xml
 SwitchSwitch.lua
-Widgets/TalentRow.lua
-Frames/DialogBoxes.lua
-Frames/ProfileSuggestionFrame.lua
-Frames/Main/MainFrame.lua
-Frames/Main/MenuItems/Profiles.lua
-Frames/Main/MenuItems/ExportImport.lua
-Frames/Main/MenuItems/Options.lua
-
+frames.xml
 GobalEvents.lua
 MinimapIcon.lua
-TalentUIFrame.lua
 Commands.lua
 Init.lua

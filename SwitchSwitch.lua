@@ -6,7 +6,7 @@ local namespace = select(2, ...)
 --############################################
 -- Addon Setup & Lib Setup
 --############################################
-local SwitchSwitch = LibStub("AceAddon-3.0"):NewAddon("SwitchSwitch", "AceEvent-3.0", "AceTimer-3.0", "AceSerializer-3.0", "AceComm-3.0", "AceBucket-3.0")
+local SwitchSwitch = LibStub("AceAddon-3.0"):NewAddon("SwitchSwitch", "AceEvent-3.0", "AceTimer-3.0", "AceSerializer-3.0", "AceComm-3.0", "AceBucket-3.0", "AceHook-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("SwitchSwitch")
 local AceGUI = LibStub("AceGUI-3.0")
 local LibDBIcon = LibStub("LibDBIcon-1.0")

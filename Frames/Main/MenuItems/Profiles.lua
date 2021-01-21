@@ -39,13 +39,33 @@ function ProfilesEditorPage:SetDropDownGroupList()
     local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
     local dropDownData = {}
     local count = 0
+    local oldGroup = DropDownGroup.status or DropDownGroup.localstatus
+    
+    if(type(oldGroup) ~= "table" or oldGroup.selected == nil) then
+        oldGroup = nil
+    else
+        oldGroup = oldGroup.selected
+    end
+
+    local oldGroupExitsInNew = false
     for name, data in pairs(talentsProfiles) do
         dropDownData[name] = name
         count = count + 1 
+        if(oldGroup == name) then
+            oldGroupExitsInNew = true
+        end
     end
+
+    if(not oldGroupExitsInNew) then
+        oldGroup = nil
+    end
+
+
     DropDownGroup:SetGroupList(dropDownData)
     if(count > 0) then
-        if(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.CustomProfileName and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsProfile, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
+        if(oldGroup ~= nil) then
+            DropDownGroup:SetGroup(oldGroup)
+        elseif(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.CustomProfileName and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsProfile, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
             DropDownGroup:SetGroup(SwitchSwitch.CurrentActiveTalentsProfile)
         else
             SwitchSwitch:PrintTable(dropDownData)
@@ -155,4 +175,12 @@ function ProfilesEditorPage:CreateHeader(Text)
     header:SetFullWidth(true)
     header:SetHeight(35)
     return header
+end
+
+function SwitchSwitch:RefreshProfilesEditorPage()
+    if(DropDownGroup == nil) then
+        return
+    end
+    ProfilesEditorPage:SetDropDownGroupList()
+    CurrentEditSpec = SwitchSwitch:GetCurrentSpec()
 end
