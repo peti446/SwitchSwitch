@@ -389,24 +389,24 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
 
     if(UnitAffectingCombat("Player")) then
         SwitchSwitch:DebugPrint("Player is in combat.")
-        return
+        return false
     end
 
     --Check if profileName is not null
     if(not profileName or type(profileName) ~= "string") then
         SwitchSwitch:DebugPrint("Given profile name is null")
-        return
+        return false
     end
 
     --Check  if table exits
     if(not SwitchSwitch:DoesProfileExits(profileName)) then
         SwitchSwitch:Print(L["Could not change talents to Profile '%s' as it does not exit"]:format(profileName))
-        return
+        return false
     end
 
     --If we cannot change talents why even try?
     if(not SwitchSwitch:CanChangeTalents()) then
-        if(self.dbpc.char.autoUseItems) then
+        if(SwitchSwitch.dbpc.char.autoUseTomes) then
             -- Now all tomes have level so lets add them based on character level
             local tomesID = {}
             --Check for level to add the Clear mind tome
@@ -449,7 +449,7 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
             if(not itemIDToUse) then
                 --No item found so return
                 SwitchSwitch:Print(L["Could not find a Tome to use and change talents"])
-                return
+                return false
             end
 
             -- Set the item attibute
@@ -463,11 +463,12 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
             --No check for usage so just return
             SwitchSwitch:Print(L["Could not change talents as you are not in a rested area, or dont have the buff"])
         end
-        return
+        return false
     end
 
     --Function to set talents
     SwitchSwitch:SetTalents(profileName)
+    return true
 end
 --Helper function to avoid needing to copy-caste every time...
 function SwitchSwitch:SetTalents(profileName)
@@ -598,8 +599,7 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName)
     return true
 end
 
---Gets the profile that is active from all the saved profiles
-function SwitchSwitch:GetCurrentProfileFromSaved()
+function SwitchSwitch:GetCurrentActiveProfile()
     --Iterate trough every talent profile
     for name, TalentArray in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
         if(SwitchSwitch:IsCurrentTalentProfile(name)) then

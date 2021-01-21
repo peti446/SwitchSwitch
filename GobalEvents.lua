@@ -85,7 +85,7 @@ function SwitchSwitch:PLAYER_ENTERING_WORLD()
 end
 
 function SwitchSwitch:PLAYER_TALENT_UPDATE()
-    self.CurrentActiveTalentsProfile = self:GetCurrentProfileFromSaved()
+    self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
     self:RefreshTalentUI()
     self:RefreshProfilesEditorPage()
 end

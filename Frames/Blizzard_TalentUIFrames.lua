@@ -8,7 +8,10 @@ local function OnDropDownSelectionChanged(self, _, profile)
         return
     end
 
-    SwitchSwitch:ActivateTalentProfile(profile)
+    local talentsAlreadyChanged = SwitchSwitch:ActivateTalentProfile(profile)
+    if(not talentsAlreadyChanged) then
+        SwitchSwitch:RefreshTalentUI()
+    end
 end
 
 local function OnSaveClicked()
