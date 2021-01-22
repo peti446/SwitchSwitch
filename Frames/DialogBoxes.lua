@@ -135,7 +135,7 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
         button:Enable()
         --Check if text is not nill or not empty
         if(data ~= nil and data ~= '') then
-            if(data:lower() == SwitchSwitch.CustomProfileName:lower()) then
+            if(data:lower() == SwitchSwitch.defaultProfileName:lower()) then
                 --Text is "custom" so disable the Create button and give a warning
                 label:SetText(label:GetText() .. "\n\n|cFFFF0000" .. L["'Custom' cannot be used as name!"])
                 button:Disable()

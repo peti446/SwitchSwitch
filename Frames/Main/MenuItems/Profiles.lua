@@ -65,7 +65,7 @@ function ProfilesEditorPage:SetDropDownGroupList()
     if(count > 0) then
         if(oldGroup ~= nil) then
             DropDownGroup:SetGroup(oldGroup)
-        elseif(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.CustomProfileName and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsProfile, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
+        elseif(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.defaultProfileName and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsProfile, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
             DropDownGroup:SetGroup(SwitchSwitch.CurrentActiveTalentsProfile)
         else
             SwitchSwitch:PrintTable(dropDownData)
@@ -106,7 +106,7 @@ local function OnTalentSelected(self, _, newColumn, oldColumn)
 end
 
 function ProfilesEditorPage:OnGroupSelected(frame, group)
-    SwitchSwitch:DebugPrint("Changed to talent profile: " .. group)
+    SwitchSwitch:DebugPrint("Displaying profile to edit: " .. group)
 
     frame:ReleaseChildren()
     frame:SetLayout("Fill")

@@ -2,7 +2,6 @@
 -- Namespace
 --############################################
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
-local addonName = select(1, ...)
 
 --##########################################################################################################################
 --                                  Default configurations

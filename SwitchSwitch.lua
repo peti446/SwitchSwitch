@@ -17,11 +17,9 @@ namespace[2] = L
 namespace[3] = AceGUI
 namespace[4] = LibDBIcon
 
-SwitchSwitch.G = {}
-SwitchSwitch.G.SwitchingTalents = false
 SwitchSwitch.InternalVersion = 2.0
-SwitchSwitch.CustomProfileName = "custom"
-SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.CustomProfileName
+SwitchSwitch.defaultProfileName = "custom"
+SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName
 
 --##########################################################################################################################
 --                                  Helper Functions
@@ -225,7 +223,7 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
         self:DebugPrint("Deleted")
 
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
-            SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.CustomProfileName:lower()
+            SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName:lower()
         end
         
         return true
@@ -255,17 +253,11 @@ end
 
 --Get the talent from the current active spec
 function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
-    --If not provided save talents will be true
-    if(saveTalentsPVP == nil) then
-        saveTalentsPVP = true;
-    end
-
     local talentSet =
     {
-        ["pva"] = {},
-        ["pvp"] = {},
-        ["heart_of_azeroth_essences"] = {}
+        ["pva"] = {}
     }
+    
     --Iterate over all tiers of talents normal
     for Tier = 1, GetMaxTalentTier() do
         --Create default table
@@ -291,6 +283,7 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
 
     --Only save talents if requested
     if(saveTalentsPVP) then
+        talentSet["pvp"] = {}
         --Iterate over pvp talents
         for Tier = 1, 3 do
             pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
@@ -305,6 +298,7 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
 
     --Get Essence information
     if(SwitchSwitch:HasHeartOfAzerothEquipped()) then
+        talentSet["heart_of_azeroth_essences"] = {}
         local MilestoneIDs = {115,116,117,119}
         for index, id in ipairs(MilestoneIDs) do
             local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
@@ -467,14 +461,13 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
     end
 
     --Function to set talents
-    SwitchSwitch:SetTalents(profileName)
+    SwitchSwitch:LearnTalents(profileName)
     return true
 end
 --Helper function to avoid needing to copy-caste every time...
-function SwitchSwitch:SetTalents(profileName)
+function SwitchSwitch:LearnTalents(profileName)
     --Make sure our event talent change does not detect this as custom switch
-    SwitchSwitch.G.SwitchingTalents = true
-    SwitchSwitch:Print(L["Changing talents"] .. ":" .. profileName)
+    SwitchSwitch:Print(L["Changing talents"] .. ": " .. profileName)
 
     --Check if the talent addon is up
     if(not IsAddOnLoaded("Blizzard_TalentUI")) then
@@ -528,20 +521,8 @@ function SwitchSwitch:SetTalents(profileName)
         end
     end
 
-    --Change gear set if available
-    if(currentTalentProfile.gearSet ~= nil) then
-        SwitchSwitch:DebugPrint("ID: ", currentTalentProfile.gearSet)
-        local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(currentTalentProfile.gearSet)
-        if(not isEquipped) then
-            C_EquipmentSet.UseEquipmentSet(currentTalentProfile.gearSet)
-        end
-    end
-
-
     --Print and return
     SwitchSwitch:Print(L["Changed talents to '%s'"]:format(profileName))
-    --Set the global switching variable to false so we detect custom talents switches (after a time as the evnt might fire late)
-    C_Timer.After(1.0,function() SwitchSwitch.G.SwitchingTalents = false end)
     --Set the global value of the current Profile so we can remember it later
     SwitchSwitch.CurrentActiveTalentsProfile = profileName:lower()
 end
@@ -604,11 +585,11 @@ function SwitchSwitch:GetCurrentActiveProfile()
     for name, TalentArray in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
         if(SwitchSwitch:IsCurrentTalentProfile(name)) then
             --Return the currentprofilename
-            SwitchSwitch:DebugPrint("Detected:" .. name)
+            SwitchSwitch:DebugPrint("Detected: " .. name)
             return name:lower()
         end
     end
     SwitchSwitch:DebugPrint("No profiles match current talnets")
     --Return the custom profile name
-    return SwitchSwitch.CustomProfileName
+    return SwitchSwitch.defaultProfileName
 end
