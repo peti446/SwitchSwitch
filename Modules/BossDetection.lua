@@ -188,7 +188,7 @@ end
 
 function BossDetection:GetPlayerMapPos(mapID)
     local x, y = UnitPosition('player')
-	if not x then return end
+	if not x  or not mapID then return end
 
     local _, pos1 = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0))
     local _, pos2 = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1))
