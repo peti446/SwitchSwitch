@@ -151,7 +151,7 @@ local function OnGroupSelected(frame, _, group)
         frame:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
         local label = AceGUI:Create("Label")
         label:SetFullWidth(true)
-        label:SetText(L["Will suggest a talent build when entering the instance in a specific dificulty."] .. "\n\n" .. L["Changes here will affect all %s of %s"]:format(SwitchSwitch.ContentTypeStrings[ContentType], Expansion))
+        label:SetText(L["Will suggest a talent build when entering the instance in a specific dificulty."] .. "\n\n|cffff0000" .. L["Changes here will affect all %s of %s"]:format(SwitchSwitch.ContentTypeStrings[ContentType], Expansion) .. "|r")
         frame:AddChild(label)
 
         for _, id in ipairs(difficulties) do
