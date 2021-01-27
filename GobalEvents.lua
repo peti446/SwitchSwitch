@@ -43,49 +43,34 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
     end
 end
 
-function SwitchSwitch:PLAYER_ENTERING_WORLD()
-    --Check if we actually switched map from last time
-    local instanceID = select(8,GetInstanceInfo())
-    --Debuging
-    SwitchSwitch:DebugPrint("Entering instance: " .. string.join(" - ", tostringall(GetInstanceInfo())))
-    if(LastInstanceID == instanceID) then
+function SwitchSwitch:PLAYER_TALENT_UPDATE(onlyActiveUpdate)
+    self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
+    if(type(onlyActiveUpdate) == "boolean" and onlyActiveUpdate == true) then
         return
     end
-    LastInstanceID = instanceID
-    --Check if we are in an instance
-    local inInstance, instanceType = IsInInstance()
-    if(inInstance) then
-        local profileNameToUse = self.dbpc.char.autoSuggest[instanceType]
-
-        SwitchSwitch:DebugPrint("Instance type: " .. instanceType)
-
-        --Party is a table so we need to ge the profile out via dificullty
-        if(instanceType == "party") then
-            local difficulty = GetDungeonDifficultyID()
-            local difficultyByID = 
-            {
-                [1] = "HM", -- Normal mode but we truncate it up to hc profile mode
-                [2] = "HM",
-                [23] = "MM"
-            }
-            profileNameToUse = self.dbpc.char.autoSuggest[instanceType][difficultyByID[difficulty]]
-        end
-        --Check if we are already in the current profile
-        if(profileNameToUse ~= nil and profileNameToUse ~= "") then
-            if(not SwitchSwitch:IsCurrentTalentProfile(profileNameToUse)) then 
-                SwitchSwitch:DebugPrint("Atuo suggest changing to profile: " .. profileNameToUse)
-                SwitchSwitch:ToggleSuggestionFrame(profileNameToUse)
-            else
-                SwitchSwitch:DebugPrint("Profile " .. profileNameToUse .. " is already in use.")
-            end
-        else
-            SwitchSwitch:DebugPrint("No profile set for this type of instance.")
-        end
-    end
-end
-
-function SwitchSwitch:PLAYER_TALENT_UPDATE()
-    self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
     self:RefreshTalentUI()
     self:RefreshProfilesEditorPage()
+end
+
+
+function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficultyID, npcID)
+    local allSuggestionsForInstance = self:GetProfilesSuggestionInstanceData(instanceID)
+    local suggestedProfileName = nil
+    if(npcID ~= nil) then
+        -- We are in npc zone or mousovered it
+        if(allSuggestionsForInstance["bosses"] ~= nil) then
+            suggestedProfileName = allSuggestionsForInstance["bosses"][npcID]
+        end
+    else
+        -- We entered an instance !!
+        if(allSuggestionsForInstance["difficulties"] ~= nil) then
+            suggestedProfileName = allSuggestionsForInstance["difficulties"][difficultyID]
+        end
+    end
+    
+    if(suggestedProfileName ~= nil) then
+        if(suggestedProfileName ~= self.CurrentActiveTalentsProfile) then
+            self:ToggleSuggestionFrame(suggestedProfileName)
+        end
+    end
 end

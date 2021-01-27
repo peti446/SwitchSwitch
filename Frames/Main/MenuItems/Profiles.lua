@@ -68,7 +68,6 @@ function ProfilesEditorPage:SetDropDownGroupList()
         elseif(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.defaultProfileName and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsProfile, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
             DropDownGroup:SetGroup(SwitchSwitch.CurrentActiveTalentsProfile)
         else
-            SwitchSwitch:PrintTable(dropDownData)
             DropDownGroup:SetGroup(select(1, next(dropDownData, nil)))
         end
     end
@@ -85,6 +84,7 @@ local function OnRenameProfile(self, _)
     local originalName = editBox:GetUserData("OriginalText")
     local newName = editBox:GetText()
     if(SwitchSwitch:RenameProfile(originalName, newName, nil, CurrentEditSpec)) then
+        DropDownGroup.status = newName:lower()
         ProfilesEditorPage:SetDropDownGroupList()
     end
 end
@@ -102,7 +102,7 @@ local function OnTalentSelected(self, _, newColumn, oldColumn)
     local row = self:GetUserData("Row")
     t["pva"][row]["column"] = newColumn
     t["pva"][row]["id"] = self:GetTalentID(newColumn)
-    SwitchSwitch:PLAYER_TALENT_UPDATE()
+    SwitchSwitch:PLAYER_TALENT_UPDATE(true)
 end
 
 function ProfilesEditorPage:OnGroupSelected(frame, group)

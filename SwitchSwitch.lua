@@ -117,6 +117,15 @@ function SwitchSwitch:tablelength(T)
     return count
 end
 
+function SwitchSwitch:table_has_value (tab, val)
+    for _, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
 -------------------------------------------------------------------- Talent table edition
 function SwitchSwitch:DoesClassProfilesTableExits(class)
     if(class == nil) then
@@ -238,7 +247,17 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
 
         self:SetProfileData(newName, self:GetProfileData(name, class, spec), class, spec)
         self:DeleteProfileData(name, class, spec)
-    
+        local suggestions = self:GetProfilesSuggestionTable(class, spec)
+        for instanceID, instanceSuggestionData in pairs(suggestions) do
+            for suggestionType, profilesList in pairs(instanceSuggestionData) do
+                for id, suggestedProfileName in pairs(profilesList) do
+                    if(name == suggestedProfileName) then
+                        profilesList[id] = newName
+                    end
+                end
+            end
+        end
+
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
             SwitchSwitch.CurrentActiveTalentsProfile = newName
         end
@@ -247,6 +266,75 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
     end
 
     return false
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function SwitchSwitch:DoesClassProfilesSuggestionTableExits(class)
+    if(class == nil) then
+        return false
+    end
+
+    if(self.db.global.TalentSuggestions[class] == nil) then
+        return false
+    end
+
+    return true
+end
+
+function SwitchSwitch:DoesSpecProfilesSuggestionTableExits(class, spec)
+    if(not self:DoesClassProfilesSuggestionTableExits(class)) then
+        return false
+    end
+
+    if(spec == nil) then
+        return false
+    end
+
+    if(self.db.global.TalentSuggestions[class][spec] == nil) then
+        return false
+    end
+
+    return true
+end
+
+function SwitchSwitch:GetProfilesSuggestionTable(class, spec)
+    local profileTable = {}
+    local class = class or self:GetPlayerClass()
+    local spec = spec or self:GetCurrentSpec()
+
+    if(spec ~= nil and class ~= nil) then
+        if(not self:DoesClassProfilesSuggestionTableExits(class)) then
+            self.db.global.TalentSuggestions[class] = {}
+        end
+    
+        if(not self:DoesSpecProfilesSuggestionTableExits(class, spec)) then
+            self.db.global.TalentSuggestions[class][spec] = {}
+        end
+    
+        profileTable = self.db.global.TalentSuggestions[class][spec]
+    end
+
+    return profileTable
+end
+
+function SwitchSwitch:GetProfilesSuggestionInstanceData(instanceID, class, spec)
+    local spec = spec or self:GetCurrentSpec()
+    local class = class or self:GetPlayerClass()
+    local t = self:GetProfilesSuggestionTable(class, spec)
+
+    if(t[instanceID] == nil) then
+        t[instanceID] = {}
+    end
+
+    return t[instanceID]
+end
+
+function SwitchSwitch:SetProfilesSuggestionInstanceData(instanceID, newTable, class, spec)
+    local spec = spec or self:GetCurrentSpec()
+    local class = class or self:GetPlayerClass()
+    local t = self:GetProfilesSuggestionTable(class, spec)
+    t[instanceID] = newTable
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------

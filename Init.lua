@@ -36,7 +36,8 @@ local dbDefaults =
     global =
     {
         ["Version"] = SwitchSwitch.InternalVersion,
-        ["TalentProfiles"] = {}
+        ["TalentProfiles"] = {},
+        ["TalentSuggestions"] = {}
     },
 }
 
@@ -50,7 +51,6 @@ function SwitchSwitch:OnInitialize()
 
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE", "PLAYER_SPECIALIZATION_CHANGED"}, 0.75, "PLAYER_TALENT_UPDATE")
     
@@ -69,13 +69,35 @@ function SwitchSwitch:OnEnable()
 
     --Load Commands
     SwitchSwitch.Commands:Init()
-    
+
     --Init the minimap
     SwitchSwitch:InitMinimapIcon()
 
     --Load the UI if not currently loaded
     if(not IsAddOnLoaded("Blizzard_TalentUI")) then
         LoadAddOn("Blizzard_TalentUI")
+    end
+
+    -- Enable Boss detection and register instances
+    self:RegisterMessage("SWITCHSWITCH_BOSS_DETECTED")
+    self:EnableModule("BossDetection")
+    for expansion, data in pairs(SwitchSwitch.InstancesBossData) do
+        for contentType, contentData in pairs(data) do
+            for jurnalID, InstanceData in pairs(contentData) do
+                local suggestions = self:GetProfilesSuggestionInstanceData(InstanceData.instanceID)
+                local BossDetectionData = InstanceData["bossData"] or {}
+                -- Right now we want to register the whole isntance for detection
+                -- As we need the data for boss down detection
+                --for bossID, _ in pairs(suggestions["bosses"] or {}) do 
+                --    BossDetectionData[bossID] = InstanceData["bossData"][bossID]
+                --end
+                local hasInstanceSuggestions = next(suggestions["difficulties"] or {}, nil) ~= nil
+                local hasBossSuggestions = next(BossDetectionData, nil) ~= nil
+                if(hasBossSuggestions or hasInstanceSuggestions) then
+                    self:GetModule("BossDetection"):RegisterInstance(InstanceData.instanceID, BossDetectionData)
+                end
+            end
+        end
     end
 end
 

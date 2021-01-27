@@ -6,6 +6,7 @@
     <Script file="Frames/Blizzard_TalentUIFrames.lua"/>
     <Script file="Frames/Main/MainFrame.lua"/>
     <Script file="Frames/Main/MenuItems/Profiles.lua"/>
+    <Script file="Frames/Main/MenuItems/TalentSuggestionConfig.lua"/>
     <Script file="Frames/Main/MenuItems/ExportImport.lua"/>
     <Script file="Frames/Main/MenuItems/Options.lua"/>
 </Ui>
