@@ -62,13 +62,13 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
                     ["jurnalIndex"] = 4,
                     ["ecnounterID"] = 2428
                 },
-                [167517] = { -- Inerva
+                [165521] = { -- Inerva
                     ["requieres"] = {164261},
                     ["zoneID"] = 1744,
                     ["jurnalIndex"] = 6,
                     ["ecnounterID"] = 2420
                 },
-                [24664] = { -- Sun King
+                [165759] = { -- Sun King
                     ["requieres"] = {172145},
                     ["zoneID"] = 1746,
                     ["jurnalIndex"] = 3,
@@ -86,14 +86,14 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
                     ["jurnalIndex"] = 5,
                     ["ecnounterID"] = 2418
                 },
-                [166971] = { --Council
-                    ["requieres"] = {24664, 166644},
+                [166969] = { --Council
+                    ["requieres"] = {165759, 166644},
                     ["zoneID"] = 1750,
                     ["jurnalIndex"] = 7,
                     ["ecnounterID"] = 2426
                 },
-                [174733] = { -- Sludgefist
-                    ["requieres"] = {167517, 166971},
+                [164407] = { -- Sludgefist
+                    ["requieres"] = {166969, 165521},
                     ["zoneID"] = 1735,
                     ["position"] = {
                         ["x1"] = 64.0,
@@ -104,14 +104,14 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
                     ["jurnalIndex"] = 8,
                     ["ecnounterID"] = 2394
                 },
-                [165318] = { -- Stone Legion
+                [168112] = { -- Stone Legion
                     ["requieres"] = {},
                     ["zoneID"] = 1747,
                     ["jurnalIndex"] = 9,
                     ["ecnounterID"] = 2425
                 },
                 [167406] = { --Sire Denathrius
-                    ["requieres"] = {165318},
+                    ["requieres"] = {168112},
                     ["zoneID"] = 1747,
                     ["jurnalIndex"] = 10,
                     ["ecnounterID"] = 2424

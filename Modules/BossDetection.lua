@@ -59,7 +59,7 @@ function BossDetection:OnTooltipSetUnit(tooltip)
     npcID = tonumber(npcID)
 
     if (npcType and (npcType == "Creature" or npcType == "Vehicle")) then
-        if(CurrentInstanceData[npcID] ~= nil) then
+        if(CurrentInstanceData[npcID] ~= nil and not SwitchSwitch:table_has_value(CurrentBossesDefeated, npcID)) then
             local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
             self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, npcID)
             SwitchSwitch:DebugPrint("---- Detected Boss:" .. current_instanceID .. ", " .. current_difficultyID .. ", " .. npcID )
