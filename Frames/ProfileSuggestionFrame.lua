@@ -84,7 +84,7 @@ local function CreateSuggestionFrame(profileName)
     if (SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime > 0) then 
         local fadeTimerId = SwitchSwitch:ScheduleRepeatingTimer(function(frame)
             frame:SetUserData("SecondsPassed", frame:GetUserData("SecondsPassed")+1)
-            frame:GetUserData("TextToUpdate"):SetText(L["Closing %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime - frame:GetUserData("SecondsPassed"))) .. "\n\n")
+            frame:GetUserData("TextToUpdate"):SetText(L["Closing in %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime - frame:GetUserData("SecondsPassed"))) .. "\n\n")
             if(frame:GetUserData("SecondsPassed") >= SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime) then
                 frame:Hide()
             end
