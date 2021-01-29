@@ -1,23 +1,20 @@
 #!/bin/bash
 
-
 if [ -f ".env" ]; then
 	. ".env"
 fi
 
 declare -A translationStrings
 translationTempFile=$(mktemp)
-regex='L\[\"(.+)\"\]'
+regex='L\[\"([^]]+)\"\]'
 projectID=299998
 
 process_addon_translations(){
 while read -r line || [ -n "$line" ] ; do
-    if [[ $line =~ $regex ]]
-    then
-        local matchKey="${BASH_REMATCH[1]}"
-        translationStrings["$matchKey"]=true
-    fi
-done < <(cat "$1");
+	if [[ $line =~ $regex ]] ; then
+		translationStrings["${BASH_REMATCH[1]}"]=true
+	fi
+done < <(cat "$1" | grep -oP $regex);
 }
 
 while IFS= read -r -d '' line; do 
