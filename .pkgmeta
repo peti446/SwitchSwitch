@@ -19,3 +19,4 @@ enable-nolib-creation: no
 
 ignore:
   - README.md
+  - CurseForge_UpldateTranslations.sh
