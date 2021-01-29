@@ -23,6 +23,10 @@ jobs:
        - uses: actions/checkout@v1
          with:
            fetch-depth: 500
+       - name: Upload locales strings to CurseForge
+         run: ./CurseForge_UpldateTranslations.sh
+         env:
+           CF_API_KEY: ${{ secrets.CF_API_KEY }}
        - name: Create and uploat to curseforge
          uses: BigWigsMods/packager@master
          env:
