@@ -24,13 +24,13 @@ done < <(find . -type f -name "*.lua" -not -path "*/Locales/*" -not -path "*/Lib
 for x in "${!translationStrings[@]}"; do
 	printf "L[\"%s\"] = %s\n" "$x" "${translationStrings[$x]}" >> "$translationTempFile"
 done
-cat $translationTempFile
+
 #language: "enUS", //[enUS, deDE, esES, ect], Required, No Default
 #       namespace: "toc", //Any namespace name, comma delimited. Default: Base Namespace
 #       formatType: TableAdditions, //['GlobalStrings','TableAdditions','SimpleTable']. Default: TableAdditions
 #       missing-phrase-handling: DoNothing //['DoNothing', 'DeleteIfNoTranslations', 'DeleteIfTranslationsOnlyExistForSelectedLanguage', 'DeletePhrase']. Default: DoNothing
 #   localizations: "Localizations To Import"
-exit 
+
 result=$( curl -sS -0 -X POST -w "%{http_code}" \
 -H "X-Api-Token: $CF_API_KEY" \
 -F "metadata={ language: \"enUS\", formatType: \"TableAdditions\", \"missing-phrase-handling\": \"DeletePhrase\" }" \
