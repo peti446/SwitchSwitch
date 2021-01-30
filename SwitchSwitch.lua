@@ -543,7 +543,7 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
             end
         else
             --No check for usage so just return
-            SwitchSwitch:Print(L["Could not change talents as you are not in a rested area, or dont have the buff"])
+            SwitchSwitch:Print(L["Could not change talents as you are not in a rested area, or don’t have the buff"])
         end
         return false
     end

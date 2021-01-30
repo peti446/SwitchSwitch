@@ -131,7 +131,7 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
         local data = self:GetParent().editBox:GetText()
         local label = self:GetParent().text
         local button =  self:GetParent().button1
-        label:SetText(L["Create/Ovewrite a profile"])
+        label:SetText(L["Create/Overwrite a profile"])
         button:Enable()
         --Check if text is not nill or not empty
         if(data ~= nil and data ~= '') then
