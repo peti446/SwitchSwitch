@@ -30,7 +30,7 @@ function MenuEntry:OnOpen(parent)
     scroll:SetFullHeight(true)
     scroll:SetLayout("Flow")
     parent:AddChild(scroll)
-    local parent = scroll
+    parent = scroll
 
     parent:AddChild(self:CreateHeader(L["Export"]))
     parent:AddChild(self:CreateLabel(L["Select one or more profiles from you current sepc to export"] ..  ".\n\n"))
@@ -126,12 +126,8 @@ function MenuEntry:SetDropDownProfileList()
     end
     local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
     local ProfilesDropDownData = {}
-    local oldGroupExitsInNew = false
     for name, data in pairs(talentsProfiles) do
         ProfilesDropDownData[name] = name
-        if(oldGroup == name) then
-            oldGroupExitsInNew = true
-        end
     end
     ProfilesDropDown:SetList(ProfilesDropDownData)
     ProfilesDropDown:Fire("OnValueChanged", next(ProfilesDropDownData), false)

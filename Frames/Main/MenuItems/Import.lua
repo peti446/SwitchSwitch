@@ -10,7 +10,7 @@ function MenuEntry:OnOpen(parent)
     scroll:SetFullHeight(true)
     scroll:SetLayout("Flow")
     parent:AddChild(scroll)
-    local parent = scroll
+    parent = scroll
 
     parent:AddChild(self:CreateHeader(L["Import"]))
     parent:AddChild(self:CreateLabel(L["Imported profiles will be added with the names they had at time of export, if the name is already taken '_imported_X' will be appended to the name"] .. ".\n\n"))

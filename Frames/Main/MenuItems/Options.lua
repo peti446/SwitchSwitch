@@ -11,7 +11,7 @@ function OptionsPage:OnOpen(parent)
     scroll:SetFullHeight(true)
     scroll:SetLayout("Flow")
     parent:AddChild(scroll)
-    local parent = scroll
+    parent = scroll
 
     parent:AddChild(self:CreateHeader(L["General"]));
 
@@ -44,7 +44,7 @@ function OptionsPage:OnOpen(parent)
 
     parent:AddChild(self:CreateHeader(L["Misc"]));
 
-    local cb = self:CreateCheckBox(L["Enable minimap button"])
+    cb = self:CreateCheckBox(L["Enable minimap button"])
     cb:SetValue(not SwitchSwitch.dbpc.char.minimap.hide)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
         SwitchSwitch.dbpc.char.minimap.hide = not newVal
@@ -52,7 +52,7 @@ function OptionsPage:OnOpen(parent)
     end)
     parent:AddChild(cb);
 
-    local cb = self:CreateCheckBox(L["Enable debug messages in chat"])
+    cb = self:CreateCheckBox(L["Enable debug messages in chat"])
     cb:SetValue(SwitchSwitch.dbpc.char.debug)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
         SwitchSwitch.dbpc.char.debug = newVal

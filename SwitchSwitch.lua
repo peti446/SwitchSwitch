@@ -157,8 +157,8 @@ end
 
 function SwitchSwitch:GetProfilesTable(class, spec)
     local profileTable = {}
-    local class = class or self:GetPlayerClass()
-    local spec = spec or self:GetCurrentSpec()
+    class = class or self:GetPlayerClass()
+    spec = spec or self:GetCurrentSpec()
 
     if(spec ~= nil and class ~= nil) then
         if(not self:DoesClassProfilesTableExits(class)) then
@@ -200,10 +200,10 @@ function SwitchSwitch:GetProfileData(name, class, spec)
         return nil
     end
 
-    local spec = spec or self:GetCurrentSpec()
-    local class = class or self:GetPlayerClass()
+    spec = spec or self:GetCurrentSpec()
+    class = class or self:GetPlayerClass()
     local t = self:GetProfilesTable(class, spec)
-    local name = name:lower()
+    name = name:lower()
 
     if(not self:DoesProfileExits(name, class, spec)) then
         t[name] = {}
@@ -217,16 +217,16 @@ function SwitchSwitch:SetProfileData(name, newTable, class, spec)
         return
     end
 
-    local spec = spec or self:GetCurrentSpec()
-    local class = class or self:GetPlayerClass()
+    spec = spec or self:GetCurrentSpec()
+    class = class or self:GetPlayerClass()
     local t = self:GetProfilesTable(class, spec)
-    local name = name:lower()
+    name = name:lower()
     t[name] = newTable
 end
 
 function SwitchSwitch:DeleteProfileData(name, class, spec)
     if(self:DoesProfileExits(name, class, spec)) then
-        local name = name:lower()
+        name = name:lower()
 
         self:SetProfileData(name, nil, class, spec)
         self:DebugPrint("Deleted")
@@ -241,8 +241,8 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
 end
 
 function SwitchSwitch:RenameProfile(name, newName, class, spec)
-    if(self:DoesProfileExits(name, calss, spec)) then
-        local name = name:lower()
+    if(self:DoesProfileExits(name, class, spec)) then
+        name = name:lower()
         local newName = newName:lower()
 
         self:SetProfileData(newName, self:GetProfileData(name, class, spec), class, spec)
@@ -300,8 +300,8 @@ end
 
 function SwitchSwitch:GetProfilesSuggestionTable(class, spec)
     local profileTable = {}
-    local class = class or self:GetPlayerClass()
-    local spec = spec or self:GetCurrentSpec()
+    class = class or self:GetPlayerClass()
+    spec = spec or self:GetCurrentSpec()
 
     if(spec ~= nil and class ~= nil) then
         if(not self:DoesClassProfilesSuggestionTableExits(class)) then
@@ -319,8 +319,8 @@ function SwitchSwitch:GetProfilesSuggestionTable(class, spec)
 end
 
 function SwitchSwitch:GetProfilesSuggestionInstanceData(instanceID, class, spec)
-    local spec = spec or self:GetCurrentSpec()
-    local class = class or self:GetPlayerClass()
+    spec = spec or self:GetCurrentSpec()
+    class = class or self:GetPlayerClass()
     local t = self:GetProfilesSuggestionTable(class, spec)
 
     if(t[instanceID] == nil) then
@@ -331,8 +331,8 @@ function SwitchSwitch:GetProfilesSuggestionInstanceData(instanceID, class, spec)
 end
 
 function SwitchSwitch:SetProfilesSuggestionInstanceData(instanceID, newTable, class, spec)
-    local spec = spec or self:GetCurrentSpec()
-    local class = class or self:GetPlayerClass()
+    spec = spec or self:GetCurrentSpec()
+    class = class or self:GetPlayerClass()
     local t = self:GetProfilesSuggestionTable(class, spec)
     t[instanceID] = newTable
 end
