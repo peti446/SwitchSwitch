@@ -15,6 +15,20 @@ jobs:
            config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/6fb0108eb5a81aec673d2edf9fccb2b1e812f829/.luacheckrc
            args: "--no-color -q --no-self"
            annotate: warning
+       - name: Create alpha package
+         uses: BigWigsMods/packager@master
+       - name: Upload alpha package to artifacts
+         uses: actions/upload-artifact@v2
+         with:
+           name: SwitchSwitch.zip
+           path: |
+             .release/*
+             !.release/*.zip
+       - name: Remove old artifacts
+         uses: c-hive/gha-remove-artifacts@v1
+         with:
+           age: '3 month'
+           skip-tags: true
  
     Deploy-Packages:
       if: startsWith(github.ref, 'refs/tags/')
