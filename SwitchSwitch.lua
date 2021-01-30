@@ -35,7 +35,7 @@ function SwitchSwitch:DebugPrintTable(tbl, indent)
     if not indent then indent = 0 end
     if type(tbl) == 'table' then
         for k, v in pairs(tbl) do
-            formatting = string.rep("  ", indent) .. k .. ": "
+            local formatting = string.rep("  ", indent) .. k .. ": "
             if type(v) == "table" then
                 self:Print(formatting)
                 self:PrintTableDebug(v, indent+1)
@@ -57,7 +57,7 @@ function SwitchSwitch:PrintTable(tbl, indent)
     if not indent then indent = 0 end
     if type(tbl) == 'table' then
         for k, v in pairs(tbl) do
-            formatting = string.rep("  ", indent) .. k .. ": "
+            local formatting = string.rep("  ", indent) .. k .. ": "
             if type(v) == "table" then
                 self:Print(formatting)
                 self:PrintTable(v, indent+1)
@@ -358,7 +358,7 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
         --Iterate trought the 2 columnds
         for Column = 1, 3 do
             --Get talent info
-            talentID, name, texture, selected, available, _, _, _, _, _, _ = GetTalentInfo(Tier, Column, GetActiveSpecGroup())
+            local talentID, name, texture, selected, available = GetTalentInfo(Tier, Column, GetActiveSpecGroup())
             --If the talent is selected store the nececary information
             if(selected) then
                 talentSet["pva"][Tier]["id"] = talentID
@@ -374,7 +374,7 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
         talentSet["pvp"] = {}
         --Iterate over pvp talents
         for Tier = 1, 3 do
-            pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
+            local pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
             talentSet["pvp"][Tier] =
             {
                 ["unlocked"] = pvpTalentInfo.enabled,
@@ -658,7 +658,7 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName)
     if(currentprofile.pva ~= nil) then
         --Check normal talents
         for i, talentInfo in ipairs(currentprofile.pva) do
-            talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
+            local talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
             if(not known) then
                 SwitchSwitch:DebugPrint(string.format("Talent with the name %s is not leanred", name))
                 return false

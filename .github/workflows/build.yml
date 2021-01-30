@@ -8,11 +8,11 @@ jobs:
       steps:
        - uses: actions/checkout@v1
          with:
-           fetch-depth: 500
+           fetch-depth: 50
        - name: Lint lua files
          uses: nebularg/actions-luacheck@v1
          with:
-           config: https://gist.githubusercontent.com/nebularg/aaccb396168a4076a7a0b7dbcbe6fb42/raw/36a15bd6b375351321711bb21095091ab90087b9/.luacheckrc
+           config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/6fb0108eb5a81aec673d2edf9fccb2b1e812f829/.luacheckrc
            args: "--no-color -q --no-self"
            annotate: warning
  
@@ -23,7 +23,7 @@ jobs:
       steps:
        - uses: actions/checkout@v1
          with:
-           fetch-depth: 500
+           fetch-depth: 50
        - name: Upload locales strings to CurseForge
          run: ./CurseForge_UpldateTranslations.sh
          env:

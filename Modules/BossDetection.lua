@@ -41,7 +41,7 @@ function BossDetection:RegisterBoss(InstanceID, BossID, BossData)
     end
 end
 
-function BossDetection:OnTooltipSetUnit(tooltip) 
+function BossDetection:OnTooltipSetUnit(tooltip)
     if(UnitAffectingCombat("player")) then
         return
     end
@@ -90,7 +90,7 @@ function BossDetection:PLAYER_ENTERING_WORLD()
             self:PLAYER_STOPPED_MOVING()
             return
         end
-        
+
         -- We cannot use zone IDs or stuff like that for boss detection so we will try to check evey second during movement if we can to change talents
         -- as we can also not rely on players standing still when entering boss area
         self:RegisterEvent("PLAYER_STARTED_MOVING")
@@ -137,7 +137,7 @@ function BossDetection:DoCheckWork()
     local map = C_Map.GetBestMapForUnit("player")
     local x, y = self:GetPlayerMapPos(map)
     local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
-    
+
     if(not x) then
         x = -1
         y = -1
@@ -161,7 +161,7 @@ function BossDetection:DoCheckWork()
             end
 
             -- IF the boss can not be killed we dont want to suggest a talent as the boss might be down or requirements have not been met
-            if (canBeKilled) then            
+            if (canBeKilled) then
                 if(data.position ~= nil) then
                     if(data.position.x1 >= x and data.position.y1 <= y and data.position.x2 <= x and data.position.y2 >= y) then
                         self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, bossID)
@@ -193,7 +193,7 @@ function BossDetection:GetPlayerMapPos(mapID)
     local _, pos1 = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(0, 0))
     local _, pos2 = C_Map.GetWorldPosFromMapPos(mapID, CreateVector2D(1, 1))
     if not pos1 or not pos2 then return end
-    
+
     pos2:Subtract(pos1)
     x = x - pos1.x
     y = y - pos1.y
@@ -209,7 +209,7 @@ function BossDetection:GetKilledBossesInInstance(instacneID, difficultyID, insta
             local saved_instanceID = self:GetInstanceIDFromSavedOutIndex(i)
             if(instacneID == saved_instanceID) then
                 for encounterIndex=1, saved_numEncounters do
-                    _, _, isKilled, _ = GetSavedInstanceEncounterInfo(i, encounterIndex)
+                    local _, _, isKilled, _ = GetSavedInstanceEncounterInfo(i, encounterIndex)
                     for bossID,data in pairs(instanceData) do
                         if(data.jurnalIndex == encounterIndex and isKilled) then
                             table.insert( rtvData, bossID )

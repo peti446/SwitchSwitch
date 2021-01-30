@@ -1,6 +1,6 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Export"])
-local profilesDropDown
+local ProfilesDropDown
 
 local function ExportButtonClicked(button)
     local editBox = button:GetUserData("EditBox")

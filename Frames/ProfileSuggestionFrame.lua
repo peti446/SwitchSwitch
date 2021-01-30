@@ -67,7 +67,7 @@ local function CreateSuggestionFrame(profileName)
     frame:AddChild(buttonGroup)
 
     frame:SetCallback("OnClose", function(frame)
-        point1, _, relativePoint1, xOfs, yOfs = frame:GetPoint(1);
+        local point1, _, relativePoint1, xOfs, yOfs = frame:GetPoint(1);
         SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.point = point1;
         SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.relativePoint = relativePoint1;
         SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameX = xOfs;

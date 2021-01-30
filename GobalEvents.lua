@@ -11,7 +11,7 @@ function SwitchSwitch:ADDON_LOADED(event, arg1)
     end
 end
 
-function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
+function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
     if(not IsAddOnLoaded("Blizzard_TalentUI")) then
         LoadAddOn("Blizzard_TalentUI")
         return
@@ -39,7 +39,7 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
         SwitchSwitch.TalentsData[playerSpec][row]["requiredLevel"] = tierUnlockLevel
         SwitchSwitch.TalentsData[playerSpec][row]["data"] = {}
         for column=1,NUM_TALENT_COLUMNS do
-            local talentID, name, texture, selected, available, spellID, unknown, row, column, known, grantedByAura = GetTalentInfo(row, column, spec)
+            local talentID, name, texture, _, _, spellID = GetTalentInfo(row, column, spec)
             SwitchSwitch.TalentsData[playerSpec][row]["data"][column] =
             {
                 ["talentID"] = talentID,

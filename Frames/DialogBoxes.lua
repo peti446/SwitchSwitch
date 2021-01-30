@@ -172,7 +172,7 @@ StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
         SwitchSwitch:SetProfileData(data.profile, nil, data.class, data.spec)
         SwitchSwitch:DebugPrint("Create profile")
         --If talent spec table does not exist create one
-        SwitchSwitch:SetProfileData(data.profile, SwitchSwitch:GetCurrentTalents(savePVPTalents), data.class, data.spec)
+        SwitchSwitch:SetProfileData(data.profile, SwitchSwitch:GetCurrentTalents(data.savePVP), data.class, data.spec)
         SwitchSwitch:PLAYER_TALENT_UPDATE(true)
     end,
     OnCancel = function(self, data)

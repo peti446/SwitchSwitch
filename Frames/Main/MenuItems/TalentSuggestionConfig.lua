@@ -223,7 +223,7 @@ function TalentsSuggestionPage:OnOpen(parent)
 end
 
 function TalentsSuggestionPage:OnClose()
-    treeData = nil
+    treeGroup = nil
     CurrentSelectedPath = nil
 end
 
