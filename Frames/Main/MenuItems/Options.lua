@@ -1,5 +1,5 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
-local OptionsPage = SwitchSwitch:RegisterMenuEntry(L["Options"])
+local OptionsPage = SwitchSwitch:RegisterMenuEntry(L["Character Options"])
 
 
 function OptionsPage:OnOpen(parent)
@@ -22,7 +22,7 @@ function OptionsPage:OnOpen(parent)
     end)
     parent:AddChild(cb)
 
-    local cbForSlider = self:CreateCheckBox(L["Suggest talent changes based on zone"])
+    local cbForSlider = self:CreateCheckBox(L["Suggest talent changes based on zone/boss"])
     cbForSlider:SetValue(SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled)
     cbForSlider:SetCallback("OnValueChanged", function(self, _, newVal)
         SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled = newVal

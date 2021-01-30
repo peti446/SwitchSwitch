@@ -260,10 +260,7 @@ function TalentsSuggestionPage:OnOpen(parent)
 end
 
 function TalentsSuggestionPage:OnClose()
-
-
 end
-
 
 function TalentsSuggestionPage:CreateHeader(Text)
     local header = AceGUI:Create("Heading")

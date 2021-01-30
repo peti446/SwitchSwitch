@@ -12,6 +12,7 @@ embeds_libs.xml
 embeds_locales.xml
 SwitchSwitch.lua
 InstancesData.lua
+ExportImportHelper.lua
 frames.xml
 Modules/BossDetection.lua
 GobalEvents.lua
