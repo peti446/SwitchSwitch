@@ -45,7 +45,7 @@ local function SetMenuEntryEnabled(newID)
         if(oldMenuEntry.enabled and oldMenuEntry.OnClose ~= nil) then
             oldMenuEntry:OnClose()
             oldMenuEntry.enabled = false
-            
+
         end
     end
 
@@ -78,7 +78,7 @@ function SwitchSwitch:GetMainFrame()
     _G[FrameName] = frame.frame
     tinsert(UISpecialFrames, FrameName)
     UISpecialFramesCurrentID = #UISpecialFrames
-    
+
     --Start setup
     frame:SetTitle("SwitchSwitch")
     frame:SetStatusText("Created by: " .. AuthorList .. " Version: " .. GetAddOnMetadata("SwitchSwitch", "Version"))
@@ -182,7 +182,7 @@ function SwitchSwitch:HideMainFrame()
         if(oldMenuEntry.enabled and oldMenuEntry.OnClose ~= nil) then
             oldMenuEntry:OnClose()
             oldMenuEntry.enabled = false
-            
+
         end
     end
     frame:Release()

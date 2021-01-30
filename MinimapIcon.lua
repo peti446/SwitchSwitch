@@ -1,7 +1,7 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
 local LDBSwitchSwitch = LibStub("LibDataBroker-1.1"):NewDataObject("SwitchSwitchIcon", {
-    type = "data source", 
+    type = "data source",
     text = "Switch Switch",
     icon = "Interface\\Icons\\INV_Artifact_Tome02",
 });

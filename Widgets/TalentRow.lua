@@ -44,7 +44,7 @@ local methods =
             self:SetTalentID(i)
         end
     end,
-    
+
     ["Hide"] = function(self)
 		self.frame:Hide()
 	end,
@@ -52,8 +52,8 @@ local methods =
 	["Show"] = function(self)
 		self.frame:Show()
     end,
-    
-    ["SetLevel"] = function(self, level) 
+
+    ["SetLevel"] = function(self, level)
         self.levelLabel:SetText(level)
     end,
 
@@ -71,7 +71,7 @@ local methods =
     ["GetTalentID"] = function(self, column)
         return self.talents[column].talentID
     end,
- 
+
     ["SetColumnSelected"] = function(self, column)
         if(self.currentColumnSelected ~= nil) then
             self.talents[self.currentColumnSelected].knownSelection:Hide()
@@ -114,11 +114,11 @@ local function Constructor()
         talents = frame["talents"],
 		type  = Type
     }
-    
+
 	for method, func in pairs(methods) do
 		widget[method] = func
     end
-    
+
 	return AceGUI:RegisterAsWidget(widget)
 end
 

@@ -95,12 +95,12 @@ function SwitchSwitch:deepcopy(o, seen)
     seen = seen or {}
     if o == nil then return nil end
     if seen[o] then return seen[o] end
-  
+
     local no
     if type(o) == 'table' then
       no = {}
       seen[o] = no
-  
+
       for k, v in next, o, nil do
         no[self:deepcopy(k, seen)] = self:deepcopy(v, seen)
       end
@@ -164,11 +164,11 @@ function SwitchSwitch:GetProfilesTable(class, spec)
         if(not self:DoesClassProfilesTableExits(class)) then
             self.db.global.TalentProfiles[class] = {}
         end
-    
+
         if(not self:DoesSpecProfilesTableExits(class, spec)) then
             self.db.global.TalentProfiles[class][spec] = {}
         end
-    
+
         profileTable = self.db.global.TalentProfiles[class][spec]
     end
 
@@ -197,7 +197,7 @@ end
 
 function SwitchSwitch:GetProfileData(name, class, spec)
     if(name == nil) then
-        return nil  
+        return nil
     end
 
     local spec = spec or self:GetCurrentSpec()
@@ -307,11 +307,11 @@ function SwitchSwitch:GetProfilesSuggestionTable(class, spec)
         if(not self:DoesClassProfilesSuggestionTableExits(class)) then
             self.db.global.TalentSuggestions[class] = {}
         end
-    
+
         if(not self:DoesSpecProfilesSuggestionTableExits(class, spec)) then
             self.db.global.TalentSuggestions[class][spec] = {}
         end
-    
+
         profileTable = self.db.global.TalentSuggestions[class][spec]
     end
 
@@ -345,7 +345,7 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
     {
         ["pva"] = {}
     }
-    
+
     --Iterate over all tiers of talents normal
     for Tier = 1, GetMaxTalentTier() do
         --Create default table
@@ -408,11 +408,11 @@ function SwitchSwitch:CanChangeTalents()
     end
     -- If in combat we cannot change so lets exit early
    if(InCombatLockdown()) then
-        return false		
+        return false
    end
-	
+
     --All buffs ids for the tomes
-    local buffLookingFor = 
+    local buffLookingFor =
     {
         226234,
         227041,
@@ -598,7 +598,7 @@ function SwitchSwitch:LearnTalents(profileName)
                 --Lern the talent in the tier
                 LearnPvpTalent(pvpTalentTabl.id, pvpTalentTabl.tier)
             end
-        end 
+        end
     end
 
 
@@ -631,7 +631,7 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName)
         for milestoneID, essenceID in pairs(currentActiveTalents.heart_of_azeroth_essences) do
             if(currentprofile.heart_of_azeroth_essences[milestoneID] == nil or essenceID ~= currentprofile.heart_of_azeroth_essences[milestoneID]) then
                 SwitchSwitch:DebugPrint("Essences do not match");
-                return false   
+                return false
             end
         end
     end

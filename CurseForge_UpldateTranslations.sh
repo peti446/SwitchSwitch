@@ -17,7 +17,7 @@ while read -r line || [ -n "$line" ] ; do
 done < <(cat "$1" | grep -oP $regex);
 }
 
-while IFS= read -r -d '' line; do 
+while IFS= read -r -d '' line; do
 	process_addon_translations "$line"
 done < <(find . -type f -name "*.lua" -not -path "*/Locales/*" -not -path "*/Libs/*" -not -path "*/.release/*" -print0)
 

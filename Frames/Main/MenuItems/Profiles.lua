@@ -9,7 +9,7 @@ function ProfilesEditorPage:OnOpen(parent)
 
     local newButton = AceGUI:Create("Button")
     newButton:SetText(L["New Profile"])
-    newButton:SetCallback("OnClick", function(self) 
+    newButton:SetCallback("OnClick", function(self)
         local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
         if(dialog) then
             dialog.data = {
@@ -40,7 +40,7 @@ function ProfilesEditorPage:SetDropDownGroupList()
     local dropDownData = {}
     local count = 0
     local oldGroup = DropDownGroup.status or DropDownGroup.localstatus
-    
+
     if(type(oldGroup) ~= "table" or oldGroup.selected == nil) then
         oldGroup = nil
     else
@@ -50,7 +50,7 @@ function ProfilesEditorPage:SetDropDownGroupList()
     local oldGroupExitsInNew = false
     for name, data in pairs(talentsProfiles) do
         dropDownData[name] = name
-        count = count + 1 
+        count = count + 1
         if(oldGroup == name) then
             oldGroupExitsInNew = true
         end

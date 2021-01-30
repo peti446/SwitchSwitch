@@ -51,7 +51,7 @@ function OptionsPage:OnOpen(parent)
         SwitchSwitch:SetMinimapIconVisible(SwitchSwitch.dbpc.char.minimap.hide)
     end)
     parent:AddChild(cb);
-    
+
     local cb = self:CreateCheckBox(L["Enable debug messages in chat"])
     cb:SetValue(SwitchSwitch.dbpc.char.debug)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)

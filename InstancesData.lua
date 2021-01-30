@@ -8,7 +8,7 @@ SwitchSwitch.ContentTypeStrings =
     [3] = L["Scenarios"]
 }
 
-SwitchSwitch.DificultyStrings = 
+SwitchSwitch.DificultyStrings =
 {
     [1] = L["Normal"],
     [2] = L["Heroic"],

@@ -75,7 +75,7 @@ function SwitchSwitch:RefreshTalentUI()
         dropDownData[name] = name
     end
     dropDown:SetList(dropDownData)
-    
+
     if(self.CurrentActiveTalentsProfile ~= self.CustomProfileName and self:DoesProfileExits(self.CurrentActiveTalentsProfile)) then
         dropDown:SetValue(self.CurrentActiveTalentsProfile)
         saveButton.frame:Hide()

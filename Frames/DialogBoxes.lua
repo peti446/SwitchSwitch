@@ -12,7 +12,7 @@ StaticPopupDialogs["SwitchSwitch_ConfirmTomeUsage"] =
     preferredIndex = 3,
     exclusive = true,
     enterClicksFirstButton = true,
-    OnShow = function(self, data) 
+    OnShow = function(self, data)
         --Wellll as there is no build-in way to have secure button as part of a static popuop we need to replace the buttons shig
         -- so we do
         if(self.sbutton == nil) then
@@ -77,7 +77,7 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
     enterClicksFirstButton = true,
     autoCompleteSource = SwitchSwitch.GetAutoCompleatProfiles,
     autoCompleteArgs = {},
-    OnShow = function(self) 
+    OnShow = function(self)
         --Add the check box to ignore pvp talent
         if(savePVPCheckbox == nil) then
             savePVPCheckbox = CreateFrame("CheckButton", nil, self, "UICheckButtonTemplate")
@@ -118,16 +118,16 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
             end
             return
         end
-    
+
         SwitchSwitch:DebugPrint("Create profile")
         --If talent spec table does not exist create one
         SwitchSwitch:SetProfileData(profileName, SwitchSwitch:GetCurrentTalents(savePVPTalents), data.class, data.spec)
         SwitchSwitch:PLAYER_TALENT_UPDATE(true)
-    
+
         --Let the user know that the profile has been created
         SwitchSwitch:Print(L["Talent profile %s created!"]:format(profileName))
     end,
-    EditBoxOnTextChanged = function (self) 
+    EditBoxOnTextChanged = function (self)
         local data = self:GetParent().editBox:GetText()
         local label = self:GetParent().text
         local button =  self:GetParent().button1

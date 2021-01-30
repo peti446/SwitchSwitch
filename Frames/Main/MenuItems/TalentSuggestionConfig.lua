@@ -6,7 +6,7 @@ local function OnDropDownGroupSelectedForType(frame, _, group)
     local DifficultyID = frame:GetUserData("DifficultyID")
     local Expansion = frame:GetUserData("Expansion")
     local ContentType = frame:GetUserData("ContentType")
-    
+
     if(group == "None") then
         group = nil
     end
@@ -62,7 +62,7 @@ local function OnGroupSelected(frame, _, group)
     frame:ReleaseChildren()
     frame:SetLayout("Flow")
     if(JurnalInstanceID ~= nil) then
-        
+
         -- Get the data
         ContentType = tonumber(ContentType)
         JurnalInstanceID = tonumber(JurnalInstanceID)
@@ -127,14 +127,14 @@ local function OnGroupSelected(frame, _, group)
             end
         end
     elseif(ContentType ~= nil) then
-        
+
         -- Get the data
         ContentType = tonumber(ContentType)
         local contentData = SwitchSwitch.InstancesBossData[Expansion][ContentType]
         local dropDownData = {
             ["None"] = L["None"]
         }
-        local difficulties = {} 
+        local difficulties = {}
 
         for profileName, _ in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
             dropDownData[profileName] = profileName
@@ -184,7 +184,7 @@ local function OnGroupSelected(frame, _, group)
             if(setValue == "Multiple") then
                 dropDown:SetValue("None")
                 dropDown:SetText(L["Multiple values"])
-            else 
+            else
                 dropDown:SetValue(setValue)
             end
             dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelectedForType)
@@ -202,7 +202,7 @@ local function GetInstanceNameByID(ID, isRaid)
         EJ_SelectTier(tier)
         local index = 1
         local instanceID, name = EJ_GetInstanceByIndex(index, isRaid)
-        
+
         while instanceID do
             if(instanceID == ID) then
                 return name
@@ -233,7 +233,7 @@ function TalentsSuggestionPage:SetTreeData()
     end
 
     local treeData = {}
-    for expansion, expansionData in pairs(SwitchSwitch.InstancesBossData) do 
+    for expansion, expansionData in pairs(SwitchSwitch.InstancesBossData) do
         local expansionTree = {
             text = expansion,
             value = expansion,

@@ -20,13 +20,13 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
     if(type(units) == "table" and units["player"] == nil) then
         return
     end
-    
+
     local playerSpec = SwitchSwitch:GetCurrentSpec()
     if(playerSpec ==  self.lastUpdatePlayerSpec) then
         return
     end
     self.lastUpdatePlayerSpec = playerSpec
-    
+
     if(type(SwitchSwitch.TalentsData) ~= "table") then
         SwitchSwitch.TalentsData = {}
     end
@@ -40,7 +40,7 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
         SwitchSwitch.TalentsData[playerSpec][row]["data"] = {}
         for column=1,NUM_TALENT_COLUMNS do
             local talentID, name, texture, selected, available, spellID, unknown, row, column, known, grantedByAura = GetTalentInfo(row, column, spec)
-            SwitchSwitch.TalentsData[playerSpec][row]["data"][column] = 
+            SwitchSwitch.TalentsData[playerSpec][row]["data"][column] =
             {
                 ["talentID"] = talentID,
                 ["textureID"] = texture,
@@ -54,7 +54,7 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
     self:PLAYER_TALENT_UPDATE(true)
 end
 
--- When true is passed in we will only update the current active profile, 
+-- When true is passed in we will only update the current active profile,
 -- other wise do full update if the player is changing talents or the talbe is null (manually called)
 function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
     self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
@@ -62,8 +62,8 @@ function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
     if(type(units) ~= "boolean" or not units) then
         return
     end
-    
-    -- If we reach here its means 
+
+    -- If we reach here its means
     self:RefreshProfilesEditorPage()
     self:RefreshTalentsSuggestionUI()
     self:RefreshExportUI()
@@ -84,7 +84,7 @@ function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficu
             suggestedProfileName = allSuggestionsForInstance["difficulties"][difficultyID]
         end
     end
-    
+
     if(suggestedProfileName ~= nil) then
         if(suggestedProfileName ~= self.CurrentActiveTalentsProfile) then
             self:ToggleSuggestionFrame(suggestedProfileName)

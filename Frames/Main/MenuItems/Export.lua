@@ -50,7 +50,7 @@ function MenuEntry:OnOpen(parent)
 				end
 			end
 		end
-        
+
         self:GetUserData("ButtonToEnable"):SetDisabled(not hasSelected)
     end)
     parent:AddChild(ProfilesDropDown)

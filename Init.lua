@@ -6,7 +6,7 @@ local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 --##########################################################################################################################
 --                                  Default configurations
 --##########################################################################################################################
-local dbpcDefaults = 
+local dbpcDefaults =
 {
     char = {
         ["Version"] = SwitchSwitch.InternalVersion,
@@ -24,14 +24,14 @@ local dbpcDefaults =
             ["enabled"] = true,
             ["fadeTime"] = 15
         },
-        ["minimap"] = 
-        { 
+        ["minimap"] =
+        {
             ["hide"] = false,
         }
     },
 }
 
-local dbDefaults = 
+local dbDefaults =
 {
     global =
     {
@@ -53,7 +53,7 @@ function SwitchSwitch:OnInitialize()
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE"}, 0.75, "PLAYER_TALENT_UPDATE")
-    
+
     -- #######################################################################################################
     -- UPDATE FROM < 2.0 - DEPRECTED SOON
     -- #######################################################################################################
@@ -88,7 +88,7 @@ function SwitchSwitch:OnEnable()
                 local BossDetectionData = InstanceData["bossData"] or {}
                 -- Right now we want to register the whole isntance for detection
                 -- As we need the data for boss down detection
-                --for bossID, _ in pairs(suggestions["bosses"] or {}) do 
+                --for bossID, _ in pairs(suggestions["bosses"] or {}) do
                 --    BossDetectionData[bossID] = InstanceData["bossData"][bossID]
                 --end
                 local hasInstanceSuggestions = next(suggestions["difficulties"] or {}, nil) ~= nil
@@ -125,7 +125,7 @@ local function GetVersionNumber(str)
 
         str = tonumber(str)
     end
-    
+
     return str
 end
 
