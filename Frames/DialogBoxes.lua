@@ -31,7 +31,7 @@ StaticPopupDialogs["SwitchSwitch_ConfirmTomeUsage"] =
         self.button1:Hide()
         end,
         OnAccept = function(self, data, data2)
-        --Execute it after a timer so that the the call is not executed when we still dont have the buff as it takes time to activate
+        --Execute it after a timer so that the the call is not executed when we still don't have the buff as it takes time to activate
         SwitchSwitch:DebugPrint("Changing talents after 1 seconds to " .. data2)
         C_Timer.After(1, function() SwitchSwitch:ActivateTalentProfile(data2) end)
         self.sbutton:Hide()

@@ -12,7 +12,8 @@ jobs:
        - name: Lint lua files
          uses: nebularg/actions-luacheck@v1
          with:
-           args: "--no-color -q"
+           config: https://gist.githubusercontent.com/nebularg/aaccb396168a4076a7a0b7dbcbe6fb42/raw/36a15bd6b375351321711bb21095091ab90087b9/.luacheckrc
+           args: "--no-color -q --no-self"
            annotate: warning
  
     Deploy-Packages:

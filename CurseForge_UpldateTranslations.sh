@@ -19,7 +19,7 @@ done < <(cat "$1" | grep -oP $regex);
 
 while IFS= read -r -d '' line; do 
 	process_addon_translations "$line"
-done < <(find . -type f -name "*.lua" -not -path "*/Locales/*" -not -path "*/Libs/*" -print0)
+done < <(find . -type f -name "*.lua" -not -path "*/Locales/*" -not -path "*/Libs/*" -not -path "*/.release/*" -print0)
 
 for x in "${!translationStrings[@]}"; do
 	printf "L[\"%s\"] = %s\n" "$x" "${translationStrings[$x]}" >> "$translationTempFile"
@@ -31,7 +31,7 @@ done
 #       missing-phrase-handling: DoNothing //['DoNothing', 'DeleteIfNoTranslations', 'DeleteIfTranslationsOnlyExistForSelectedLanguage', 'DeletePhrase']. Default: DoNothing
 #   localizations: "Localizations To Import"
 
-result=$( curl -sS -0 -X POST -w "%{http_code}" \
+result=$( curl -sS -0 -o /dev/null -X POST -w "%{http_code}" \
 -H "X-Api-Token: $CF_API_KEY" \
 -F "metadata={ language: \"enUS\", formatType: \"TableAdditions\", \"missing-phrase-handling\": \"DeletePhrase\" }" \
 -F "localizations=<$translationTempFile" \
