@@ -1,5 +1,6 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Export"])
+local profilesDropDown
 
 local function ExportButtonClicked(button)
     local editBox = button:GetUserData("EditBox")
@@ -34,21 +35,12 @@ function MenuEntry:OnOpen(parent)
     parent:AddChild(self:CreateHeader(L["Export"]))
     parent:AddChild(self:CreateLabel(L["Select one or more profiles from you current sepc to export"] ..  ".\n\n"))
 
-    local dropDown = AceGUI:Create("Dropdown")
-    dropDown:SetLabel(L["Select profiles to export"])
-    dropDown:SetMultiselect(true)
-    dropDown:SetFullWidth(true)
-    local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
-    local dropDownData = {}
-    local oldGroupExitsInNew = false
-    for name, data in pairs(talentsProfiles) do
-        dropDownData[name] = name
-        if(oldGroup == name) then
-            oldGroupExitsInNew = true
-        end
-    end
-    dropDown:SetList(dropDownData)
-    dropDown:SetCallback("OnValueChanged", function(self,_,key,checked)
+    ProfilesDropDown = AceGUI:Create("Dropdown")
+    ProfilesDropDown:SetLabel(L["Select profiles to export"])
+    ProfilesDropDown:SetMultiselect(true)
+    ProfilesDropDown:SetFullWidth(true)
+    self:SetDropDownProfileList()
+    ProfilesDropDown:SetCallback("OnValueChanged", function(self)
         local hasSelected = false
 		for i, widget in self.pullout:IterateItems() do
 			if widget.type == "Dropdown-Item-Toggle" then
@@ -61,7 +53,7 @@ function MenuEntry:OnOpen(parent)
         
         self:GetUserData("ButtonToEnable"):SetDisabled(not hasSelected)
     end)
-    parent:AddChild(dropDown)
+    parent:AddChild(ProfilesDropDown)
 
     local cb = self:CreateCheckBox(L["Should export PVP Talents?"])
     cb:SetDescription(L["Will only export pvp talents if the specific profile was created with pvp talents enabled, this will not add pvp talents to any profile"])
@@ -69,10 +61,10 @@ function MenuEntry:OnOpen(parent)
 
     local exportButton = self:CreateButton(L["Export"])
     exportButton:SetDisabled(true)
-    exportButton:SetUserData("DropDown", dropDown)
+    exportButton:SetUserData("DropDown", ProfilesDropDown)
     exportButton:SetUserData("PVPCheckBox", cb)
     exportButton:SetCallback("OnClick", ExportButtonClicked)
-    dropDown:SetUserData("ButtonToEnable", exportButton)
+    ProfilesDropDown:SetUserData("ButtonToEnable", exportButton)
     parent:AddChild(exportButton)
 
     local editBox = self:CreateEditBox(L["Export String"])
@@ -126,4 +118,28 @@ function MenuEntry:CreateLabel(Text)
     label:SetFullWidth(true)
     label:SetText(Text)
     return label
+end
+
+function MenuEntry:SetDropDownProfileList()
+    if(ProfilesDropDown == nil) then
+        return
+    end
+    local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
+    local ProfilesDropDownData = {}
+    local oldGroupExitsInNew = false
+    for name, data in pairs(talentsProfiles) do
+        ProfilesDropDownData[name] = name
+        if(oldGroup == name) then
+            oldGroupExitsInNew = true
+        end
+    end
+    ProfilesDropDown:SetList(ProfilesDropDownData)
+    ProfilesDropDown:Fire("OnValueChanged", next(ProfilesDropDownData), false)
+end
+
+function SwitchSwitch:RefreshExportUI()
+    if(ProfilesDropDown == nil) then
+        return
+    end
+    MenuEntry:SetDropDownProfileList()
 end

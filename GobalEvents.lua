@@ -16,12 +16,20 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
         LoadAddOn("Blizzard_TalentUI")
         return
     end
+
+    if(type(units) == "table" and units["player"] == nil) then
+        return
+    end
+    
+    local playerSpec = SwitchSwitch:GetCurrentSpec()
+    if(playerSpec ==  self.lastUpdatePlayerSpec) then
+        return
+    end
+    self.lastUpdatePlayerSpec = playerSpec
     
     if(type(SwitchSwitch.TalentsData) ~= "table") then
         SwitchSwitch.TalentsData = {}
     end
-
-    local playerSpec = SwitchSwitch:GetCurrentSpec()
     SwitchSwitch.TalentsData[playerSpec] = {}
     local spec = GetActiveSpecGroup()
     for row=1,MAX_TALENT_TIERS do
@@ -41,15 +49,24 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED()
             }
         end
     end
+
+    --Update all the UI that is dependend on spec
+    self:PLAYER_TALENT_UPDATE(true)
 end
 
-function SwitchSwitch:PLAYER_TALENT_UPDATE(onlyActiveUpdate)
+-- When true is passed in we will only update the current active profile, 
+-- other wise do full update if the player is changing talents or the talbe is null (manually called)
+function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
     self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
-    if(type(onlyActiveUpdate) == "boolean" and onlyActiveUpdate == true) then
+    self:RefreshTalentUI()
+    if(type(units) ~= "boolean" or not units) then
         return
     end
-    self:RefreshTalentUI()
+    
+    -- If we reach here its means 
     self:RefreshProfilesEditorPage()
+    self:RefreshTalentsSuggestionUI()
+    self:RefreshExportUI()
 end
 
 

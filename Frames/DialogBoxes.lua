@@ -122,7 +122,7 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
         SwitchSwitch:DebugPrint("Create profile")
         --If talent spec table does not exist create one
         SwitchSwitch:SetProfileData(profileName, SwitchSwitch:GetCurrentTalents(savePVPTalents), data.class, data.spec)
-        SwitchSwitch:PLAYER_TALENT_UPDATE()
+        SwitchSwitch:PLAYER_TALENT_UPDATE(true)
     
         --Let the user know that the profile has been created
         SwitchSwitch:Print(L["Talent profile %s created!"]:format(profileName))
@@ -173,7 +173,7 @@ StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
         SwitchSwitch:DebugPrint("Create profile")
         --If talent spec table does not exist create one
         SwitchSwitch:SetProfileData(data.profile, SwitchSwitch:GetCurrentTalents(savePVPTalents), data.class, data.spec)
-        SwitchSwitch:PLAYER_TALENT_UPDATE()
+        SwitchSwitch:PLAYER_TALENT_UPDATE(true)
     end,
     OnCancel = function(self, data)
         local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")

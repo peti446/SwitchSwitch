@@ -1,5 +1,6 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local TalentsSuggestionPage = SwitchSwitch:RegisterMenuEntry(L["Talents Suggestion"])
+local treeGroup, CurrentSelectedPath
 
 local function OnDropDownGroupSelectedForType(frame, _, group)
     local DifficultyID = frame:GetUserData("DifficultyID")
@@ -52,7 +53,7 @@ end
 
 local function OnGroupSelected(frame, _, group)
     local Expansion, ContentType, JurnalInstanceID = ("\001"):split(group)
-
+    CurrentSelectedPath = group
     if(not IsAddOnLoaded("Blizzard_EncounterJournal")) then
         LoadAddOn("Blizzard_EncounterJournal")
     end
@@ -214,9 +215,23 @@ local function GetInstanceNameByID(ID, isRaid)
 end
 
 function TalentsSuggestionPage:OnOpen(parent)
-    local treeGroup = AceGUI:Create("TreeGroup")
+    treeGroup = AceGUI:Create("TreeGroup")
     treeGroup:SetFullWidth(true)
     treeGroup:SetFullHeight(true)
+    parent:AddChild(treeGroup)
+    self:SetTreeData()
+end
+
+function TalentsSuggestionPage:OnClose()
+    treeData = nil
+    CurrentSelectedPath = nil
+end
+
+function TalentsSuggestionPage:SetTreeData()
+    if(treeGroup == nil) then
+        return
+    end
+
     local treeData = {}
     for expansion, expansionData in pairs(SwitchSwitch.InstancesBossData) do 
         local expansionTree = {
@@ -242,24 +257,23 @@ function TalentsSuggestionPage:OnOpen(parent)
 
         table.insert( treeData, expansionTree )
     end
+
     treeGroup:SetTree(treeData)
     treeGroup:SetCallback("OnGroupSelected", OnGroupSelected)
     treeGroup:SetLayout("Flow")
-    treeGroup:SelectByPath("Shadowlands\0011\0011190")
+    CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011190"
+    treeGroup:SelectByPath(CurrentSelectedPath)
     local treeStatus = {
         groups= {
             ["Shadowlands"] = true,
             ["Shadowlands\0011"] = true,
             ["Shadowlands\0012"] = true
         },
-        selected = "Shadowlands\0011\0011190"
+        selected = CurrentSelectedPath
     }
     treeGroup:SetStatusTable(treeStatus)
     treeGroup:RefreshTree()
-    parent:AddChild(treeGroup)
-end
 
-function TalentsSuggestionPage:OnClose()
 end
 
 function TalentsSuggestionPage:CreateHeader(Text)
@@ -268,4 +282,9 @@ function TalentsSuggestionPage:CreateHeader(Text)
     header:SetFullWidth(true)
     header:SetHeight(35)
     return header
+end
+
+-- Called on talent changes/spec changes
+function SwitchSwitch:RefreshTalentsSuggestionUI()
+    TalentsSuggestionPage:SetTreeData()
 end

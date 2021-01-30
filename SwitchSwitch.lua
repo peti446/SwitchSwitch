@@ -234,7 +234,7 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
             SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName:lower()
         end
-        
+        self:PLAYER_TALENT_UPDATE(true)
         return true
     end
     return false
@@ -261,7 +261,7 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
             SwitchSwitch.CurrentActiveTalentsProfile = newName
         end
-        
+        self:PLAYER_TALENT_UPDATE(true)
         return true
     end
 

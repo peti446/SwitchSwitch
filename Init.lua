@@ -52,7 +52,7 @@ function SwitchSwitch:OnInitialize()
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-    self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE", "PLAYER_SPECIALIZATION_CHANGED"}, 0.75, "PLAYER_TALENT_UPDATE")
+    self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE"}, 0.75, "PLAYER_TALENT_UPDATE")
     
     -- #######################################################################################################
     -- UPDATE FROM < 2.0 - DEPRECTED SOON
@@ -99,6 +99,9 @@ function SwitchSwitch:OnEnable()
             end
         end
     end
+
+    -- Lets refresh all the UIS
+    self:PLAYER_TALENT_UPDATE(true)
 end
 
 function SwitchSwitch:OnDisable()
