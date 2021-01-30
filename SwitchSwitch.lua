@@ -185,7 +185,7 @@ function SwitchSwitch:DoesProfileExits(name, class, spec)
         return false
     end
 
-    local name = name:lower()
+    name = name:lower()
     for k,v in pairs(self:GetProfilesTable(class, spec)) do
         if(k:lower() == name) then
             return true
@@ -213,7 +213,7 @@ function SwitchSwitch:GetProfileData(name, class, spec)
 end
 
 function SwitchSwitch:SetProfileData(name, newTable, class, spec)
-    if(neme ~= nil) then
+    if(name ~= nil) then
         return
     end
 
