@@ -25,12 +25,24 @@ function MenuEntry:OnOpen(parent)
     importButton:SetUserData("EditBox", editBox)
     importButton:SetCallback("OnClick", function(self)
         local text = self:GetUserData("EditBox"):GetText()
-        SwitchSwitch:ImportEncodedProfiles(text)
+        local statusLabel = self:GetUserData("StatusLabel")
+        local sucess, statusText = SwitchSwitch:ImportEncodedProfiles(text)
         self:GetUserData("EditBox"):SetText("")
         self:SetDisabled(true)
+        if(sucess) then
+            statusLabel:SetText(statusText)
+        else
+            statusLabel:SetText("|cffff0000" .. L["The string you tried to import is not valid"] .. "|r")
+        end
     end)
     editBox:SetUserData("ButtonToEnable", importButton)
     parent:AddChild(importButton)
+
+    local statusLabel = self:CreateLabel("");
+    statusLabel:SetFontObject(GameFontNormalLarge)
+    statusLabel.alignoffset = 45
+    importButton:SetUserData("StatusLabel", statusLabel)
+    parent:AddChild(statusLabel)
 end
 
 function MenuEntry:OnClose()

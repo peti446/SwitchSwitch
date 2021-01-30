@@ -25,7 +25,8 @@ end
 function SwitchSwitch:ImportEncodedProfiles(encoded)
     local compressed = LibDeflate:DecodeForPrint(encoded)
     local uncompressed = LibDeflate:DecompressDeflate(compressed, {["level"] = 9})
-    local version, serializedData = string.match( uncompressed, "^@SWITCHSWITCH_(%d+)@(.+)$" )
+    local version, serializedData = string.match( uncompressed or "", "^@SWITCHSWITCH_(%d+)@(.+)$" )
+    local infoText = ""
     if(version == nil) then return false end
 
     if(tonumber(version) == 1) then
@@ -34,8 +35,12 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
 
         if(unserializedData["TalentData"] ~= nil) then
             for classID, classData in pairs(unserializedData["TalentData"]) do
+                local className = select(1, GetClassInfo(classID))
                 for specID, profilesData in pairs(classData) do
+                    local specName = select(2, GetSpecializationInfoByID(specID))
                     local currentSavedData = self:GetProfilesTable(classID, specID)
+                    local profilesCount = 0
+                    local namesList = ""
                     for name, data in pairs(profilesData) do
                         local saveName = name
                         local counter = 1
@@ -44,13 +49,20 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
                             counter = counter + 1
                         end
                         currentSavedData[saveName] = data
+                        namesList = namesList .. saveName .. ", "
+                        profilesCount = profilesCount + 1
                     end
+                    namesList = string.sub( namesList, string.len( namesList ) - 2 )
+                    infoText = infoText .. L["Imported %d profile(s) for class %s-%s: %s"]:format(profilesCount, className, specName, namesList)
                 end
+                infoText = infoText .. "\n"
             end
         end
     else
         return false
     end
+
     self:PLAYER_TALENT_UPDATE(true)
-    return true
+    self:Print(infoText)
+    return true, infoText
 end
