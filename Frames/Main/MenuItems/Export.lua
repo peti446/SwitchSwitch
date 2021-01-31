@@ -78,6 +78,7 @@ end
 
 function MenuEntry:OnClose()
     SwitchSwitch:DebugPrint("Closing Export tab")
+    ProfilesDropDown = nil
 end
 
 

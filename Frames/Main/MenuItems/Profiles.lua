@@ -70,6 +70,9 @@ function ProfilesEditorPage:SetDropDownGroupList()
         else
             DropDownGroup:SetGroup(select(1, next(dropDownData, nil)))
         end
+    else
+        DropDownGroup:ReleaseChildren()
+        DropDownGroup.dropdown:SetText("")
     end
 end
 
