@@ -213,8 +213,8 @@ function SwitchSwitch:GetProfileData(name, class, spec)
 end
 
 function SwitchSwitch:SetProfileData(name, newTable, class, spec)
-    if(name ~= nil) then
-        return
+    if(name == nil) then
+        return nil
     end
 
     spec = spec or self:GetCurrentSpec()
