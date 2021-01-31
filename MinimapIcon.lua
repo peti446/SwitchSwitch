@@ -14,8 +14,8 @@ function LDBSwitchSwitch:OnTooltipShow()
     tooltip:AddLine(" ")
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Click"], NORMAL_FONT_COLOR_CODE, L["Show config panel"]))
     tooltip:AddLine(" ")
-    if(SwitchSwitch.dbpc.char.SelectedTalentsProfile ~= SwitchSwitch.defaultProfileName) then
-        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.dbpc.char.SelectedTalentsProfile))
+    if(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.defaultProfileName) then
+        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsProfile))
     else
         tooltip:AddLine(("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]))
     end
