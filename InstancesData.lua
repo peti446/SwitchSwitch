@@ -26,7 +26,7 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
             ["instanceID"] = 2296, -- Castle of nathria (InstanceID)
             ["difficulties"] = {14,15,16},
             ["bossData"] = {
-                [172145] = { -- Shriekwing
+                [164406] = { -- Shriekwing
                     ["requieres"] = {},
                     ["zoneID"] = 1735,
                     ["position"] = {
@@ -39,7 +39,7 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
                     ["ecnounterID"] = 2393
                 },
                 [165066] = { -- Altimor
-                    ["requieres"] = {172145},
+                    ["requieres"] = {164406},
                     ["zoneID"] = 1735,
                     ["position"] = {
                         ["x1"] = 74.0,
@@ -69,13 +69,13 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
                     ["ecnounterID"] = 2420
                 },
                 [165759] = { -- Sun King
-                    ["requieres"] = {172145},
+                    ["requieres"] = {164406},
                     ["zoneID"] = 1746,
                     ["jurnalIndex"] = 3,
                     ["ecnounterID"] = 2422
                 },
                 [166644] = { -- Xymos
-                    ["requieres"] = {172145},
+                    ["requieres"] = {164406},
                     ["zoneID"] = 1745,
                     ["position"] = {
                         ["x1"] = 70.0,
