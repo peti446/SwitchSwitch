@@ -8,7 +8,7 @@ local SuggestionFrame
 --##########################################################################################################################
 local function CreateSuggestionFrame(profileName)
     local frame = AceGUI:Create("Window")
-    local frameLocation = SwitchSwitch.dbpc.char.talentsSuggestionFrame.location
+    local frameLocation = SwitchSwitch.db.profile.talentsSuggestionFrame.location
     frame:SetPoint(frameLocation.point, UIParent, frameLocation.relativePoint, frameLocation.frameX, frameLocation.frameY)
     frame:SetLayout("Flow")
     frame:SetWidth(275)
@@ -24,11 +24,11 @@ local function CreateSuggestionFrame(profileName)
     frame:AddChild(descriptionLabel)
 
     local remainingLabel
-    if(SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled) then
+    if(SwitchSwitch.db.profile.talentsSuggestionFrame.enabled) then
         remainingLabel = AceGUI:Create("Label")
         remainingLabel:SetFullWidth(true)
         remainingLabel:SetFontObject(GameFontWhite)
-        remainingLabel:SetText(L["Closing in %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime)) .. "\n\n")
+        remainingLabel:SetText(L["Closing in %s seconds..."]:format(string.format("%.0f",SwitchSwitch.db.profile.talentsSuggestionFrame.fadeTime)) .. "\n\n")
         remainingLabel:SetJustifyH("CENTER")
         frame:AddChild(remainingLabel)
     else
@@ -68,10 +68,10 @@ local function CreateSuggestionFrame(profileName)
 
     frame:SetCallback("OnClose", function(frame)
         local point1, _, relativePoint1, xOfs, yOfs = frame:GetPoint(1);
-        SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.point = point1;
-        SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.relativePoint = relativePoint1;
-        SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameX = xOfs;
-        SwitchSwitch.dbpc.char.talentsSuggestionFrame.location.frameY = yOfs;
+        SwitchSwitch.db.profile.talentsSuggestionFrame.location.point = point1;
+        SwitchSwitch.db.profile.talentsSuggestionFrame.location.relativePoint = relativePoint1;
+        SwitchSwitch.db.profile.talentsSuggestionFrame.location.frameX = xOfs;
+        SwitchSwitch.db.profile.talentsSuggestionFrame.location.frameY = yOfs;
         local timerID = frame:GetUserData("TimerID")
         if(timerID ~= nil) then
             SwitchSwitch:CancelTimer(timerID)
@@ -81,11 +81,11 @@ local function CreateSuggestionFrame(profileName)
         SwitchSwitch:DebugPrint("Closing Suggestion Frame")
     end)
 
-    if (SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled) then
+    if (SwitchSwitch.db.profile.talentsSuggestionFrame.enabled) then
         local fadeTimerId = SwitchSwitch:ScheduleRepeatingTimer(function(frame)
             frame:SetUserData("SecondsPassed", frame:GetUserData("SecondsPassed")+1)
-            frame:GetUserData("TextToUpdate"):SetText(L["Closing in %s seconds..."]:format(string.format("%.0f",SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime - frame:GetUserData("SecondsPassed"))) .. "\n\n")
-            if(frame:GetUserData("SecondsPassed") >= SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime) then
+            frame:GetUserData("TextToUpdate"):SetText(L["Closing in %s seconds..."]:format(string.format("%.0f",SwitchSwitch.db.profile.talentsSuggestionFrame.fadeTime - frame:GetUserData("SecondsPassed"))) .. "\n\n")
+            if(frame:GetUserData("SecondsPassed") >= SwitchSwitch.db.profile.talentsSuggestionFrame.fadeTime) then
                 frame:Hide()
             end
         end, 1.0, frame)

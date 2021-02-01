@@ -16,17 +16,17 @@ function OptionsPage:OnOpen(parent)
     parent:AddChild(self:CreateHeader(L["General"]));
 
     local cb = self:CreateCheckBox(L["Ask to automatically use tome when trying to change talents"])
-    cb:SetValue(SwitchSwitch.dbpc.char.autoUseTomes)
+    cb:SetValue(SwitchSwitch.db.profile.autoUseTomes)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
-        SwitchSwitch.dbpc.char.autoUseTomes = newVal
+        SwitchSwitch.db.profile.autoUseTomes = newVal
     end)
     parent:AddChild(cb)
 
     local cbForSlider = self:CreateCheckBox(L["Suggest talent changes based on zone/boss"])
-    cbForSlider:SetValue(SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled)
+    cbForSlider:SetValue(SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
     cbForSlider:SetCallback("OnValueChanged", function(self, _, newVal)
-        SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled = newVal
-        self:GetUserData("slider"):SetDisabled(not SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled)
+        SwitchSwitch.db.profile.talentsSuggestionFrame.enabled = newVal
+        self:GetUserData("slider"):SetDisabled(not SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
     end)
     parent:AddChild(cbForSlider)
 
@@ -34,28 +34,28 @@ function OptionsPage:OnOpen(parent)
     fadeSlider:SetSliderValues(10, 60, 1)
     fadeSlider:SetLabel(L["Time for suggestion-frame to fade away (in seconds)"])
     fadeSlider:SetFullWidth(true)
-    fadeSlider:SetValue(math.min(60, math.max(10, SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime)))
+    fadeSlider:SetValue(math.min(60, math.max(10, SwitchSwitch.db.profile.talentsSuggestionFrame.fadeTime)))
     fadeSlider:SetCallback("OnValueChanged", function(_, _, newVal)
-        SwitchSwitch.dbpc.char.talentsSuggestionFrame.fadeTime = newVal
+        SwitchSwitch.db.profile.talentsSuggestionFrame.fadeTime = newVal
     end)
-    fadeSlider:SetDisabled(not SwitchSwitch.dbpc.char.talentsSuggestionFrame.enabled)
+    fadeSlider:SetDisabled(not SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
     parent:AddChild(fadeSlider)
     cbForSlider:SetUserData("slider", fadeSlider)
 
     parent:AddChild(self:CreateHeader(L["Misc"]));
 
     cb = self:CreateCheckBox(L["Enable minimap button"])
-    cb:SetValue(not SwitchSwitch.dbpc.char.minimap.hide)
+    cb:SetValue(not SwitchSwitch.db.profile.minimap.hide)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
-        SwitchSwitch.dbpc.char.minimap.hide = not newVal
-        SwitchSwitch:SetMinimapIconVisible(SwitchSwitch.dbpc.char.minimap.hide)
+        SwitchSwitch.db.profile.minimap.hide = not newVal
+        SwitchSwitch:SetMinimapIconVisible(newVal)
     end)
     parent:AddChild(cb);
 
     cb = self:CreateCheckBox(L["Enable debug messages in chat"])
-    cb:SetValue(SwitchSwitch.dbpc.char.debug)
+    cb:SetValue(SwitchSwitch.db.profile.debug)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
-        SwitchSwitch.dbpc.char.debug = newVal
+        SwitchSwitch.db.profile.debug = newVal
     end)
     parent:AddChild(cb);
 end

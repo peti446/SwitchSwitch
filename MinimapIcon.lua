@@ -27,7 +27,7 @@ end
 
 function SwitchSwitch:InitMinimapIcon()
     if(AlreadyRegistered == false) then
-        mmIcon:Register("SwitchSwitch", LDBSwitchSwitch, self.dbpc.char)
+        mmIcon:Register("SwitchSwitch", LDBSwitchSwitch, self.db.profile.minimap)
         AlreadyRegistered = true
     end
 end

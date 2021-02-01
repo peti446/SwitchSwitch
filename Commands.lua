@@ -27,7 +27,7 @@ end
 
 function Commands:ResetFrameLocation(frame)
 	if(frame == "suggestion") then
-		SwitchSwitch.dbpc.char.talentsSuggestionFrame.point =
+		SwitchSwitch.db.profile.talentsSuggestionFrame.point =
 		{
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",

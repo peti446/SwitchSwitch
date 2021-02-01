@@ -17,7 +17,7 @@ namespace[2] = L
 namespace[3] = AceGUI
 namespace[4] = LibDBIcon
 
-SwitchSwitch.InternalVersion = 2.0
+SwitchSwitch.InternalVersion = 20
 SwitchSwitch.defaultProfileName = "custom"
 SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName
 
@@ -26,7 +26,7 @@ SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName
 --##########################################################################################################################
 -- Function to print a debug message
 function SwitchSwitch:DebugPrint(...)
-    if(type(self.dbpc) ~= "table" or self.dbpc.char.debug) then
+    if(type(self.db) ~= "table" or self.db.profile.debug) then
         self:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
     end
 end
@@ -488,7 +488,7 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
 
     --If we cannot change talents why even try?
     if(not SwitchSwitch:CanChangeTalents()) then
-        if(SwitchSwitch.dbpc.char.autoUseTomes) then
+        if(SwitchSwitch.db.profile.autoUseTomes) then
             -- Now all tomes have level so lets add them based on character level
             local tomesID = {}
             --Check for level to add the Clear mind tome

@@ -6,10 +6,11 @@ local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 --##########################################################################################################################
 --                                  Default configurations
 --##########################################################################################################################
-local dbpcDefaults =
+local dbCharDefaults =
 {
-    char = {
-        ["Version"] = SwitchSwitch.InternalVersion,
+    char = 
+    {
+        ["Version"] = 2.0,
         ["debug"] = false,
         ["autoUseTomes"] = true,
         ["talentsSuggestionFrame"] =
@@ -28,17 +29,39 @@ local dbpcDefaults =
         {
             ["hide"] = false,
         }
-    },
+    }
 }
 
 local dbDefaults =
 {
     global =
     {
-        ["Version"] = SwitchSwitch.InternalVersion,
+        ["Version"] = -1,
         ["TalentProfiles"] = {},
         ["TalentSuggestions"] = {}
     },
+    profile = 
+    {
+        ["Version"] = -1,
+        ["debug"] = false,
+        ["autoUseTomes"] = true,
+        ["talentsSuggestionFrame"] =
+        {
+            ["location"] =
+            {
+                ["point"] = "CENTER",
+                ["relativePoint"] = "CENTER",
+                ["frameX"] = 0,
+                ["frameY"] = 0
+            },
+            ["enabled"] = true,
+            ["fadeTime"] = 15
+        },
+        ["minimap"] =
+        {
+            ["hide"] = false,
+        }
+    }
 }
 
 --##########################################################################################################################
@@ -46,8 +69,8 @@ local dbDefaults =
 --##########################################################################################################################
 function SwitchSwitch:OnInitialize()
     self:DebugPrint("Addon Initializing")
-    self.db = LibStub("AceDB-3.0"):New("SwitchSwitchDB", dbDefaults, true)
-    self.dbpc = LibStub("AceDB-3.0"):New("SwitchSwitchDBPC", dbpcDefaults, true)
+    self.db = LibStub("AceDB-3.0"):New("SwitchSwitchDB", dbDefaults)
+    self.dbpcDEPRECTED_OLD_ACEDB = LibStub("AceDB-3.0"):New("SwitchSwitchDBPC", dbCharDefaults, true)
 
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
@@ -130,23 +153,22 @@ local function GetVersionNumber(str)
 end
 
 function SwitchSwitch:Update()
-    --Get old version string
-    local globalConfigVersion = GetVersionNumber(self.db.global.Version)
-    local characterConfigVerison = GetVersionNumber(self.dbpc.char.Version)
-
-    --Update Global table
-    if(globalConfigVersion ~= self.InternalVersion) then
-
-    end
-
-    -- Update character table
-    if(characterConfigVerison ~= self.InternalVersion) then
-
-    end
-
     -- #######################################################################################################
     -- UPDATE FROM < 2.0 - DEPRECTED SOON
     -- #######################################################################################################
+    local characterDeprectedConfigVerison = GetVersionNumber(self.dbpcDEPRECTED_OLD_ACEDB.char.Version)
+    if(characterDeprectedConfigVerison < 20) then
+        if(self.db:GetCurrentProfile() == "Default") then
+            local realmKey = GetRealmName()
+            local charKey = UnitName("player") .. " - " .. realmKey
+            self.db:SetProfile(charKey)
+            self.db:ResetProfile(false, true)
+        end
+        self.db.profile = self.dbpcDEPRECTED_OLD_ACEDB.char 
+        self.dbpcDEPRECTED_OLD_ACEDB.char = dbCharDefaults.char
+        self.dbpcDEPRECTED_OLD_ACEDB.char.Version = self.InternalVersion
+    end
+
     --Update Global table
     if(type(self.DEPRECTED_OLD_VERSION_PROFILES) == "table" and self.DEPRECTED_OLD_VERSION_PROFILES.Version ~= nil) then
         local oldGCV = GetVersionNumber(self.DEPRECTED_OLD_VERSION_PROFILES.Version)
@@ -169,20 +191,39 @@ function SwitchSwitch:Update()
             self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
             self:Print("You just updated form a pre 2.0 version to 2.0. You might need to reset the saved variables if lua errors happen")
             self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
-            self.dbpc.char.debug = self.DEPRECTED_OLD_VERSION_CHAR_CONF.debug
-            self.dbpc.char.autoUseTomes = self.DEPRECTED_OLD_VERSION_CHAR_CONF.autoUseItems
-            self.dbpc.char.talentsSuggestionFrame.fadeTime = math.min(60,math.max(10, self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame))
-            self.dbpc.char.talentsSuggestionFrame.enabled = self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame > 0
+            self.db.profile.debug = self.DEPRECTED_OLD_VERSION_CHAR_CONF.debug
+            self.db.profile.autoUseTomes = self.DEPRECTED_OLD_VERSION_CHAR_CONF.autoUseItems
+            self.db.profile.talentsSuggestionFrame.fadeTime = math.min(60,math.max(10, self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame))
+            self.db.profile.talentsSuggestionFrame.enabled = self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame > 0
             -- Tables need deep copy
-            self.dbpc.char.talentsSuggestionFrame.location = self:deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
+            self.db.profile.talentsSuggestionFrame.location = self:deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
             -- We set this to nill as we dont want to import again
             self.DEPRECTED_OLD_VERSION_CHAR_CONF = {}
             SwitchSwitchConfig = {}
         end
     end
+
     -- #######################################################################################################
+
+    --Get old version string
+    local globalConfigVersion = GetVersionNumber(self.db.global.Version)
+    local characterConfigVerison = GetVersionNumber(self.db.profile.Version)
+
+    -- Internal version to release version
+    -- 2.0 - 2.0,2.01
+    -- 20 - 2.02
+
+    --Update Global table
+    if(globalConfigVersion ~= -1 and globalConfigVersion ~= self.InternalVersion) then
+
+    end
+
+    -- Update character table
+    if(characterConfigVerison ~= -1 and characterConfigVerison ~= self.InternalVersion) then
+
+    end
 
     -- Lastly we update the verison of the config
     self.db.global.Version = self.InternalVersion
-    self.dbpc.char.Version = self.InternalVersion
+    self.db.profile.Version = self.InternalVersion
 end
