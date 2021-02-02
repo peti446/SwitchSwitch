@@ -1,7 +1,7 @@
 ## Interface: 90002
 ## Title: SwitchSwitch
 ## Author: Geloch, Riukka (Sanguino - EU Horde)
-## Version: 2.0
+## Version: @project-version@
 ## Notes: Allows you to creater talents profiles and switch between them quickly and automaticly.
 ## LoadOnDemand: 0
 ## SavedVariablesPerCharacter: SwitchSwitchConfig, SwitchSwitchDBPC

@@ -10,7 +10,7 @@ local AlreadyRegistered = false
 
 function LDBSwitchSwitch:OnTooltipShow()
     local tooltip = self
-    tooltip:AddLine("Switch Switch V" .. SwitchSwitch.InternalVersion)
+    tooltip:AddLine("Switch Switch " .. GetAddOnMetadata("SwitchSwitch", "Version"))
     tooltip:AddLine(" ")
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Click"], NORMAL_FONT_COLOR_CODE, L["Show config panel"]))
     tooltip:AddLine(" ")

@@ -81,7 +81,7 @@ function SwitchSwitch:GetMainFrame()
 
     --Start setup
     frame:SetTitle("SwitchSwitch")
-    frame:SetStatusText("Created by: " .. AuthorList .. " Version: " .. GetAddOnMetadata("SwitchSwitch", "Version"))
+    frame:SetStatusText("Created by: " .. AuthorList .. " Version: " .. GetAddOnMetadata("SwitchSwitch", "Version"):sub(2))
     frame:SetLayout("Flow")
     frame:SetCallback("OnClose", OnMainFrameClosed)
     frame:SetHeight(600)
@@ -164,7 +164,6 @@ end
 
 function SwitchSwitch:ShowMainFrame_Config()
     self:ShowMainFrame()
-    SetMenuEntryEnabled(3)
 end
 
 function SwitchSwitch:HideMainFrame()

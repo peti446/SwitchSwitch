@@ -60,7 +60,14 @@ local function OnGroupSelected(frame, _, group)
 
     -- Reset the frame as we are now in a new instance
     frame:ReleaseChildren()
-    frame:SetLayout("Flow")
+    frame:SetLayout("Fill")
+
+    local scroll = AceGUI:Create("ScrollFrame")
+    scroll:SetFullWidth(true)
+    scroll:SetFullHeight(true)
+    scroll:SetLayout("Flow")
+    frame:AddChild(scroll)
+
     if(JurnalInstanceID ~= nil) then
 
         -- Get the data
@@ -75,11 +82,11 @@ local function OnGroupSelected(frame, _, group)
         end
 
         -- Set up per dificulty dropdowns
-        frame:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
+        scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
         local label = AceGUI:Create("Label")
         label:SetFullWidth(true)
         label:SetText(L["Will suggest a talent build when entering the instance in a specific difficulty."])
-        frame:AddChild(label)
+        scroll:AddChild(label)
         for _, id in ipairs(instanceData["difficulties"]) do
             local dropDown = AceGUI:Create("Dropdown")
             dropDown:SetLabel(SwitchSwitch.DificultyStrings[id])
@@ -96,16 +103,16 @@ local function OnGroupSelected(frame, _, group)
             end
             dropDown:SetValue(setValue)
             dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelected)
-            frame:AddChild(dropDown)
+            scroll:AddChild(dropDown)
         end
 
         -- Lets list all bosses if there are any
         if (instanceData["bossData"] ~= nil) then
-            frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per boss"]))
+            scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per boss"]))
             local label = AceGUI:Create("Label")
             label:SetFullWidth(true)
             label:SetText(L["Allows you to set specific talents build when mouse hovering a boss in the instance, set to none to disable for specific boss."])
-            frame:AddChild(label)
+            scroll:AddChild(label)
             for npcID, bossData in pairs(instanceData["bossData"]) do
                 local name, _, _, _, _, _, _, instanceID = EJ_GetEncounterInfo(bossData.ecnounterID)
                 local dropDown = AceGUI:Create("Dropdown")
@@ -123,7 +130,7 @@ local function OnGroupSelected(frame, _, group)
                 end
                 dropDown:SetValue(setValue)
                 dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelected)
-                frame:AddChild(dropDown)
+                scroll:AddChild(dropDown)
             end
         end
     elseif(ContentType ~= nil) then
@@ -149,11 +156,11 @@ local function OnGroupSelected(frame, _, group)
         end
 
         -- Set up per dificulty dropdowns
-        frame:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
+        scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
         local label = AceGUI:Create("Label")
         label:SetFullWidth(true)
         label:SetText(L["Will suggest a talent build when entering the instance in a specific difficulty."] .. "\n\n|cffff0000" .. L["Changes here will affect all %s of %s"]:format(SwitchSwitch.ContentTypeStrings[ContentType], Expansion) .. "|r")
-        frame:AddChild(label)
+        scroll:AddChild(label)
 
         for _, id in ipairs(difficulties) do
             local dropDown = AceGUI:Create("Dropdown")
@@ -188,9 +195,11 @@ local function OnGroupSelected(frame, _, group)
                 dropDown:SetValue(setValue)
             end
             dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelectedForType)
-            frame:AddChild(dropDown)
+            scroll:AddChild(dropDown)
         end
     end
+
+    scroll:DoLayout()
 end
 
 local function GetInstanceNameByID(ID, isRaid)
@@ -215,14 +224,18 @@ local function GetInstanceNameByID(ID, isRaid)
 end
 
 function TalentsSuggestionPage:OnOpen(parent)
+    SwitchSwitch:DebugPrint("Opening Talent Suggestion config")
     treeGroup = AceGUI:Create("TreeGroup")
     treeGroup:SetFullWidth(true)
     treeGroup:SetFullHeight(true)
+    treeGroup:SetLayout("Flow")
+    treeGroup:SetCallback("OnGroupSelected", OnGroupSelected)
     parent:AddChild(treeGroup)
     self:SetTreeData()
 end
 
 function TalentsSuggestionPage:OnClose()
+    SwitchSwitch:DebugPrint("Closing Talent Suggestion config")
     treeGroup = nil
     CurrentSelectedPath = nil
 end
@@ -259,10 +272,7 @@ function TalentsSuggestionPage:SetTreeData()
     end
 
     treeGroup:SetTree(treeData)
-    treeGroup:SetCallback("OnGroupSelected", OnGroupSelected)
-    treeGroup:SetLayout("Flow")
     CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011190"
-    treeGroup:SelectByPath(CurrentSelectedPath)
     local treeStatus = {
         groups= {
             ["Shadowlands"] = true,
@@ -273,7 +283,8 @@ function TalentsSuggestionPage:SetTreeData()
     }
     treeGroup:SetStatusTable(treeStatus)
     treeGroup:RefreshTree()
-
+    treeGroup:SelectByPath(CurrentSelectedPath)
+    treeGroup:DoLayout()
 end
 
 function TalentsSuggestionPage:CreateHeader(Text)
