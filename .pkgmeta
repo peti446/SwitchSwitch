@@ -12,7 +12,9 @@ externals:
   Libs/AceLocale-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceLocale-3.0
   Libs/AceBucket-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceBucket-3.0
   Libs/AceHook-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceHook-3.0
+  Libs/AceDB-3.0: https://repos.curseforge.com/wow/ace3/trunk/AceDB-3.0
   Libs/LibDBIcon-1.0: https://repos.curseforge.com/wow/libdbicon-1-0/trunk/LibDBIcon-1.0
+  Libs/LibDataBroker-1.1: https://github.com/tekkub/libdatabroker-1-1
 
 enable-nolib-creation: no
 
