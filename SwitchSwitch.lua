@@ -230,6 +230,16 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
 
         self:SetProfileData(name, nil, class, spec)
         self:DebugPrint("Deleted")
+        local suggestions = self:GetProfilesSuggestionTable(class, spec)
+        for instanceID, instanceSuggestionData in pairs(suggestions) do
+            for suggestionType, profilesList in pairs(instanceSuggestionData) do
+                for id, suggestedProfileName in pairs(profilesList) do
+                    if(name == suggestedProfileName) then
+                        profilesList[id] = nil
+                    end
+                end
+            end
+        end
 
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
             SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName:lower()
@@ -246,7 +256,6 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
         local newName = newName:lower()
 
         self:SetProfileData(newName, self:GetProfileData(name, class, spec), class, spec)
-        self:DeleteProfileData(name, class, spec)
         local suggestions = self:GetProfilesSuggestionTable(class, spec)
         for instanceID, instanceSuggestionData in pairs(suggestions) do
             for suggestionType, profilesList in pairs(instanceSuggestionData) do
@@ -257,6 +266,8 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
                 end
             end
         end
+        -- Need to delete after as it will delete the suggestion entries
+        self:DeleteProfileData(name, class, spec)
 
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
             SwitchSwitch.CurrentActiveTalentsProfile = newName
