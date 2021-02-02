@@ -8,7 +8,7 @@ local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 --##########################################################################################################################
 local dbCharDefaults =
 {
-    char = 
+    char =
     {
         ["Version"] = 2.0,
         ["debug"] = false,
@@ -40,7 +40,7 @@ local dbDefaults =
         ["TalentProfiles"] = {},
         ["TalentSuggestions"] = {}
     },
-    profile = 
+    profile =
     {
         ["Version"] = -1,
         ["debug"] = false,
@@ -164,7 +164,7 @@ function SwitchSwitch:Update()
             self.db:SetProfile(charKey)
             self.db:ResetProfile(false, true)
         end
-        self.db.profile = self.dbpcDEPRECTED_OLD_ACEDB.char 
+        self.db.profile = self.dbpcDEPRECTED_OLD_ACEDB.char
         self.dbpcDEPRECTED_OLD_ACEDB.char = dbCharDefaults.char
         self.dbpcDEPRECTED_OLD_ACEDB.char.Version = self.InternalVersion
     end
