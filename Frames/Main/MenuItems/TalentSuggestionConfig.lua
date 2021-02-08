@@ -271,13 +271,30 @@ function TalentsSuggestionPage:SetTreeData()
         table.insert( treeData, expansionTree )
     end
 
+    -- We handle PVP separate as it is not per expansion but global
+    table.insert( treeData, {
+        text = L["PVP"],
+        value = "PVP",
+        children = {
+            {
+                text = L["Battlegrounds"],
+                value = "battlegroudns",
+            },
+            {
+                text = L["Arena"],
+                value = "arena",
+            }
+        }
+    })
+
     treeGroup:SetTree(treeData)
     CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011190"
     local treeStatus = {
         groups= {
             ["Shadowlands"] = true,
             ["Shadowlands\0011"] = true,
-            ["Shadowlands\0012"] = true
+            ["Shadowlands\0012"] = true,
+            ["PVP"] = true
         },
         selected = CurrentSelectedPath
     }

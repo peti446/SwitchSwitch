@@ -147,6 +147,35 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
     deleteButton:SetCallback("OnClick",OnDeleteProfile)
     scroll:AddChild(deleteButton)
 
+    scroll:AddChild(self:CreateHeader(L["Gear Set"]))
+    scroll:AddChild(self:CreateLabel(L["Gear set to equip automaticly when activating this profile set (Blizzard gear set, needs to be created beforehand)"] .. ".\n" .. "|cFFFF0000".. L["Warning: This setting is per character, renaming this profile means you will need to re-set this on each character for this profile"] .. ".|r"))
+    local gearSetDropDown = AceGUI:Create("Dropdown")
+    gearSetDropDown:SetLabel(L["Gear Set"])
+    gearSetDropDown:SetText(L["None"])
+    local gearSets = {
+    }
+    for _, id in ipairs(C_EquipmentSet.GetEquipmentSetIDs()) do
+        local name = C_EquipmentSet.GetEquipmentSetInfo(id)
+        gearSets[name] = name
+    end
+    gearSets["none"] = L["None"]
+    gearSetDropDown:SetList(gearSets)
+    gearSetDropDown:SetUserData("ProfileName", group)
+    gearSetDropDown:SetValue("none")
+    if(type(SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()]) == "table" and SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()][group] ~= nil) then
+        gearSetDropDown:SetValue(SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()][group])
+    end
+    gearSetDropDown:SetCallback("OnValueChanged", function(self, _, name)
+        if(name == "none") then
+            name = nil
+        end
+        if(type(SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()]) ~= "table") then
+            SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()] = {}
+        end
+        SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()][self:GetUserData("ProfileName")] = name
+    end)
+    scroll:AddChild(gearSetDropDown)
+
     scroll:AddChild(self:CreateHeader(L["Talents"]))
 
     local talentFrameGroup = AceGUI:Create("SimpleGroup")
@@ -179,6 +208,13 @@ function ProfilesEditorPage:CreateHeader(Text)
     header:SetFullWidth(true)
     header:SetHeight(35)
     return header
+end
+
+function ProfilesEditorPage:CreateLabel(Text)
+    local label = AceGUI:Create("Label")
+    label:SetFullWidth(true)
+    label:SetText(Text)
+    return label
 end
 
 function SwitchSwitch:RefreshProfilesEditorPage()

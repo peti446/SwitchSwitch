@@ -61,6 +61,11 @@ local dbDefaults =
         {
             ["hide"] = false,
         }
+    },
+    char =
+    {
+        ["Version"] = -1,
+        ["gearSets"] = {}
     }
 }
 
@@ -207,6 +212,7 @@ function SwitchSwitch:Update()
 
     --Get old version string
     local globalConfigVersion = GetVersionNumber(self.db.global.Version)
+    local profileConfigVerison = GetVersionNumber(self.db.profile.Version)
     local characterConfigVerison = GetVersionNumber(self.db.profile.Version)
 
     -- Internal version to release version
@@ -218,6 +224,11 @@ function SwitchSwitch:Update()
 
     end
 
+    -- Update profile table
+    if(profileConfigVerison ~= -1 and profileConfigVerison ~= self.InternalVersion) then
+
+    end
+
     -- Update character table
     if(characterConfigVerison ~= -1 and characterConfigVerison ~= self.InternalVersion) then
 
@@ -226,4 +237,5 @@ function SwitchSwitch:Update()
     -- Lastly we update the verison of the config
     self.db.global.Version = self.InternalVersion
     self.db.profile.Version = self.InternalVersion
+    self.db.char.Version = self.InternalVersion
 end

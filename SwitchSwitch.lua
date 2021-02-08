@@ -228,8 +228,10 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
     if(self:DoesProfileExits(name, class, spec)) then
         name = name:lower()
 
+        -- Delete from the profiles table
         self:SetProfileData(name, nil, class, spec)
         self:DebugPrint("Deleted")
+        -- Delete from suggestion
         local suggestions = self:GetProfilesSuggestionTable(class, spec)
         for instanceID, instanceSuggestionData in pairs(suggestions) do
             for suggestionType, profilesList in pairs(instanceSuggestionData) do
@@ -240,10 +242,15 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
                 end
             end
         end
-
+        -- Delete from gear sets
+        if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table") then
+            self.db.char.gearSets[self:GetCurrentSpec()][name] = nil
+        end
+        -- Update current actvie profile
         if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
             SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName:lower()
         end
+
         self:PLAYER_TALENT_UPDATE(true)
         return true
     end
@@ -266,6 +273,11 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
                 end
             end
         end
+
+        if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table") then
+            self.db.char.gearSets[self:GetCurrentSpec()][newName] = self.db.char.gearSets[self:GetCurrentSpec()][name]
+        end
+
         -- Need to delete after as it will delete the suggestion entries
         self:DeleteProfileData(name, class, spec)
 
@@ -617,6 +629,15 @@ function SwitchSwitch:LearnTalents(profileName)
         --Learn essences
         for milestoneID, essenceID in pairs(currentTalentProfile.heart_of_azeroth_essences) do
             C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
+        end
+    end
+
+    -- Gear set
+    if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileName] ~= nil) then
+        local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileName])
+        local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+        if(name ~= nil and not isEquipped) then
+            C_EquipmentSet.UseEquipmentSet(itemSetID)
         end
     end
 

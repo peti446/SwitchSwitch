@@ -5,7 +5,18 @@ SwitchSwitch.ContentTypeStrings =
 {
     [1] = L["Raids"],
     [2] = L["Dungeons"],
-    [3] = L["Scenarios"]
+    [3] = L["Scenarios"],
+    [20] = L["Arenas"],
+    [21] = L["Battleground"]
+}
+
+SwitchSwitch.InstanceTypeToContentID =
+{
+    ["raid"] = 1,
+    ["party"] = 2,
+    ["scenario"] = 3,
+    ["arena"] = 20,
+    ["pvp"] = 21,
 }
 
 SwitchSwitch.DificultyStrings =
@@ -17,7 +28,6 @@ SwitchSwitch.DificultyStrings =
     [15] = L["Heroic"],
     [16] = L["Mythic"],
 }
-
 
 -- Shadowlands
 SwitchSwitch.InstancesBossData["Shadowlands"] = {
