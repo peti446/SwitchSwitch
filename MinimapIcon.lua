@@ -32,6 +32,12 @@ function SwitchSwitch:InitMinimapIcon()
     end
 end
 
+function SwitchSwitch:RefreshMinimapIcon()
+    if(AlreadyRegistered) then
+        mmIcon:Refresh("SwitchSwitch", self.db.profile.minimap)
+    end
+end
+
 function SwitchSwitch:SetMinimapIconVisible(visible)
     if(visible) then
         if(not AlreadyRegistered) then self:InitMinimapIcon() end

@@ -90,6 +90,14 @@ function SwitchSwitch:OnInitialize()
 
     --Update the tables in case they are not updated
     SwitchSwitch:Update();
+
+    -- Set up Settings for profiles settings
+    local aceOptionTable = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+    LibStub("AceConfig-3.0"):RegisterOptionsTable("SwitchSwitch", aceOptionTable)
+
+    self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+    self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+    self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 end
 
 function SwitchSwitch:OnEnable()

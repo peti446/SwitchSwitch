@@ -1,6 +1,6 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
-local OptionsPage = SwitchSwitch:RegisterMenuEntry(L["Character Options"])
-
+local OptionsPage = SwitchSwitch:RegisterMenuEntry(L["Options"])
+local scrollFrameParent
 
 function OptionsPage:OnOpen(parent)
     SwitchSwitch:DebugPrint("Selected Options tab")
@@ -11,16 +11,26 @@ function OptionsPage:OnOpen(parent)
     scroll:SetFullHeight(true)
     scroll:SetLayout("Flow")
     parent:AddChild(scroll)
-    parent = scroll
 
-    parent:AddChild(self:CreateHeader(L["General"]));
+    scrollFrameParent = scroll
+    self:PrintOptions()
+end
+
+function OptionsPage:OnClose()
+    SwitchSwitch:DebugPrint("Closing Options tab")
+    LibStub("AceConfigDialog-3.0"):Close("SwitchSwitch")
+    scrollFrameParent = nil
+end
+
+function OptionsPage:PrintOptions()
+    scrollFrameParent:AddChild(self:CreateHeader(L["General"]));
 
     local cb = self:CreateCheckBox(L["Ask to automatically use tome when trying to change talents"])
     cb:SetValue(SwitchSwitch.db.profile.autoUseTomes)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
         SwitchSwitch.db.profile.autoUseTomes = newVal
     end)
-    parent:AddChild(cb)
+    scrollFrameParent:AddChild(cb)
 
     local cbForSlider = self:CreateCheckBox(L["Suggest talent changes based on zone/boss"])
     cbForSlider:SetValue(SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
@@ -28,7 +38,7 @@ function OptionsPage:OnOpen(parent)
         SwitchSwitch.db.profile.talentsSuggestionFrame.enabled = newVal
         self:GetUserData("slider"):SetDisabled(not SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
     end)
-    parent:AddChild(cbForSlider)
+    scrollFrameParent:AddChild(cbForSlider)
 
     local fadeSlider = AceGUI:Create("Slider")
     fadeSlider:SetSliderValues(10, 60, 1)
@@ -39,10 +49,10 @@ function OptionsPage:OnOpen(parent)
         SwitchSwitch.db.profile.talentsSuggestionFrame.fadeTime = newVal
     end)
     fadeSlider:SetDisabled(not SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
-    parent:AddChild(fadeSlider)
+    scrollFrameParent:AddChild(fadeSlider)
     cbForSlider:SetUserData("slider", fadeSlider)
 
-    parent:AddChild(self:CreateHeader(L["Misc"]));
+    scrollFrameParent:AddChild(self:CreateHeader(L["Misc"]));
 
     cb = self:CreateCheckBox(L["Enable minimap button"])
     cb:SetValue(not SwitchSwitch.db.profile.minimap.hide)
@@ -50,18 +60,22 @@ function OptionsPage:OnOpen(parent)
         SwitchSwitch.db.profile.minimap.hide = not newVal
         SwitchSwitch:SetMinimapIconVisible(newVal)
     end)
-    parent:AddChild(cb);
+    scrollFrameParent:AddChild(cb);
 
     cb = self:CreateCheckBox(L["Enable debug messages in chat"])
     cb:SetValue(SwitchSwitch.db.profile.debug)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
         SwitchSwitch.db.profile.debug = newVal
     end)
-    parent:AddChild(cb);
-end
+    scrollFrameParent:AddChild(cb);
 
-function OptionsPage:OnClose()
-    SwitchSwitch:DebugPrint("Closing Options tab")
+    scrollFrameParent:AddChild(self:CreateHeader(L["Settings Profiles"]))
+
+    local groupForProfiles = AceGUI:Create("SimpleGroup")
+    groupForProfiles:SetLayout("Flow")
+    groupForProfiles:SetFullWidth(true)
+    scrollFrameParent:AddChild(groupForProfiles)
+    LibStub("AceConfigDialog-3.0"):Open("SwitchSwitch", groupForProfiles)
 end
 
 function OptionsPage:CreateCheckBox(Text)
@@ -77,4 +91,12 @@ function OptionsPage:CreateHeader(Text)
     header:SetFullWidth(true)
     header:SetHeight(35)
     return header
+end
+
+
+function SwitchSwitch:RefreshConfig(db, profile) 
+    LibStub("AceConfigDialog-3.0"):Close("SwitchSwitch")
+    scrollFrameParent:ReleaseChildren()
+    OptionsPage:PrintOptions()
+    self:RefreshMinimapIcon()
 end
