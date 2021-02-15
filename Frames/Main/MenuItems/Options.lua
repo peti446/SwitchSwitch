@@ -94,7 +94,7 @@ function OptionsPage:CreateHeader(Text)
 end
 
 
-function SwitchSwitch:RefreshConfig(db, profile) 
+function SwitchSwitch:RefreshConfig(db, profile)
     LibStub("AceConfigDialog-3.0"):Close("SwitchSwitch")
     scrollFrameParent:ReleaseChildren()
     OptionsPage:PrintOptions()
