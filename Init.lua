@@ -116,21 +116,25 @@ function SwitchSwitch:OnEnable()
 
     -- Enable Boss detection and register instances
     self:RegisterMessage("SWITCHSWITCH_BOSS_DETECTED")
+    self:RegisterMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED")
     self:EnableModule("BossDetection")
+    local detectionModule = self:GetModule("BossDetection")
     for expansion, data in pairs(SwitchSwitch.InstancesBossData) do
         for contentType, contentData in pairs(data) do
             for jurnalID, InstanceData in pairs(contentData) do
-                local suggestions = self:GetProfilesSuggestionInstanceData(InstanceData.instanceID)
-                local BossDetectionData = InstanceData["bossData"] or {}
-                -- Right now we want to register the whole isntance for detection
-                -- As we need the data for boss down detection
-                --for bossID, _ in pairs(suggestions["bosses"] or {}) do
-                --    BossDetectionData[bossID] = InstanceData["bossData"][bossID]
-                --end
-                local hasInstanceSuggestions = next(suggestions["difficulties"] or {}, nil) ~= nil
-                local hasBossSuggestions = next(BossDetectionData, nil) ~= nil
-                if(hasBossSuggestions or hasInstanceSuggestions) then
-                    self:GetModule("BossDetection"):RegisterInstance(InstanceData.instanceID, BossDetectionData)
+                -- Register the data with the module
+                detectionModule:RegisterInstance(InstanceData["instanceID"], InstanceData["bossData"] or {})
+                -- Check aswell for suggestion to automaticly start detecting them avoids us going over them later
+                local suggestions = self:GetProfilesSuggestionInstanceData(InstanceData["instanceID"])
+                for id, _ in pairs(suggestions["difficulties"] or {}) do
+                    detectionModule:SetDetectionForInstanceEnabled(InstanceData["instanceID"], id, true)
+                end
+                for id,_ in pairs(suggestions["bosses"] or {}) do
+                    detectionModule:SetDetectionForBossEnabled(id, InstanceData["instanceID"], true)
+                end
+                -- For mythic plus we are not going to detext each sesson we just detect the mythic+ dificulty (normal mythic dificulty in this case 23)
+                if(next(suggestions["mythic+"] or {},nil) ~= nil) then
+                    detectionModule:SetDetectionForInstanceEnabled(InstanceData["instanceID"], self.PreMythicPlusDificulty, true)
                 end
             end
         end

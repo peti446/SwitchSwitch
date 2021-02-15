@@ -1,8 +1,19 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local BossDetection = SwitchSwitch:NewModule("BossDetection", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
-local InstancesToDetect = {}
 local CurrentInstanceData = {}
-local CurrentBossesDefeated = {}
+local CurrentInstanceBossesDefeated = {}
+
+local ActiveDetection = {
+    ["types"] = {
+        -- Simple array of types returned by GetInstanceData()
+    },
+    ["instances"] = {
+        -- Will contain two sub-arrais of ids:
+        -- difficulites -> Array of difficulties IDs to detect
+        -- bossIDs -> array of bossIDs to detect
+    }
+}
+local InstancesData = {}
 
 function BossDetection:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -17,27 +28,78 @@ function BossDetection:OnDisable()
     self:CancelAllTimers()
 end
 
-function BossDetection:RegisterInstance(InstanceID, InstanceData)
-    InstancesToDetect[InstanceID] = InstanceData
-    if(InstanceData == nil) then
-        SwitchSwitch:DebugPrint("Deregistering instance " .. InstanceID)
+function BossDetection:RegisterInstance(InstanceID, data)
+    InstancesData[InstanceID] = data
+end
+
+function BossDetection:SetDetectingInstanceTypeEnabled(typeString, enabled)
+    if(enabled) then
+        if(not SwitchSwitch:table_has_value(ActiveDetection.types, typeString)) then
+            table.insert(ActiveDetection.types, typeString)
+            SwitchSwitch:DebugPrint("Registered instance type: " .. tostring(typeString))
+        end
     else
-        SwitchSwitch:DebugPrint("Registering instance " .. InstanceID)
+        SwitchSwitch:table_remove_value(ActiveDetection.types, typeString)
+        SwitchSwitch:DebugPrint("De-registered instance type: " .. tostring(typeString))
     end
 end
 
-function BossDetection:RegisterBoss(InstanceID, BossID, BossData)
-    if(BossID == nil) then
-        self:RegisterInstance(InstanceID, InstancesToDetect[InstanceID] or {})
+-- Pass -1 for all dificulties
+function BossDetection:SetDetectionForInstanceEnabled(InstanceID, difficultyID, enabled)
+    if(type(InstancesData[InstanceID]) ~= "table") then
+        SwitchSwitch:DebugPrint("Trying to detect a instance of which we do not have data.")
         return
     end
 
-    InstancesToDetect[InstanceID] = InstancesToDetect[InstanceID] or {}
-    InstancesToDetect[InstanceID][BossID] = BossData
-    if(BossData == nil) then
-        SwitchSwitch:DebugPrint("Deregistering boss for instance " .. InstanceID .. " with id " .. BossID)
+    -- Make sure that the array exits as below we are expeting the array to not be null or any other value
+    local instanceDetectionData = ActiveDetection.instances[InstanceID] or {}
+    if(type(instanceDetectionData["difficulites"]) ~= "table") then
+        instanceDetectionData["difficulites"] = {}
+    end
+
+    if(enabled) then
+        if(not SwitchSwitch:table_has_value(instanceDetectionData["difficulites"], difficultyID) and not SwitchSwitch:table_has_value(instanceDetectionData["difficulites"], -1)) then
+            table.insert( instanceDetectionData["difficulites"], difficultyID )
+            SwitchSwitch:DebugPrint("Registered difficulty for instance id("..tostring(InstanceID).."): " .. tostring(difficultyID))
+        end
     else
-        SwitchSwitch:DebugPrint("Registering boss for instance " .. InstanceID .. " with id " .. BossID)
+        SwitchSwitch:table_remove_value(instanceDetectionData["difficulites"], difficultyID)
+        SwitchSwitch:DebugPrint("De-registered difficulty for instance id("..tostring(InstanceID).."): " .. tostring(difficultyID))
+    end
+
+    -- Set the new data to the list, if the instanceID is empty lets just delete the entry so we do not even bother checking difficulties and bossIDs
+    ActiveDetection.instances[InstanceID] = instanceDetectionData
+    if(next(ActiveDetection.instances[InstanceID]["bossIDs"] or {},nil) == nil and next(ActiveDetection.instances[InstanceID]["difficulites"],nil) == nil) then
+        ActiveDetection.instances[InstanceID] = nil
+    end
+end
+
+function BossDetection:SetDetectionForBossEnabled(BossID, InstanceID, enabled)
+    if(type(InstancesData[InstanceID]) ~= "table") then
+        SwitchSwitch:DebugPrint("Trying to detect a instance of which we do not have data.")
+        return
+    end
+
+    -- Make sure that the array exits as below we are expeting the array to not be null or any other value
+    local instanceDetectionData = ActiveDetection.instances[InstanceID] or {}
+    if(type(instanceDetectionData["bossIDs"]) ~= "table") then
+        instanceDetectionData["bossIDs"] = {}
+    end
+
+    if(enabled) then
+        if(not SwitchSwitch:table_has_value(instanceDetectionData["bossIDs"], BossID)) then
+            table.insert( instanceDetectionData["bossIDs"], BossID)
+            SwitchSwitch:DebugPrint("Register boss with id: " .. tostring(BossID))
+        end
+    else
+        SwitchSwitch:table_remove_value(instanceDetectionData["bossIDs"], BossID)
+        SwitchSwitch:DebugPrint("De-register boss with id: " .. tostring(BossID))
+    end
+
+    -- Set the new data to the list, if the instanceID is empty lets just delete the entry so we do not even bother checking difficulties and bossIDs
+    ActiveDetection.instances[InstanceID] = instanceDetectionData
+    if(next(ActiveDetection.instances[InstanceID]["bossIDs"], nil) == nil and next(ActiveDetection.instances[InstanceID]["difficulites"] or {}, nil) == nil) then
+        ActiveDetection.instances[InstanceID] = nil
     end
 end
 
@@ -59,8 +121,11 @@ function BossDetection:OnTooltipSetUnit(tooltip)
     npcID = tonumber(npcID)
 
     if (npcType and (npcType == "Creature" or npcType == "Vehicle")) then
-        if(CurrentInstanceData[npcID] ~= nil and not SwitchSwitch:table_has_value(CurrentBossesDefeated, npcID)) then
-            local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+        local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+        local activeDetectionInstanceData = ActiveDetection.instances[current_instanceID] or {}
+        -- We will only send the message if we are actually wanting to detect this boss, to avoid firing if we do not really want to detect as the data might be set correctly
+        -- causing a suggesiton to pop up even if we dont want to
+        if(SwitchSwitch:table_has_value(activeDetectionInstanceData["bossIDs"] or {}, npcID) and not SwitchSwitch:table_has_value(CurrentInstanceBossesDefeated, npcID)) then
             self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, npcID)
             SwitchSwitch:DebugPrint("---- Detected Boss:" .. current_instanceID .. ", " .. current_difficultyID .. ", " .. npcID )
         end
@@ -68,17 +133,24 @@ function BossDetection:OnTooltipSetUnit(tooltip)
 end
 
 function BossDetection:PLAYER_ENTERING_WORLD()
-    local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+    local _, current_instanceType, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
     if(select(1, IsInInstance())) then
 
+        if(SwitchSwitch:table_has_value(ActiveDetection.types, current_instanceType)) then
+            self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType)
+        end
+
         local shouldDetectBosses = false
-        for detecteableInstancID, data in pairs(InstancesToDetect) do
-            if(detecteableInstancID == current_instanceID) then
-                self.awaitingMovement = true
-                shouldDetectBosses = true
-                CurrentInstanceData = data or {}
-                SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID .. " Waiting Movement to start suggestion if neceesary")
-                break
+        for detecteableID, data in pairs(ActiveDetection.instances) do
+            if(detecteableID == current_instanceID) then
+                self.awaitingMovement = next(data["difficulites"] or {},nil) ~= nil
+                self.awaitingBossDetection =  next(data["bossIDs"] or {}, nil) ~= nil
+                if(self.awaitingMovement or self.awaitingBossDetection) then
+                    shouldDetectBosses = true
+                    CurrentInstanceData = InstancesData[detecteableID] or {}
+                    SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID .. " Waiting Movement to start suggestion if neceesary")
+                    break
+                end
             end
         end
 
@@ -93,6 +165,7 @@ function BossDetection:PLAYER_ENTERING_WORLD()
 
         -- We cannot use zone IDs or stuff like that for boss detection so we will try to check evey second during movement if we can to change talents
         -- as we can also not rely on players standing still when entering boss area
+        self.NeedsBossKillUpdate = true
         self:RegisterEvent("PLAYER_STARTED_MOVING")
         self:RegisterEvent("PLAYER_STOPPED_MOVING")
         self:RegisterEvent("BOSS_KILL")
@@ -107,13 +180,25 @@ function BossDetection:PLAYER_ENTERING_WORLD()
 end
 
 function BossDetection:PLAYER_STARTED_MOVING()
-    self:ScheduleRepeatingTimer("DoCheckWork", 1.5)
+    -- First we need to update all bosses killed in the current instance
+    -- This function is called multiple times so we want to update it only once
+    if(self.NeedsBossKillUpdate == true) then
+        self:BOSS_KILL()
+        self.NeedsBossKillUpdate = false
+    end
+
     if(self.awaitingMovement) then
         local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
-        self.awaitingMovement = false
-        self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, nil)
-        SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID )
-        self:BOSS_KILL()
+        local instanceDetectionData = ActiveDetection.instances[current_instanceID] or {}
+        if(SwitchSwitch:table_has_value(instanceDetectionData["difficulites"] or {}, current_difficultyID) or SwitchSwitch:table_has_value(instanceDetectionData["difficulites"] or {}, -1)) then
+            self.awaitingMovement = false
+            self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, nil)
+            SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID )
+        end
+    end
+
+    if(self.awaitingBossDetection) then
+        self:ScheduleRepeatingTimer("DoCheckWork", 1.5)
     end
 end
 
@@ -124,7 +209,7 @@ end
 
 function BossDetection:BOSS_KILL()
     local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
-    CurrentBossesDefeated = self:GetKilledBossesInInstance(current_instanceID, current_difficultyID, CurrentInstanceData)
+    CurrentInstanceBossesDefeated = self:GetKilledBossesInInstance(current_instanceID, current_difficultyID, CurrentInstanceData)
 end
 
 
@@ -134,26 +219,31 @@ function BossDetection:DoCheckWork()
         return
     end
 
+    local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+    local instanceDetectionData = ActiveDetection.instances[current_instanceID] or {}
+    if(type(instanceDetectionData["bossIDs"]) ~= "table") then
+        return
+    end
+
     local map = C_Map.GetBestMapForUnit("player")
     local x, y = self:GetPlayerMapPos(map)
-    local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
-
     if(not x) then
         x = -1
         y = -1
     end
 
-    for bossID, data in pairs(CurrentInstanceData) do
+    for i,bossID in ipairs(instanceDetectionData["bossIDs"]) do
+        local data = CurrentInstanceData[bossID] or {}
         if(data.ZoneID == map) then
             -- This will return if not all requirements are defeated so the resolution before will not happen
             local canBeKilled = true
-            if(SwitchSwitch:table_has_value(CurrentBossesDefeated, bossID)) then
+            if(SwitchSwitch:table_has_value(CurrentInstanceBossesDefeated, bossID)) then
                 canBeKilled = false
             end
 
             if(canBeKilled and type(data.requieres) == "table" and #data.requieres > 0) then
                 for i, requiredBossID in ipairs(data.requieres) do
-                    if(not SwitchSwitch:table_has_value(CurrentBossesDefeated, requiredBossID)) then
+                    if(not SwitchSwitch:table_has_value(CurrentInstanceBossesDefeated, requiredBossID)) then
                         canBeKilled = false
                         break
                     end

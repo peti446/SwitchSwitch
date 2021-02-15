@@ -70,6 +70,15 @@ function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
 end
 
 
+function SwitchSwitch:SWITCHSWITCH_INSTANCE_TYPE_DETECTED(event_name, contentType)
+    if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= nil) then
+        if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= self.CurrentActiveTalentsProfile) then
+            self:ToggleSuggestionFrame(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"])
+        end
+    end
+end
+
+
 function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficultyID, npcID)
     local allSuggestionsForInstance = self:GetProfilesSuggestionInstanceData(instanceID)
     local suggestedProfileName = nil
@@ -82,6 +91,10 @@ function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficu
         -- We entered an instance !!
         if(allSuggestionsForInstance["difficulties"] ~= nil) then
             suggestedProfileName = allSuggestionsForInstance["difficulties"][difficultyID]
+        end
+        -- If we are in mythic/mythic+ we want to see the week specific data
+        if(difficultyID == self.PreMythicPlusDificulty and allSuggestionsForInstance["mythic+"] ~= nil and allSuggestionsForInstance["mythic+"][self:GetCurrentWeeksMythicID()] ~= nil) then
+            suggestedProfileName = allSuggestionsForInstance["mythic+"][self:GetCurrentWeeksMythicID()]
         end
     end
 

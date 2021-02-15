@@ -29,6 +29,28 @@ SwitchSwitch.DificultyStrings =
     [16] = L["Mythic"],
 }
 
+SwitchSwitch.PreMythicPlusDificulty = 23
+
+SwitchSwitch.MythicPlusAffixes = {
+    -- Sesion got by C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
+    -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
+    -- Sesason 1 Shadowlands
+    [5] = {
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 3)]    = L["Week"] .. " 1"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(11))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(3))   ..")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 124)]    = L["Week"] .. " 2"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(7))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(124)) ..")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12)]  = L["Week"] .. " 3"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(123)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(12))  .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 4)]    = L["Week"] .. " 4"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(122)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(4))   .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 14)]    = L["Week"] .. " 5"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(8))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(14))  .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 13)]     = L["Week"] .. " 6"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(6))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(13))  .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 3)]   = L["Week"] .. " 7"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(123)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(13))  .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 4)]      = L["Week"] .. " 8"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(7))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(4))   .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 124)] = L["Week"] .. " 9"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(122)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(124)) .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 13)]    = L["Week"] .. " 10" .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(11))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(13))  .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12)]    = L["Week"] .. " 11" .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(8))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(12))  .. ")",
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 14)]     = L["Week"] .. " 12" .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(6))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(14))  .. ")",
+    },
+}
+
 -- Shadowlands
 SwitchSwitch.InstancesBossData["Shadowlands"] = {
     [1] = {
@@ -133,34 +155,42 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
         [1188] = { -- Da other Side
             ["instanceID"] = 2291,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1185] = { -- Halls of atonement
             ["instanceID"] = 2287,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1184] = { -- Mists of Tirna Scithe
             ["instanceID"] = 2290,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1183] = { -- Plaguefall
             ["instanceID"] = 2289,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1189] = { -- Sanguine Depths
             ["instanceID"] = 2284,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1186] = { -- Spires of Ascension
             ["instanceID"] = 2285,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1182] = { -- Necrotic Wake
             ["instanceID"] = 2286,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
         [1187] = { -- Theather of pain
             ["instanceID"] = 2293,
             ["difficulties"] = {1,2,23},
+            ["hasMythic+"] = true,
         },
     }
 }

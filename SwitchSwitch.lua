@@ -117,11 +117,27 @@ function SwitchSwitch:tablelength(T)
     return count
 end
 
-function SwitchSwitch:table_has_value (tab, val)
+function SwitchSwitch:table_has_value(tab, val)
     for _, value in ipairs(tab) do
         if value == val then
             return true
         end
+    end
+    return false
+end
+
+function SwitchSwitch:table_remove_value(tab, val)
+    local removePos = -1
+    for pos, data in ipairs(tab) do
+        if(data == val) then
+            removePos = pos
+            break;
+        end
+    end
+
+    if(removePos ~= -1) then
+        table.remove(tab, removePos)
+        return true
     end
     return false
 end
@@ -358,6 +374,31 @@ function SwitchSwitch:SetProfilesSuggestionInstanceData(instanceID, newTable, cl
     class = class or self:GetPlayerClass()
     local t = self:GetProfilesSuggestionTable(class, spec)
     t[instanceID] = newTable
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function SwitchSwitch:GetCurrentWeeksMythicID()
+    local ids = {}
+    for i, k in ipairs(C_MythicPlus.GetCurrentAffixes()) do
+        table.insert(ids, k.id)
+    end
+
+    return self:encodeMythicPlusAffixesIDs(unpack(ids))
+end
+
+function SwitchSwitch:encodeMythicPlusAffixesIDs(id1, id2, id3)
+    assert(id1 < 256, "To long number to compres into 32 bit")
+    assert(id2 < 256, "To long number to compres into 32 bit")
+    assert(id3 < 256, "To long number to compres into 32 bit")
+    return bit.bor(bit.band(id1, 0xFF), bit.lshift(bit.band(id2, 0xFF), 8), bit.lshift(bit.band(id3, 0xFF), 16))
+end
+
+function SwitchSwitch:decodeMythicPlusAffixesID(encoded)
+    local id1 = bit.band(encoded, 0xFF)
+    local id2 = bit.band((bit.rshift(encoded, 8)), 0xFF)
+    local id3 = bit.band((bit.rshift(encoded, 16)), 0xFF)
+    return id1, id2, id3
 end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
