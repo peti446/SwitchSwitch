@@ -60,7 +60,7 @@ function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
     local tempActiveProfile = self.CurrentActiveTalentsProfile
     self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
     if(self.CurrentActiveTalentsProfile ~= tempActiveProfile) then
-        self:SendMessage("SWITCHSWITCH_CURRENT_TALENT_PROFILE_UPDATED", current_instanceType)
+        self:SendMessage("SWITCHSWITCH_CURRENT_TALENT_PROFILE_UPDATED")
         self:UpdateLDBText()
         self:RefreshTalentUI()
     end
