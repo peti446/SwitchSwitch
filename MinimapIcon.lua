@@ -2,8 +2,9 @@ local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
 local LDBSwitchSwitch = LibStub("LibDataBroker-1.1"):NewDataObject("SwitchSwitchIcon", {
     type = "data source",
-    text = "Switch Switch",
+    label = "Switch Switch",
     icon = "Interface\\Icons\\INV_Artifact_Tome02",
+    text = SwitchSwitch.CurrentActiveTalentsProfile,
 });
 local mmIcon = LibStub("LibDBIcon-1.0")
 local AlreadyRegistered = false
@@ -23,6 +24,10 @@ end
 
 function LDBSwitchSwitch:OnClick(button, down)
     SwitchSwitch:TogleMainFrame()
+end
+
+function SwitchSwitch:UpdateLDBText()
+    LDBSwitchSwitch.text = SwitchSwitch.CurrentActiveTalentsProfile
 end
 
 function SwitchSwitch:InitMinimapIcon()

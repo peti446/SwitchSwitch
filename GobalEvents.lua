@@ -57,8 +57,13 @@ end
 -- When true is passed in we will only update the current active profile,
 -- other wise do full update if the player is changing talents or the talbe is null (manually called)
 function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
+    local tempActiveProfile = self.CurrentActiveTalentsProfile
     self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
-    self:RefreshTalentUI()
+    if(self.CurrentActiveTalentsProfile ~= tempActiveProfile) then
+        self:SendMessage("SWITCHSWITCH_CURRENT_TALENT_PROFILE_UPDATED", current_instanceType)
+        self:UpdateLDBText()
+        self:RefreshTalentUI()
+    end
     if(type(units) ~= "boolean" or not units) then
         return
     end
