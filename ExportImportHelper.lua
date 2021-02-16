@@ -52,7 +52,7 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
                         namesList = namesList .. saveName .. ", "
                         profilesCount = profilesCount + 1
                     end
-                    namesList = string.sub( namesList, string.len( namesList ) - 2 )
+                    namesList = namesList:sub(1, -3)
                     infoText = infoText .. L["Imported %d profile(s) for class %s-%s: %s"]:format(profilesCount, className, specName, namesList)
                 end
                 infoText = infoText .. "\n"
