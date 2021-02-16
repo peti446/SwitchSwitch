@@ -531,6 +531,27 @@ function SwitchSwitch:CanChangeTalents()
     return false
 end
 
+function SwitchSwitch:GetValidTomesItemsID()
+    local tomesID = {}
+    --Check for level to add the Clear mind tome
+    if (UnitLevel("player") <= 50) then
+        table.insert(tomesID, 141640) -- Clear mind
+        table.insert(tomesID, 141446) -- Tranquil mind crafted
+        table.insert(tomesID, 143785) -- tranquil mind _ dalaran quest
+        table.insert(tomesID, 143780)  -- tranquil mind _ random
+    end
+
+    if (UnitLevel("player") <= 59) then
+        table.insert(tomesID, 153647) -- Quit mind
+    end
+
+    if (UnitLevel("player") <= 60) then
+        table.insert(tomesID, 173049) -- Still mind
+    end
+
+    return tomesID
+end
+
 function SwitchSwitch:ActivateTalentProfile(profileName)
 
     if(UnitAffectingCombat("Player")) then
@@ -554,22 +575,7 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
     if(not SwitchSwitch:CanChangeTalents()) then
         if(SwitchSwitch.db.profile.autoUseTomes) then
             -- Now all tomes have level so lets add them based on character level
-            local tomesID = {}
-            --Check for level to add the Clear mind tome
-            if (UnitLevel("player") <= 50) then
-                table.insert(tomesID, 141640) -- Clear mind
-                table.insert(tomesID, 141446) -- Tranquil mind crafted
-                table.insert(tomesID, 143785) -- tranquil mind _ dalaran quest
-                table.insert(tomesID, 143780)  -- tranquil mind _ random
-            end
-
-            if (UnitLevel("player") <= 59) then
-                table.insert(tomesID, 153647) -- Quit mind
-            end
-
-            if (UnitLevel("player") <= 60) then
-                table.insert(tomesID, 173049) -- Still mind
-            end
+            local tomesID = self:GetValidTomesItemsID()
 
             --Tomes that can be used
             local itemIDToUse = nil

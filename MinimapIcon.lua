@@ -16,9 +16,22 @@ function LDBSwitchSwitch:OnTooltipShow()
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Click"], NORMAL_FONT_COLOR_CODE, L["Show config panel"]))
     tooltip:AddLine(" ")
     if(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.defaultProfileName) then
-        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsProfile))
+        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsProfile) .. "|r")
     else
-        tooltip:AddLine(("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]))
+        tooltip:AddLine(("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]) .. "|r")
+    end
+
+    local tomesID = SwitchSwitch:GetValidTomesItemsID()
+    local tomesCuantities = {}
+    tooltip:AddLine(" ")
+    tooltip:AddLine(L["Tomes valid for this level in bag:"])
+    for i, id in ipairs(tomesID) do
+        local count = GetItemCount(id, false)
+        local colorcode = "|cFF2bc400"
+        if(count == 0) then
+            colorcode = RED_FONT_COLOR_CODE
+        end
+        tooltip:AddLine(("%s%s|r: %d"):format(colorcode, C_Item.GetItemNameByID(id), count))
     end
 end
 
