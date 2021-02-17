@@ -4,8 +4,7 @@
 ## Version: @project-version@
 ## Notes: Allows you to creater talents profiles and switch between them quickly and automaticly.
 ## LoadOnDemand: 0
-## SavedVariablesPerCharacter: SwitchSwitchConfig, SwitchSwitchDBPC
-## SavedVariables: SwitchSwitchProfiles, SwitchSwitchDB
+## SavedVariables: SwitchSwitchDB
 ## X-Curse-Project-ID: 299998
 
 embeds_libs.xml

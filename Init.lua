@@ -6,31 +6,6 @@ local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 --##########################################################################################################################
 --                                  Default configurations
 --##########################################################################################################################
-local dbCharDefaults =
-{
-    char =
-    {
-        ["Version"] = 2.0,
-        ["debug"] = false,
-        ["autoUseTomes"] = true,
-        ["talentsSuggestionFrame"] =
-        {
-            ["location"] =
-            {
-                ["point"] = "CENTER",
-                ["relativePoint"] = "CENTER",
-                ["frameX"] = 0,
-                ["frameY"] = 0
-            },
-            ["enabled"] = true,
-            ["fadeTime"] = 15
-        },
-        ["minimap"] =
-        {
-            ["hide"] = false,
-        }
-    }
-}
 
 local dbDefaults =
 {
@@ -75,18 +50,11 @@ local dbDefaults =
 function SwitchSwitch:OnInitialize()
     self:DebugPrint("Addon Initializing")
     self.db = LibStub("AceDB-3.0"):New("SwitchSwitchDB", dbDefaults)
-    self.dbpcDEPRECTED_OLD_ACEDB = LibStub("AceDB-3.0"):New("SwitchSwitchDBPC", dbCharDefaults, true)
 
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE"}, 0.75, "PLAYER_TALENT_UPDATE")
-
-    -- #######################################################################################################
-    -- UPDATE FROM < 2.0 - DEPRECTED SOON
-    -- #######################################################################################################
-    self.DEPRECTED_OLD_VERSION_PROFILES = SwitchSwitchProfiles
-    self.DEPRECTED_OLD_VERSION_CHAR_CONF = SwitchSwitchConfig
 
     --Update the tables in case they are not updated
     SwitchSwitch:Update();
@@ -175,58 +143,6 @@ local function GetVersionNumber(str)
 end
 
 function SwitchSwitch:Update()
-    -- #######################################################################################################
-    -- UPDATE FROM < 2.0 - DEPRECTED SOON
-    -- #######################################################################################################
-    local characterDeprectedConfigVerison = GetVersionNumber(self.dbpcDEPRECTED_OLD_ACEDB.char.Version)
-    if(characterDeprectedConfigVerison < 20) then
-        if(self.db:GetCurrentProfile() == "Default") then
-            local realmKey = GetRealmName()
-            local charKey = UnitName("player") .. " - " .. realmKey
-            self.db:SetProfile(charKey)
-            self.db:ResetProfile(false, true)
-        end
-        self.db.profile = self.dbpcDEPRECTED_OLD_ACEDB.char
-        self.dbpcDEPRECTED_OLD_ACEDB.char = dbCharDefaults.char
-        self.dbpcDEPRECTED_OLD_ACEDB.char.Version = self.InternalVersion
-    end
-
-    --Update Global table
-    if(type(self.DEPRECTED_OLD_VERSION_PROFILES) == "table" and self.DEPRECTED_OLD_VERSION_PROFILES.Version ~= nil) then
-        local oldGCV = GetVersionNumber(self.DEPRECTED_OLD_VERSION_PROFILES.Version)
-
-        if(oldGCV ~= self.InternalVersion) then
-            self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
-            self:Print("You just updated form a pre 2.0 version to 2.0. You might need to reset the saved variables if lua errors happen")
-            self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
-            self.db.global.TalentProfiles = self:deepcopy(self.DEPRECTED_OLD_VERSION_PROFILES.Profiles)
-            -- We set this to nill as we dont want to import again
-            self.DEPRECTED_OLD_VERSION_PROFILES = {}
-            SwitchSwitchProfiles = {}
-        end
-    end
-
-    if(type(self.DEPRECTED_OLD_VERSION_CHAR_CONF) == "table" and self.DEPRECTED_OLD_VERSION_CHAR_CONF.Version ~= nil) then
-        local oldCCV = GetVersionNumber(self.DEPRECTED_OLD_VERSION_CHAR_CONF.Version)
-
-        if(oldCCV ~= self.InternalVersion) then
-            self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
-            self:Print("You just updated form a pre 2.0 version to 2.0. You might need to reset the saved variables if lua errors happen")
-            self:Print("WARNING! WARNING! WARNING! WARNING! WARNING!")
-            self.db.profile.debug = self.DEPRECTED_OLD_VERSION_CHAR_CONF.debug
-            self.db.profile.autoUseTomes = self.DEPRECTED_OLD_VERSION_CHAR_CONF.autoUseItems
-            self.db.profile.talentsSuggestionFrame.fadeTime = math.min(60,math.max(10, self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame))
-            self.db.profile.talentsSuggestionFrame.enabled = self.DEPRECTED_OLD_VERSION_CHAR_CONF.maxTimeSuggestionFrame > 0
-            -- Tables need deep copy
-            self.db.profile.talentsSuggestionFrame.location = self:deepcopy(self.DEPRECTED_OLD_VERSION_CHAR_CONF.SuggestionFramePoint)
-            -- We set this to nill as we dont want to import again
-            self.DEPRECTED_OLD_VERSION_CHAR_CONF = {}
-            SwitchSwitchConfig = {}
-        end
-    end
-
-    -- #######################################################################################################
-
     --Get old version string
     local globalConfigVersion = GetVersionNumber(self.db.global.Version)
     local profileConfigVerison = GetVersionNumber(self.db.profile.Version)
