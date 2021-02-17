@@ -185,7 +185,12 @@ local function DrawMythicPlusSection(frame, expansion, contentType, jurnalInstan
 
         -- Sort the week data so that it always appers in same order as ID are all over the palce
         local currentSeasonData = {}
-        for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[C_MythicPlus.GetCurrentSeason()] or {}) do
+        local currentSeasonID = C_MythicPlus.GetCurrentSeason()
+        -- IF we are not 60 it will return -1 so manually setting it to current season
+        if(currentSeasonID == -1) then
+            currentSeasonID = 5
+        end
+        for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[currentSeasonID] or {}) do
             currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
         end
 
@@ -327,7 +332,12 @@ local function OnGroupSelected(frame, _, group)
             scroll:AddChild(label)
 
             local currentSeasonData = {}
-            for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[C_MythicPlus.GetCurrentSeason()] or {}) do
+            local currentSeasonID = C_MythicPlus.GetCurrentSeason()
+            -- IF we are not 60 it will return -1 so manually setting it to current season
+            if(currentSeasonID == -1) then
+                currentSeasonID = 5
+            end
+            for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[currentSeasonID] or {}) do
                 currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
             end
 

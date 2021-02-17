@@ -377,11 +377,15 @@ end
 
 function SwitchSwitch:GetCurrentWeeksMythicID()
     local ids = {}
-    for i, k in ipairs(C_MythicPlus.GetCurrentAffixes()) do
+    for i, k in ipairs(C_MythicPlus.GetCurrentAffixes() or {}) do
         table.insert(ids, k.id)
     end
 
-    return self:encodeMythicPlusAffixesIDs(unpack(ids))
+    if(next(ids, nil) ~= nil) then
+        return self:encodeMythicPlusAffixesIDs(unpack(ids))
+    end
+
+    return 0
 end
 
 function SwitchSwitch:encodeMythicPlusAffixesIDs(id1, id2, id3)
