@@ -30,7 +30,7 @@ function MenuEntry:OnOpen(parent)
         self:GetUserData("EditBox"):SetText("")
         self:SetDisabled(true)
         if(sucess) then
-            statusLabel:SetText(statusText)
+            statusLabel:SetText("|cff00ff00" .. statusText .. "|r")
         else
             statusLabel:SetText("|cffff0000" .. L["The string you tried to import is not valid"] .. "|r")
         end

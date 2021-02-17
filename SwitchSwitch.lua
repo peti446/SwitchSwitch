@@ -297,9 +297,6 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
         -- Need to delete after as it will delete the suggestion entries
         self:DeleteProfileData(name, class, spec)
 
-        if(name == SwitchSwitch.CurrentActiveTalentsProfile) then
-            SwitchSwitch.CurrentActiveTalentsProfile = newName
-        end
         self:PLAYER_TALENT_UPDATE(true)
         return true
     end
@@ -690,8 +687,6 @@ function SwitchSwitch:LearnTalents(profileName)
 
     --Print and return
     SwitchSwitch:Print(L["Changed talents to '%s'"]:format(profileName))
-    --Set the global value of the current Profile so we can remember it later
-    SwitchSwitch.CurrentActiveTalentsProfile = profileName:lower()
 end
 
 --Check if a given profile is the current talents
