@@ -7,7 +7,7 @@ SwitchSwitch.ContentTypeStrings =
     [2] = L["Dungeons"],
     [3] = L["Scenarios"],
     [20] = L["Arenas"],
-    [21] = L["Battleground"]
+    [21] = L["Battlegrounds"]
 }
 
 SwitchSwitch.InstanceTypeToContentID =
