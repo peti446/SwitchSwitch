@@ -104,7 +104,7 @@ function BossDetection:SetDetectionForBossEnabled(BossID, InstanceID, enabled)
 end
 
 function BossDetection:OnTooltipSetUnit(tooltip)
-    if(UnitAffectingCombat("player")) then
+    if(UnitAffectingCombat("player") or UnitIsDeadOrGhost("player")) then
         return
     end
 
