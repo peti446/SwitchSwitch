@@ -12,7 +12,7 @@ jobs:
        - name: Lint lua files
          uses: nebularg/actions-luacheck@v1
          with:
-           config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/6fb0108eb5a81aec673d2edf9fccb2b1e812f829/.luacheckrc
+           config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/b98091da493847f5577a5b265be286c763c8f9da/.luacheckrc
            args: "--no-color -q --no-self"
            annotate: warning
        - name: Create alpha package
@@ -29,7 +29,7 @@ jobs:
          with:
            age: '3 month'
            skip-tags: true
- 
+
     Deploy-Packages:
       if: startsWith(github.ref, 'refs/tags/')
       runs-on: ubuntu-latest

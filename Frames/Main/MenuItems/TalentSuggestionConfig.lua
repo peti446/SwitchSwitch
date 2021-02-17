@@ -387,7 +387,7 @@ local function OnGroupSelected(frame, _, group)
                 scroll:AddChild(dropDown)
             end
         end
-    else
+    elseif(Expansion == "PVP") then
         scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On enter PVP Instance"]))
         local label = AceGUI:Create("Label")
         label:SetFullWidth(true)
