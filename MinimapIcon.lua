@@ -26,12 +26,15 @@ function LDBSwitchSwitch:OnTooltipShow()
     tooltip:AddLine(" ")
     tooltip:AddLine(L["Tomes valid for this level in bag:"])
     for i, id in ipairs(tomesID) do
-        local count = GetItemCount(id, false)
-        local colorcode = "|cFF2bc400"
-        if(count == 0) then
-            colorcode = RED_FONT_COLOR_CODE
+        local name =  C_Item.GetItemNameByID(id)
+        if(name ~= nil) then
+            local count = GetItemCount(id, false) or 0
+            local colorcode = "|cFF2bc400"
+            if(count == 0) then
+                colorcode = RED_FONT_COLOR_CODE
+            end
+            tooltip:AddLine(("%s%s|r: %d"):format(colorcode, name, count))
         end
-        tooltip:AddLine(("%s%s|r: %d"):format(colorcode, C_Item.GetItemNameByID(id), count))
     end
 end
 

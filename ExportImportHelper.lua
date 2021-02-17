@@ -49,7 +49,7 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
                             counter = counter + 1
                         end
                         currentSavedData[saveName] = data
-                        namesList = namesList .. saveName .. ", "
+                        namesList = namesList .. "'" ..  saveName .. "'" .. ", "
                         profilesCount = profilesCount + 1
                     end
                     namesList = namesList:sub(1, -3)

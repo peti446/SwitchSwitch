@@ -142,6 +142,11 @@ function SwitchSwitch:OnEnable()
 
     -- Lets refresh all the UIS
     self:PLAYER_TALENT_UPDATE(true)
+    -- Load the tomes data
+    local tomesID = SwitchSwitch:GetValidTomesItemsID()
+    for i, id in ipairs(tomesID) do
+        C_Item.RequestLoadItemDataByID(id)
+    end
 end
 
 function SwitchSwitch:OnDisable()
