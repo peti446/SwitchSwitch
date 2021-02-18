@@ -9,7 +9,7 @@ local function OnPVPDownGroupSelected(frame, _, group)
         group = nil
     end
 
-    local data = SwitchSwitch:GetProfilesSuggestionInstanceData("arena")
+    local data = SwitchSwitch:GetProfilesSuggestionInstanceData(pvpType)
     data["all"] = group
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled(pvpType, group ~= nil)
 end

@@ -107,6 +107,11 @@ function SwitchSwitch:OnEnable()
             end
         end
     end
+    -- Enable boss detection for pvp and arenas
+    local data = SwitchSwitch:GetProfilesSuggestionInstanceData("pvp")
+    SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("pvp", data["all"] ~= nil)
+    data = SwitchSwitch:GetProfilesSuggestionInstanceData("arena")
+    SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("arena", data["all"] ~= nil)
 
     -- Lets refresh all the UIS
     self:PLAYER_TALENT_UPDATE(true)
