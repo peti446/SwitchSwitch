@@ -96,6 +96,18 @@ local function CreateSuggestionFrame(profileName)
     return frame
 end
 
+function SwitchSwitch:PLAYER_REGEN_DISABLED(arg1)
+    SwitchSwitch:UnregisterEvent("PLAYER_REGEN_DISABLED")
+    if(SuggestionFrame ~= nil) then
+        SuggestionFrame:Hide()
+        SwitchSwitch:RegisterEvent("PLAYER_REGEN_ENABLED", nil, arg1)
+    end
+end
+
+function SwitchSwitch:PLAYER_REGEN_ENABLED(arg1)
+    SwitchSwitch:UnregisterEvent("PLAYER_REGEN_ENABLED")
+    SwitchSwitch:ToggleSuggestionFrame(arg1)
+end
 
 function SwitchSwitch:ToggleSuggestionFrame(profileToActivate)
     --First check if the profile is valid and exists
@@ -110,4 +122,6 @@ function SwitchSwitch:ToggleSuggestionFrame(profileToActivate)
     end
     SuggestionFrame = CreateSuggestionFrame(profileToActivate)
     SuggestionFrame:Show()
+
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", nil, profileToActivate)
 end

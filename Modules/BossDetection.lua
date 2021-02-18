@@ -1,5 +1,5 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
-local BossDetection = SwitchSwitch:NewModule("BossDetection", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+local BossDetection = SwitchSwitch:NewModule("BossDetection", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0", "AceBucket-3.0")
 local CurrentInstanceData = {}
 local CurrentInstanceBossesDefeated = {}
 
@@ -24,7 +24,7 @@ function BossDetection:OnDisable()
     self:Unhook(GameTooltip, "OnTooltipSetUnit")
     self:UnregisterEvent("PLAYER_STARTED_MOVING")
     self:UnregisterEvent("PLAYER_STOPPED_MOVING")
-    self:UnregisterEvent("BOSS_KILL")
+    self:UnregisterBucket("BOSS_KILL")
     self:CancelAllTimers()
 end
 
@@ -157,7 +157,7 @@ function BossDetection:PLAYER_ENTERING_WORLD()
         if(not shouldDetectBosses) then
             self:UnregisterEvent("PLAYER_STARTED_MOVING")
             self:UnregisterEvent("PLAYER_STOPPED_MOVING")
-            self:UnregisterEvent("BOSS_KILL")
+            self:UnregisterBucket("BOSS_KILL")
             -- Need to call it maually to make sure we are stoping timers
             self:PLAYER_STOPPED_MOVING()
             return
@@ -168,12 +168,12 @@ function BossDetection:PLAYER_ENTERING_WORLD()
         self.NeedsBossKillUpdate = true
         self:RegisterEvent("PLAYER_STARTED_MOVING")
         self:RegisterEvent("PLAYER_STOPPED_MOVING")
-        self:RegisterEvent("BOSS_KILL")
+        self:RegisterBucketEvent("BOSS_KILL", 1.0, "BOSS_KILL")
     else
         -- We are not in instance so lets disable any checking
         self:UnregisterEvent("PLAYER_STARTED_MOVING")
         self:UnregisterEvent("PLAYER_STOPPED_MOVING")
-        self:UnregisterEvent("BOSS_KILL")
+        self:UnregisterBucket("BOSS_KILL")
         -- Need to call it maually to make sure we are stoping timers
         self:PLAYER_STOPPED_MOVING()
     end
@@ -210,6 +210,8 @@ end
 function BossDetection:BOSS_KILL()
     local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
     CurrentInstanceBossesDefeated = self:GetKilledBossesInInstance(current_instanceID, current_difficultyID, CurrentInstanceData)
+    SwitchSwitch:DebugPrint("Bosses defeated list:")
+    SwitchSwitch:DebugPrintTable(CurrentInstanceBossesDefeated)
 end
 
 
