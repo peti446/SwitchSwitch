@@ -250,10 +250,16 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
         -- Delete from suggestion
         local suggestions = self:GetProfilesSuggestionTable(class, spec)
         for instanceID, instanceSuggestionData in pairs(suggestions) do
-            for suggestionType, profilesList in pairs(instanceSuggestionData) do
-                for id, suggestedProfileName in pairs(profilesList) do
-                    if(name == suggestedProfileName) then
-                        profilesList[id] = nil
+            if(type(instanceID) == "string") then
+                if(name == instanceSuggestionData["all"]) then
+                    instanceSuggestionData["all"] = nil
+                end
+            else
+                for suggestionType, profilesList in pairs(instanceSuggestionData) do
+                    for id, suggestedProfileName in pairs(profilesList) do
+                        if(name == suggestedProfileName) then
+                            profilesList[id] = nil
+                        end
                     end
                 end
             end
@@ -281,10 +287,16 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
         self:SetProfileData(newName, self:GetProfileData(name, class, spec), class, spec)
         local suggestions = self:GetProfilesSuggestionTable(class, spec)
         for instanceID, instanceSuggestionData in pairs(suggestions) do
-            for suggestionType, profilesList in pairs(instanceSuggestionData) do
-                for id, suggestedProfileName in pairs(profilesList) do
-                    if(name == suggestedProfileName) then
-                        profilesList[id] = newName
+            if(type(instanceID) == "string") then
+                if(name == instanceSuggestionData["all"]) then
+                    instanceSuggestionData["all"] = newName
+                end
+            else
+                for suggestionType, profilesList in pairs(instanceSuggestionData) do
+                    for id, suggestedProfileName in pairs(profilesList) do
+                        if(name == suggestedProfileName) then
+                            profilesList[id] = newName
+                        end
                     end
                 end
             end
