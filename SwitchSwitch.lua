@@ -750,7 +750,7 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName)
         for i, talentInfo in ipairs(currentprofile.pva) do
             local talentID, name, _, selected, available, _, _, row, column, known, _ = GetTalentInfoByID(talentInfo.id, GetActiveSpecGroup())
             if(not known) then
-                SwitchSwitch:DebugPrint(string.format("Talent with the name %s is not leanred", name))
+                SwitchSwitch:DebugPrint(string.format("Talent with the name %s is not learned", name))
                 return false
             end
         end
