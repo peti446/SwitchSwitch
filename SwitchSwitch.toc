@@ -1,4 +1,4 @@
-## Interface: 90002
+## Interface: 90100
 ## Title: SwitchSwitch
 ## Author: Geloch, Riukka (Sanguino - EU Horde)
 ## Version: @project-version@
@@ -6,6 +6,7 @@
 ## LoadOnDemand: 0
 ## SavedVariables: SwitchSwitchDB
 ## X-Curse-Project-ID: 299998
+## X-WoWI-ID: 26115
 
 embeds_libs.xml
 embeds_locales.xml
