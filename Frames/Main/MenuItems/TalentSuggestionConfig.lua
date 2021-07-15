@@ -146,7 +146,7 @@ local function DrawBossesSection(frame, expansion, contentType, jurnalInstanceID
 
     -- Render boss data
     for npcID, bossData in pairs(instanceData["bossData"]) do
-        local name = EJ_GetEncounterInfo(bossData.ecnounterID)
+        local name = EJ_GetEncounterInfo(bossData.encounterID)
         local dropDown = AceGUI:Create("Dropdown")
         dropDown:SetLabel(name)
         dropDown:SetUserData("InstanceID", instanceData["instanceID"])
@@ -188,7 +188,7 @@ local function DrawMythicPlusSection(frame, expansion, contentType, jurnalInstan
         local currentSeasonID = C_MythicPlus.GetCurrentSeason()
         -- IF we are not 60 it will return -1 so manually setting it to current season
         if(currentSeasonID == -1) then
-            currentSeasonID = 5
+            currentSeasonID = 6
         end
         for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[currentSeasonID] or {}) do
             currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
@@ -196,7 +196,7 @@ local function DrawMythicPlusSection(frame, expansion, contentType, jurnalInstan
 
         --Render dropboxes
         local currentWeekID = SwitchSwitch:GetCurrentWeeksMythicID()
-        for i, packedData in ipairs(currentSeasonData) do
+        for i, packedData in pairs(currentSeasonData) do
             local compressedID, label = unpack(packedData)
             local dropDown = AceGUI:Create("Dropdown")
             local labelText = label;
@@ -343,7 +343,7 @@ local function OnGroupSelected(frame, _, group)
 
             --Render dropboxes
             local currentWeekID = SwitchSwitch:GetCurrentWeeksMythicID()
-            for i, packedData in ipairs(currentSeasonData) do
+            for i, packedData in pairs(currentSeasonData) do
                 local compressedID, label = unpack(packedData)
                 local dropDown = AceGUI:Create("Dropdown")
                 local labelText = label;
@@ -503,7 +503,7 @@ function TalentsSuggestionPage:SetTreeData()
     })
 
     treeGroup:SetTree(treeData)
-    CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011190"
+    CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011193"
     local treeStatus = {
         groups= {
             ["Shadowlands"] = true,
