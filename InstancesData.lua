@@ -43,6 +43,7 @@ SwitchSwitch.MythicPlusAffixes = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]  = BuildMythicPlusTitle("1", 10, 11, 124),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]      = BuildMythicPlusTitle("2", 9, 6, 3),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12)]  = BuildMythicPlusTitle("3", 10, 122, 12),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4)]  = BuildMythicPlusTitle("4", 9, 123, 4),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]     = BuildMythicPlusTitle("12", 9, 7, 13),
     },
     [5] = {
