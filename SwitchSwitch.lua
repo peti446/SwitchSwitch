@@ -701,6 +701,14 @@ function SwitchSwitch:LearnTalents(profileName)
         end
     end
 
+    -- Soulbind
+    if(type(self.db.char.preferredSoulbind[self:GetCurrentSpec()]) == "table" and self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName] ~= nil) then
+        local soulbindID = self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName];
+        if(soulbindID ~= nil and soulbindID ~= 0) then
+            C_Soulbinds.ActivateSoulbind(soulbindID)
+        end
+    end
+
     --Print and return
     SwitchSwitch:Print(L["Changed talents to '%s'"]:format(profileName))
 end

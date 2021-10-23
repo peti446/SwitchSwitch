@@ -154,11 +154,11 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
     gearSetDropDown:SetText(L["None"])
     local gearSets = {
     }
+    gearSets["none"] = L["None"]
     for _, id in ipairs(C_EquipmentSet.GetEquipmentSetIDs()) do
         local name = C_EquipmentSet.GetEquipmentSetInfo(id)
         gearSets[name] = name
     end
-    gearSets["none"] = L["None"]
     gearSetDropDown:SetList(gearSets)
     gearSetDropDown:SetUserData("ProfileName", group)
     gearSetDropDown:SetValue("none")
@@ -175,6 +175,46 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
         SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()][self:GetUserData("ProfileName")] = name
     end)
     scroll:AddChild(gearSetDropDown)
+
+    -- Shadowlands change active soulbind
+    scroll:AddChild(self:CreateHeader(L["Preferred Soulbind"]))
+    scroll:AddChild(self:CreateLabel(L["Change preferred soulbind when changing talents."] .. ".\n" .. "|cFFFF0000".. L["Warning: This setting is per character, renaming this profile means you will need to re-set this on each character for this profile"] .. ".|r"))
+    local preferredSoulbindDropDown = AceGUI:Create("Dropdown")
+    preferredSoulbindDropDown:SetLabel(L["Soulbind"])
+    preferredSoulbindDropDown:SetText(L["None"])
+
+    local covenantDataID = C_Covenants.GetActiveCovenantID();
+    if(covenantDataID == 0) then
+        scroll:AddChild(self:CreateLabel("|cFFFF0000" .. L["You do not have a covenant"] .. ".|r"))
+    else
+        local covenantData = C_Covenants.GetCovenantData(covenantDataID);
+
+        local possibleSoulbinds = {}
+        possibleSoulbinds["none"] = L["None"]
+        for _, id in ipairs(covenantData.soulbindIDs) do
+            local name = C_Soulbinds.GetSoulbindData(id).name
+            possibleSoulbinds[id] = name
+        end
+    
+        preferredSoulbindDropDown:SetList(possibleSoulbinds)
+        preferredSoulbindDropDown:SetUserData("ProfileName", group)
+        preferredSoulbindDropDown:SetValue("none")
+        if(type(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()]) == "table" and SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][group] ~= nil) then
+            preferredSoulbindDropDown:SetValue(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][group])
+        end
+    
+        preferredSoulbindDropDown:SetCallback("OnValueChanged", function(self, _, id)
+            if(id == "none") then
+                id = nil
+            end
+            if(type(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()]) ~= "table") then
+                SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()] = {}
+            end
+            SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][self:GetUserData("ProfileName")] = id
+        end)
+        scroll:AddChild(preferredSoulbindDropDown)
+    end
+
 
     scroll:AddChild(self:CreateHeader(L["Talents"]))
 

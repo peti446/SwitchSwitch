@@ -40,7 +40,8 @@ local dbDefaults =
     char =
     {
         ["Version"] = -1,
-        ["gearSets"] = {}
+        ["gearSets"] = {},
+        ["preferredSoulbind"] = {}
     }
 }
 
