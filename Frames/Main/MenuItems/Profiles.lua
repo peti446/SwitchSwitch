@@ -195,14 +195,14 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
             local name = C_Soulbinds.GetSoulbindData(id).name
             possibleSoulbinds[id] = name
         end
-    
+
         preferredSoulbindDropDown:SetList(possibleSoulbinds)
         preferredSoulbindDropDown:SetUserData("ProfileName", group)
         preferredSoulbindDropDown:SetValue("none")
         if(type(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()]) == "table" and SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][group] ~= nil) then
             preferredSoulbindDropDown:SetValue(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][group])
         end
-    
+
         preferredSoulbindDropDown:SetCallback("OnValueChanged", function(self, _, id)
             if(id == "none") then
                 id = nil

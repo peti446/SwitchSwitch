@@ -12,7 +12,7 @@ jobs:
        - name: Lint lua files
          uses: nebularg/actions-luacheck@v1
          with:
-           config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/b98091da493847f5577a5b265be286c763c8f9da/.luacheckrc
+           config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/07434f411ad868beeb86da6df24263d6dfc788f6/.luacheckrc
            args: "--no-color -q --no-self"
            annotate: warning
        - name: Create alpha package
