@@ -38,20 +38,21 @@ SwitchSwitch.PreMythicPlusDificulty = 23
 SwitchSwitch.MythicPlusAffixes = {
     -- Sesion got by C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
     -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
+    -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
     -- Sesason 3 Shadowlands
     [7] = {
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]  = BuildMythicPlusTitle("1", 10, 11, 124),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]      = BuildMythicPlusTitle("2", 9, 6, 3),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12)]  = BuildMythicPlusTitle("3", 10, 122, 12),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4)]    = BuildMythicPlusTitle("4", 9, 123, 4),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14)]    = BuildMythicPlusTitle("5", 10, 7, 14),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124)]    = BuildMythicPlusTitle("6", 9, 8, 124),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13)]    = BuildMythicPlusTitle("7", 10, 6, 13),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3)]    = BuildMythicPlusTitle("8", 9, 11, 3),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12)]    = BuildMythicPlusTitle("9", 10, 123, 12),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("10", 9, 122, 14),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 4)]    = BuildMythicPlusTitle("11", 10, 8, 4),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]     = BuildMythicPlusTitle("12", 9, 7, 13),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]  = BuildMythicPlusTitle("1", 9, 7, 13),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]      = BuildMythicPlusTitle("2", 10, 11, 124),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]  = BuildMythicPlusTitle("3", 9, 6, 3),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12)]  = BuildMythicPlusTitle("4", 10, 122, 12),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4)]    = BuildMythicPlusTitle("5", 9, 123, 4),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14)]    = BuildMythicPlusTitle("6", 10, 7, 14),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124)]    = BuildMythicPlusTitle("7", 9, 8, 124),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13)]    = BuildMythicPlusTitle("8", 10, 6, 13),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3)]    = BuildMythicPlusTitle("9", 9, 11, 3),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12)]    = BuildMythicPlusTitle("10", 10, 123, 12),
+        --[SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("11", 9, 122, 14),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12)]     = BuildMythicPlusTitle("12", 10, 8, 12),
     },
     -- Sesason 2 Shadowlands
     [6] = {
