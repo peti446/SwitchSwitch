@@ -38,7 +38,22 @@ SwitchSwitch.PreMythicPlusDificulty = 23
 SwitchSwitch.MythicPlusAffixes = {
     -- Sesion got by C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
     -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
-    -- Sesason 1 Shadowlands
+    -- Sesason 3 Shadowlands
+    [7] = {
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]  = BuildMythicPlusTitle("1", 10, 11, 124),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]      = BuildMythicPlusTitle("2", 9, 6, 3),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12)]  = BuildMythicPlusTitle("3", 10, 122, 12),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4)]    = BuildMythicPlusTitle("4", 9, 123, 4),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14)]    = BuildMythicPlusTitle("5", 10, 7, 14),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124)]    = BuildMythicPlusTitle("6", 9, 8, 124),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13)]    = BuildMythicPlusTitle("7", 10, 6, 13),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3)]    = BuildMythicPlusTitle("8", 9, 11, 3),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12)]    = BuildMythicPlusTitle("9", 10, 123, 12),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("10", 9, 122, 14),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 4)]    = BuildMythicPlusTitle("11", 10, 8, 4),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]     = BuildMythicPlusTitle("12", 9, 7, 13),
+    },
+    -- Sesason 2 Shadowlands
     [6] = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]  = BuildMythicPlusTitle("1", 10, 11, 124),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]      = BuildMythicPlusTitle("2", 9, 6, 3),
@@ -53,6 +68,7 @@ SwitchSwitch.MythicPlusAffixes = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 4)]    = BuildMythicPlusTitle("11", 10, 8, 4),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]     = BuildMythicPlusTitle("12", 9, 7, 13),
     },
+    -- Sesason 1 Shadowlands
     [5] = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 3)]    = L["Week"] .. " 1"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(11))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(3))   ..")",
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 124)]    = L["Week"] .. " 2"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(7))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(124)) ..")",
@@ -72,6 +88,81 @@ SwitchSwitch.MythicPlusAffixes = {
 -- Shadowlands
 SwitchSwitch.InstancesBossData["Shadowlands"] = {
     [1] = {
+        [1195] = {
+            ["instanceID"] = 2481, -- Sepulcher of the First Ones (InstanceID)
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+                [180773] = {  -- Vigilant Guardian
+                    ["requieres"] = {},
+                    ["zoneID"] = 2047,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2458,
+                    ["otherBossIDs"] = {184522},
+                },
+                [181395] = { -- Skolex
+                    ["requieres"] = {180773},
+                    ["zoneID"] = 2061,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2465,
+                },
+                [183501] = { -- Artificer Xy'mox
+                    ["requieres"] = {180773},
+                    ["zoneID"] = 2061,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2470,
+                },
+                [181224] = { -- Dausegne
+                    ["requieres"] = {180773},
+                    ["zoneID"] = 2048,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2459,
+                },
+                [181549] = { -- Prototype Pantheon
+                    ["requieres"] = {181224},
+                    ["zoneID"] = 2049,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2460,
+                    ["otherBossIDs"] = {181548, 181546, 181551},
+                },
+                [182169] = { -- Lihuvim
+                    ["requieres"] = {181549},
+                    ["zoneID"] = 2049,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2461,
+                },
+                [180906] = { -- Halondrus
+                    ["requieres"] = {181395, 183501},
+                    ["zoneID"] = 2061,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2463,
+                },
+                [181954] = { -- Anduin
+                    ["requieres"] = {182169, 180906},
+                    ["zoneID"] = 2050,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2469,
+                },
+                [181398] = { -- Lords of Dread
+                    ["requieres"] = {181954},
+                    ["zoneID"] = 2052,
+                    ["jurnalIndex"] = 9,
+                    ["encounterID"] = 2457,
+                    ["otherBossIDs"] = {181399},
+                },
+                [182777] = { -- Rygelon
+                    ["requieres"] = {181954},
+                    ["zoneID"] = 2052,
+                    ["jurnalIndex"] = 10,
+                    ["encounterID"] = 2467,
+                },
+                [180990] = { -- Jailer
+                    ["requieres"] = {181398, 182777},
+                    ["zoneID"] = 2051,
+                    ["jurnalIndex"] = 11,
+                    ["encounterID"] = 2464,
+                },
+            }
+        },
         [1193] = {
             ["instanceID"] = 2450, -- Castle of nathria (InstanceID)
             ["difficulties"] = {14,15,16},
