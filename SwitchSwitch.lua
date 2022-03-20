@@ -714,7 +714,7 @@ function SwitchSwitch:LearnTalents(profileName)
 end
 
 --Check if a given profile is the current talents
-function SwitchSwitch:IsCurrentTalentProfile(profileName)
+function SwitchSwitch:IsCurrentTalentProfile(profileName, checkGearAndSoulbinds)
     --Check if null or not existing
     if(not SwitchSwitch:DoesProfileExits(profileName)) then
         SwitchSwitch:DebugPrint(string.format("Profile name does not exist [%s]", profileName))
@@ -763,18 +763,48 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName)
             end
         end
     end
+
+    if(checkGearAndSoulbinds == true) then
+        -- Gear set
+        if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileName] ~= nil) then
+            local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileName])
+            local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+            if(name ~= nil and not isEquipped) then
+                return false
+            end
+        end
+
+        -- Soulbind
+        if(type(self.db.char.preferredSoulbind[self:GetCurrentSpec()]) == "table" and self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName] ~= nil) then
+            local soulbindID = self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName];
+            if(soulbindID ~= nil and soulbindID ~= 0 and C_Soulbinds.GetActiveSoulbindID() ~= soulbindID) then
+                return false
+            end
+        end
+    end
+
     return true
 end
 
 function SwitchSwitch:GetCurrentActiveProfile()
     --Iterate trough every talent profile
     for name, TalentArray in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
-        if(SwitchSwitch:IsCurrentTalentProfile(name)) then
+        if(SwitchSwitch:IsCurrentTalentProfile(name, true)) then
             --Return the currentprofilename
             SwitchSwitch:DebugPrint("Detected: " .. name)
             return name:lower()
         end
     end
+
+    -- Fallback in case we dont find any with the current gear/soulbind so we try to match talents without any of the gear and soulbinds
+    for name, TalentArray in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
+        if(SwitchSwitch:IsCurrentTalentProfile(name, false)) then
+            --Return the currentprofilename
+            SwitchSwitch:DebugPrint("Detected: " .. name)
+            return name:lower()
+        end
+    end
+
     SwitchSwitch:DebugPrint("No profiles match current talnets")
     --Return the custom profile name
     return SwitchSwitch.defaultProfileName
