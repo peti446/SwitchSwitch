@@ -188,7 +188,7 @@ local function DrawMythicPlusSection(frame, expansion, contentType, jurnalInstan
         local currentSeasonID = C_MythicPlus.GetCurrentSeason()
         -- IF we are not 60 it will return -1 so manually setting it to current season
         if(currentSeasonID == -1) then
-            currentSeasonID = 6
+            currentSeasonID = 7
         end
         for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[currentSeasonID] or {}) do
             currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
@@ -503,7 +503,7 @@ function TalentsSuggestionPage:SetTreeData()
     })
 
     treeGroup:SetTree(treeData)
-    CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011193"
+    CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011195"
     local treeStatus = {
         groups= {
             ["Shadowlands"] = true,
