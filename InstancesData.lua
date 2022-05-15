@@ -51,7 +51,7 @@ SwitchSwitch.MythicPlusAffixes = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13)]    = BuildMythicPlusTitle("8", 10, 6, 13),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3)]    = BuildMythicPlusTitle("9", 9, 11, 3),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 4)]    = BuildMythicPlusTitle("10", 10, 123, 4),
-        --[SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("11", 9, 122, 14),
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("11", 9, 122, 14),
         [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12)]     = BuildMythicPlusTitle("12", 10, 8, 12),
     },
     -- Sesason 2 Shadowlands
