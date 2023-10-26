@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 
 local LDBSwitchSwitch = LibStub("LibDataBroker-1.1"):NewDataObject("SwitchSwitchIcon", {
     type = "data source",
@@ -21,22 +21,6 @@ function LDBSwitchSwitch:OnTooltipShow()
         tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsProfile) .. "|r")
     else
         tooltip:AddLine(("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]) .. "|r")
-    end
-
-    local tomesID = SwitchSwitch:GetValidTomesItemsID()
-    local tomesCuantities = {}
-    tooltip:AddLine(" ")
-    tooltip:AddLine(L["Tomes valid for this level in bag:"])
-    for i, id in ipairs(tomesID) do
-        local name =  C_Item.GetItemNameByID(id)
-        if(name ~= nil) then
-            local count = GetItemCount(id, false) or 0
-            local colorcode = "|cFF2bc400"
-            if(count == 0) then
-                colorcode = RED_FONT_COLOR_CODE
-            end
-            tooltip:AddLine(("%s%s|r: %d"):format(colorcode, name, count))
-        end
     end
 end
 

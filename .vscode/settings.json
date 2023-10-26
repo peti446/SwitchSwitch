@@ -1,0 +1,30 @@
+{
+    "Lua.diagnostics.globals": [
+        "StaticPopup_Show",
+        "SlashCmdList",
+        "tostringall",
+        "PlayerTalentFrameTalents",
+        "PlayerTalentFrame",
+        "StaticPopupDialogs",
+        "StaticPopup_Resize",
+        "LE_AUTOCOMPLETE_PRIORITY_OTHER",
+        "UISpecialFrames",
+        "GameFontNormalSmall",
+        "GameFontNormalLarge",
+        "GameFontWhite",
+        "MAX_TALENT_TIERS",
+        "NUM_TALENT_COLUMNS",
+        "UIDropDownMenu_SetWidth",
+        "UIDropDownMenu_Initialize",
+        "ToggleDropDownMenu",
+        "RED_FONT_COLOR_CODE",
+        "NORMAL_FONT_COLOR_CODE",
+        "UIDropDownMenu_AddButton",
+        "UIDropDownMenu_CreateInfo",
+        "DEFAULT_CHAT_FRAME",
+        "PlayerUtil",
+        "ClassTalentFrame",
+        "TooltipDataProcessor",
+        "TooltipUtil"
+    ]
+}

@@ -25,9 +25,11 @@ SwitchSwitch.InstanceTypeToContentID =
 
 SwitchSwitch.DificultyStrings =
 {
+    -- Dungeons
     [1] = L["Normal"],
     [2] = L["Heroic"],
-    [23] = L["Mythic/Mythic+"],
+    [23] = L["Mythic"],
+    -- Raid 
     [14] = L["Normal"],
     [15] = L["Heroic"],
     [16] = L["Mythic"],
@@ -39,6 +41,10 @@ SwitchSwitch.MythicPlusAffixes = {
     -- Sesion got by C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
     -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
     -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
+    -- Season 2 DragonFlight
+    [10] = {
+
+    },
     -- Sesason 3 Shadowlands
     [7] = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]  = BuildMythicPlusTitle("1", 9, 7, 13),
@@ -86,7 +92,92 @@ SwitchSwitch.MythicPlusAffixes = {
     },
 }
 
--- Shadowlands
+-- To obtain the JurnalID look at https://wago.tools/db2/JournalInstance?sort[ID]=desc&page=1 and look at the id for the raid and the instance ID is the MapID
+-- To obtain bosses data look at https://wago.tools/db2/JournalEncounter?page=1, the UiMapID is the zone, ID is encounterid, jurnalIndex is OrderIndex
+-- The boss entry ID is the boss npc ID wich is what we search for in the tooltip
+
+-- Note: Should always be the first
+--SwitchSwitch.InstancesBossData[L["Mythic+"]] = {
+--    [10] = {
+--
+--    }
+--}
+
+
+SwitchSwitch.InstancesBossData["Dragonflight"] = {
+    -- Raids
+    [1] = {
+        [1200] = { -- Vault of the Incarnates
+            ["instanceID"] = 2522,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+                [184972] = {
+                    ["requieres"] = {},
+                    ["zoneID"] = 2119,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2480,
+                    ["otherBossIDs"] = {},
+                }
+            },
+        },
+        [1208] = { -- Aberrus, the Shadowed Crucible
+            ["instanceID"] = 2569,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+            },
+        },
+        [1207] = { -- Amirdrassil
+            ["instanceID"] = 2549,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+            },
+        }
+    },
+    -- Dungeons
+    [2] = {
+        [1209] = {
+            ["instanceID"] = 2579,
+            ["difficulties"] = {23},  
+        },
+        [1204] = { -- Halls of Infusion
+            ["instanceID"] = 2527,
+            ["difficulties"] = {1,2,23},
+        },
+        [1203] = { -- The Azure Vault	
+            ["instanceID"] = 2515,
+            ["difficulties"] = {1,2,23},
+        },
+        [1202] = { -- Ruby Life Pools
+            ["instanceID"] = 2521,
+            ["difficulties"] = {1,2,23},
+        },
+        [1201] = { -- Algeth'ar Academy
+            ["instanceID"] = 2526,
+            ["difficulties"] = {1,2,23},
+        },
+        [1199] = { -- Neltharus
+            ["instanceID"] = 2519,
+            ["difficulties"] = {1,2,23},
+        },
+        [1198] = { -- The Nokhud Offensive
+            ["instanceID"] = 2516,
+            ["difficulties"] = {1,2,23},
+        },
+        [1197] = { -- Uldaman: Legacy of Tyr
+            ["instanceID"] = 2451,
+            ["difficulties"] = {1,2,23},
+        },
+        [1196] = { -- Brackenhide Hollow
+            ["instanceID"] = 2520,
+            ["difficulties"] = {1,2,23},
+        },
+    },
+
+    -- Senarios
+    --[3] = nil,
+}
+
+
 SwitchSwitch.InstancesBossData["Shadowlands"] = {
     [1] = {
         [1195] = {
@@ -333,47 +424,38 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
         [1194] = { -- Tazavesh the Veiled Market
             ["instanceID"] = 2441,
             ["difficulties"] = {23},
-            ["hasMythic+"] = true,
         },
         [1188] = { -- Da other Side
             ["instanceID"] = 2291,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
         [1185] = { -- Halls of atonement
             ["instanceID"] = 2287,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
         [1184] = { -- Mists of Tirna Scithe
             ["instanceID"] = 2290,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
         [1183] = { -- Plaguefall
             ["instanceID"] = 2289,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
         [1189] = { -- Sanguine Depths
             ["instanceID"] = 2284,
-            ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
+            ["difficulties"] = {1,2,23}
         },
         [1186] = { -- Spires of Ascension
             ["instanceID"] = 2285,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
         [1182] = { -- Necrotic Wake
             ["instanceID"] = 2286,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
         [1187] = { -- Theather of pain
             ["instanceID"] = 2293,
             ["difficulties"] = {1,2,23},
-            ["hasMythic+"] = true,
         },
     }
 }

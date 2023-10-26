@@ -1,7 +1,7 @@
 --############################################
 -- Namespace
 --############################################
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 local SuggestionFrame
 --##########################################################################################################################
 --                                  Frames Init

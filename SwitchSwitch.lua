@@ -3,6 +3,10 @@
 --############################################
 local namespace = select(2, ...)
 
+--@debug@
+_G.SwitchSwitch = namespace;
+--@end-debug@
+
 --############################################
 -- Addon Setup & Lib Setup
 --############################################
@@ -17,7 +21,7 @@ namespace[2] = L
 namespace[3] = AceGUI
 namespace[4] = LibDBIcon
 
-SwitchSwitch.InternalVersion = 20
+SwitchSwitch.InternalVersion = 30
 SwitchSwitch.defaultProfileName = "custom"
 SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName
 
@@ -27,23 +31,39 @@ SwitchSwitch.CurrentActiveTalentsProfile = SwitchSwitch.defaultProfileName
 -- Function to print a debug message
 function SwitchSwitch:DebugPrint(...)
     if(type(self.db) ~= "table" or self.db.profile.debug) then
-        self:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")));
+        self:Print(string.join(" ", "|cFFFF0000(DEBUG)|r", tostringall(... or "nil")))
     end
 end
 
+
 function SwitchSwitch:DebugPrintTable(tbl, indent)
-    if not indent then indent = 0 end
-    if type(tbl) == 'table' then
+    if(type(self.db) == "table" and not self.db.profile.debug) then
+        return
+    end
+
+    if(tbl == nil) then
+        self:DebugPrint("Table is null")
+        return
+    end
+
+    if not indent or indent <= 1 then
+        indent = 1
+        self:DebugPrint("Table:")
+        print("{")
+    end
+
+    if type(tbl) == "table" then
         for k, v in pairs(tbl) do
-            local formatting = string.rep("  ", indent) .. k .. ": "
+            local formatting =  string.rep("  ", indent) .. k .. ": "
             if type(v) == "table" then
-                self:Print(formatting)
-                self:PrintTableDebug(v, indent+1)
+                print(formatting .. "{")
+                self:DebugPrintTable(v, indent+1)
             else
-                self:DebugPrint(formatting .. tostring(v))
+                print(formatting .. tostring(v))
             end
         end
     end
+    print(string.rep("  ", max(indent - 1, 0)) .. "}")
 end
 
 -- Function to print a message to the chat.
@@ -69,15 +89,13 @@ function SwitchSwitch:PrintTable(tbl, indent)
 end
 
 function SwitchSwitch:GetCurrentSpec()
-    return select(1, GetSpecializationInfo(GetSpecialization()))
+    return select(1, PlayerUtil.GetCurrentSpecID())
+    -- Old Way: return select(1, GetSpecializationInfo(GetSpecialization()))
 end
 
 function SwitchSwitch:GetPlayerClass()
-    return select(3, UnitClass("player"))
-end
-
-function SwitchSwitch:HasHeartOfAzerothEquipped()
-    return GetInventoryItemID("player", INVSLOT_NECK) == 158075
+    return PlayerUtil.GetClassID()
+    -- Old way: return select(3, UnitClass("player"))
 end
 
 -- String helpers
@@ -143,6 +161,7 @@ function SwitchSwitch:table_remove_value(tab, val)
 end
 
 -------------------------------------------------------------------- Talent table edition
+-------- TODO: Is it necesary? Blizzard can already store 10 talents setups
 function SwitchSwitch:DoesClassProfilesTableExits(class)
     if(class == nil) then
         return false
@@ -416,14 +435,48 @@ end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 
+-- TODO: Move this later
+function SwitchSwitch:GetSelectedLoadoutConfigID()
+    local lastSelected = PlayerUtil.GetCurrentSpecID() and C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
+    local selectionID = ClassTalentFrame and ClassTalentFrame.TalentsTab and ClassTalentFrame.TalentsTab.LoadoutDropDown and ClassTalentFrame.TalentsTab.LoadoutDropDown.GetSelectionID and ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
+    return selectionID or lastSelected or C_ClassTalents.GetActiveConfigID() or nil
+end
+
+function GetCurrentTalentsInfoList()
+    local list = {}
+
+    local configID = C_ClassTalents.GetActiveConfigID()
+    if configID == nil then return end
+
+    local configInfo = C_Traits.GetConfigInfo(configID)
+    if configInfo == nil then return end
+
+    for _, treeID in ipairs(configInfo.treeIDs) do -- in the context of talent trees, there is only 1 treeID
+
+        local nodes = C_Traits.GetTreeNodes(treeID)
+        for i, nodeID in ipairs(nodes) do
+            local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+            if(SwitchSwitch:tablelength(nodeInfo.entryIDsWithCommittedRanks) == 1) then
+                local talentInfo = {
+                    ["id"] = nodeID,
+                    ["commitedEntryID"] = nodeInfo.entryIDsWithCommittedRanks[1],
+                    ["currentRank"] = nodeInfo.currentRank
+                }
+                table.insert(list, talentInfo);
+            end
+        end
+    end
+    return list
+end
+
+
 --Get the talent from the current active spec
 function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
     local talentSet =
     {
-        ["pva"] = {}
+        ["pva"] = GetCurrentTalentsInfoList(),
     }
 
-    --Iterate over all tiers of talents normal
     for Tier = 1, GetMaxTalentTier() do
         --Create default table
         talentSet["pva"][Tier] =
@@ -461,108 +514,14 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
         end
     end
 
-    --Get Essence information
-    if(SwitchSwitch:HasHeartOfAzerothEquipped()) then
-        talentSet["heart_of_azeroth_essences"] = {}
-        local MilestoneIDs = {115,116,117,119}
-        for index, id in ipairs(MilestoneIDs) do
-            local milestonesInfo = C_AzeriteEssence.GetMilestoneInfo(id)
-            if(milestonesInfo.unlocked) then
-                talentSet["heart_of_azeroth_essences"][milestonesInfo.ID] = C_AzeriteEssence.GetMilestoneEssence(id)
-            end
-        end
-    end
-
     --Return talents
     return talentSet;
 end
 
 --Check if we can switch talents
 function SwitchSwitch:CanChangeTalents()
-    --Quick return if resting for better performance
-    if(IsResting()) then
-        return true
-    end
-    -- If in combat we cannot change so lets exit early
-   if(InCombatLockdown()) then
-        return false
-   end
-
-    --All buffs ids for the tomes
-    local buffLookingFor =
-    {
-        226234,
-        227041,
-        227563,
-        227565,
-        227569,
-        256231,
-        256229,
-        --Arena preparation wow
-        32727,
-        32728,
-        -- Dungeon preparation
-        228128,
-        -- Battleground Insight
-        248473,
-        44521,
-        -- SL LVL 60
-        -- Refuge of the dammed
-        338907,
-        -- Still mind tomes
-        324029,
-        324028,
-        321923,
-        -- Time to reflect
-        325012,
-    }
-    local debuffsLookingFor =
-    {
-        --PRepare for battle
-        290165,
-        279737
-    };
-    --There is no quick way to get if a player has a specific buff so we need to go tought all players buff and check if its one of the one we need
-    for i = 1, 40 do
-        local spellID = select(10, UnitBuff("player", i))
-        for index, id in ipairs(buffLookingFor) do
-            if(spellID == id) then
-                return true
-            end
-        end
-    end
-    --Check debufs aswell
-    for i = 1, 40 do
-        local spellID = select(10, UnitDebuff("player", i))
-        for index, id in ipairs(debuffsLookingFor) do
-            if(spellID == id) then
-                return true
-            end
-        end
-    end
-    --Buff not found
-    return false
-end
-
-function SwitchSwitch:GetValidTomesItemsID()
-    local tomesID = {}
-    --Check for level to add the Clear mind tome
-    if (UnitLevel("player") <= 50) then
-        table.insert(tomesID, 141640) -- Clear mind
-        table.insert(tomesID, 141446) -- Tranquil mind crafted
-        table.insert(tomesID, 143785) -- tranquil mind _ dalaran quest
-        table.insert(tomesID, 143780)  -- tranquil mind _ random
-    end
-
-    if (UnitLevel("player") <= 59) then
-        table.insert(tomesID, 153647) -- Quit mind
-    end
-
-    if (UnitLevel("player") <= 60) then
-        table.insert(tomesID, 173049) -- Still mind
-    end
-
-    return tomesID
+    local canChange = C_ClassTalents.CanEditTalents();
+    return canChange;
 end
 
 function SwitchSwitch:ActivateTalentProfile(profileName)
@@ -584,50 +543,9 @@ function SwitchSwitch:ActivateTalentProfile(profileName)
         return false
     end
 
-    --If we cannot change talents why even try?
     if(not SwitchSwitch:CanChangeTalents()) then
-        if(SwitchSwitch.db.profile.autoUseTomes) then
-            -- Now all tomes have level so lets add them based on character level
-            local tomesID = self:GetValidTomesItemsID()
-
-            --Tomes that can be used
-            local itemIDToUse = nil
-            local bagID = 0
-            local slot = 0
-            --Find any tome usable in the bags
-            for bag = 0, NUM_BAG_SLOTS + 1 do
-                for bagSlot = 1, GetContainerNumSlots(bag) do
-                    local currentItemInSlotID = GetContainerItemID(bag, bagSlot)
-                    for index, id in ipairs(tomesID) do
-                        if(id == currentItemInSlotID) then
-                            itemIDToUse = currentItemInSlotID
-                            bagID = bag
-                            slot = bagSlot
-                            break
-                        end
-                    end
-                end
-            end
-
-
-            --Check if we found an item if not return false
-            if(not itemIDToUse) then
-                --No item found so return
-                SwitchSwitch:Print(L["Could not find a Tome to use and change talents"])
-                return false
-            end
-
-            -- Set the item attibute
-            --Got an item so open the popup to ask to use it!
-            local dialog = StaticPopup_Show("SwitchSwitch_ConfirmTomeUsage", nil, nil, bagID .. " " .. slot)
-            if(dialog) then
-                SwitchSwitch:DebugPrint("Setting data to ask for tome usage to: " .. profileName)
-                dialog.data2 = profileName
-            end
-        else
-            --No check for usage so just return
-            SwitchSwitch:Print(L["Could not change talents as you are not in a rested area, or don’t have the buff"])
-        end
+        --No check for usage so just return
+        SwitchSwitch:Print(L["Could not change talents"])
         return false
     end
 
@@ -641,8 +559,8 @@ function SwitchSwitch:LearnTalents(profileName)
     SwitchSwitch:Print(L["Changing talents"] .. ": " .. profileName)
 
     --Check if the talent addon is up
-    if(not IsAddOnLoaded("Blizzard_TalentUI")) then
-        LoadAddOn("Blizzard_TalentUI")
+    if(not IsAddOnLoaded("Blizzard_ClassTalentUI")) then
+        LoadAddOn("Blizzard_ClassTalentUI")
     end
 
     if(not SwitchSwitch:DoesProfileExits(profileName)) then
@@ -684,14 +602,6 @@ function SwitchSwitch:LearnTalents(profileName)
         end
     end
 
-
-    if(currentTalentProfile.heart_of_azeroth_essences ~= nil and SwitchSwitch:HasHeartOfAzerothEquipped()) then
-        --Learn essences
-        for milestoneID, essenceID in pairs(currentTalentProfile.heart_of_azeroth_essences) do
-            C_AzeriteEssence.ActivateEssence(essenceID, milestoneID)
-        end
-    end
-
     -- Gear set
     if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileName] ~= nil) then
         local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileName])
@@ -701,16 +611,9 @@ function SwitchSwitch:LearnTalents(profileName)
         end
     end
 
-    -- Soulbind
-    if(type(self.db.char.preferredSoulbind[self:GetCurrentSpec()]) == "table" and self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName] ~= nil) then
-        local soulbindID = self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName];
-        if(soulbindID ~= nil and soulbindID ~= 0) then
-            C_Soulbinds.ActivateSoulbind(soulbindID)
-        end
-    end
-
     --Print and return
     SwitchSwitch:Print(L["Changed talents to '%s'"]:format(profileName))
+    return true
 end
 
 --Check if a given profile is the current talents
@@ -723,16 +626,6 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName, checkGearAndSoulbinds)
 
     local currentActiveTalents = SwitchSwitch:GetCurrentTalents()
     local currentprofile = SwitchSwitch:GetProfileData(profileName)
-
-    if(currentprofile.heart_of_azeroth_essences ~= nil and SwitchSwitch:HasHeartOfAzerothEquipped()) then
-        --Check essences
-        for milestoneID, essenceID in pairs(currentActiveTalents.heart_of_azeroth_essences) do
-            if(currentprofile.heart_of_azeroth_essences[milestoneID] == nil or essenceID ~= currentprofile.heart_of_azeroth_essences[milestoneID]) then
-                SwitchSwitch:DebugPrint("Essences do not match");
-                return false
-            end
-        end
-    end
 
     --Check pvp talents
     local currentPVPTalentsTable = C_SpecializationInfo.GetAllSelectedPvpTalentIDs()
@@ -770,14 +663,6 @@ function SwitchSwitch:IsCurrentTalentProfile(profileName, checkGearAndSoulbinds)
             local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileName])
             local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
             if(name ~= nil and not isEquipped) then
-                return false
-            end
-        end
-
-        -- Soulbind
-        if(type(self.db.char.preferredSoulbind[self:GetCurrentSpec()]) == "table" and self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName] ~= nil) then
-            local soulbindID = self.db.char.preferredSoulbind[self:GetCurrentSpec()][profileName];
-            if(soulbindID ~= nil and soulbindID ~= 0 and C_Soulbinds.GetActiveSoulbindID() ~= soulbindID) then
                 return false
             end
         end

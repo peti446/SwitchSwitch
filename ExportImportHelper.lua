@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 local LibDeflate = LibStub("LibDeflate")
 
 function SwitchSwitch:ProfilesToString(profilesList, includePVP)

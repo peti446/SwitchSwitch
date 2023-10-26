@@ -1,7 +1,7 @@
 --############################################
 -- Namespace
 --############################################
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 
 SwitchSwitch.Commands = {}
 
@@ -70,7 +70,7 @@ local function HandleSlashCommands(str)
 			if (path[arg]) then
 				if (type(path[arg]) == "function") then
 					-- all remaining args passed to our function
-					path[arg](SwitchSwitch, select(id + 1, unpack(args)))
+					path[arg](SwitchSwitch, select(id + 1,unpack(args)))
 					return
 				elseif (type(path[arg]) == "table") then
 					path = path[arg] -- another sub-table found!

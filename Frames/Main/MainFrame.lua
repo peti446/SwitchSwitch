@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 local AuthorList = "|cffff7d0aGeloch-Sanguino(EU)|r"
 local FrameName = "SwitchSwitchFrame"
 local frame, menuContainer, tabContainer, UISpecialFramesCurrentID, LastFramePosition
@@ -86,7 +86,7 @@ function SwitchSwitch:GetMainFrame()
     frame:SetCallback("OnClose", OnMainFrameClosed)
     frame:SetHeight(600)
     frame:SetWidth(870)
-    frame.frame:SetMinResize(870, 600)
+    frame.frame:SetResizeBounds(870, 600)
     frame:PauseLayout()
 
     --Set up menu  side
@@ -101,7 +101,7 @@ function SwitchSwitch:GetMainFrame()
         local currentMenuEntry = MenuEntries[i]
         menuLabel:SetText(currentMenuEntry.name);
         menuLabel:SetWidth(130)
-        menuLabel:SetFont(GameFontNormalSmall:GetFont(), 14, nil)
+        menuLabel:SetFont(GameFontNormalSmall:GetFont(), 14, "")
         menuLabel:SetColor(0.8941, 0.73725, 0.01961)
         menuLabel:SetHighlight("Interface\\QuestFrame\\UI-QuestTitleHighlight")
         menuLabel:SetCallback("OnClick", OnMenuLabelClicked)
@@ -146,7 +146,8 @@ function SwitchSwitch:GetMainFrame()
     -- We dont want it to appear in the middle all time, just after reloads, otherwise close where the user closed
     if(LastFramePosition) then
         frame:ClearAllPoints()
-        frame:SetPoint(unpack(LastFramePosition))
+        local point, relativeTo, relativePoint, offsetX, offsetY = unpack(LastFramePosition)
+        frame:SetPoint(point, relativeTo, relativePoint, offsetX, offsetY)
     end
 
     -- Lets start up with selecting the first labe as this is the default one

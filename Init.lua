@@ -1,7 +1,7 @@
 --############################################
 -- Namespace
 --############################################
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 
 --##########################################################################################################################
 --                                  Default configurations
@@ -19,7 +19,6 @@ local dbDefaults =
     {
         ["Version"] = -1,
         ["debug"] = false,
-        ["autoUseTomes"] = true,
         ["talentsSuggestionFrame"] =
         {
             ["location"] =
@@ -41,7 +40,6 @@ local dbDefaults =
     {
         ["Version"] = -1,
         ["gearSets"] = {},
-        ["preferredSoulbind"] = {}
     }
 }
 
@@ -55,7 +53,7 @@ function SwitchSwitch:OnInitialize()
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-    self:RegisterBucketEvent({"AZERITE_ESSENCE_UPDATE", "PLAYER_TALENT_UPDATE"}, 0.75, "PLAYER_TALENT_UPDATE")
+    self:RegisterBucketEvent({"PLAYER_TALENT_UPDATE"}, 0.75, "PLAYER_TALENT_UPDATE")
 
     --Update the tables in case they are not updated
     SwitchSwitch:Update();
@@ -79,8 +77,8 @@ function SwitchSwitch:OnEnable()
     SwitchSwitch:InitMinimapIcon()
 
     --Load the UI if not currently loaded
-    if(not IsAddOnLoaded("Blizzard_TalentUI")) then
-        LoadAddOn("Blizzard_TalentUI")
+    if(not IsAddOnLoaded("Blizzard_ClassTalentUI")) then
+        LoadAddOn("Blizzard_ClassTalentUI")
     end
 
     -- Enable Boss detection and register instances
@@ -116,11 +114,6 @@ function SwitchSwitch:OnEnable()
 
     -- Lets refresh all the UIS
     self:PLAYER_TALENT_UPDATE(true)
-    -- Load the tomes data
-    local tomesID = SwitchSwitch:GetValidTomesItemsID()
-    for i, id in ipairs(tomesID) do
-        C_Item.RequestLoadItemDataByID(id)
-    end
 end
 
 function SwitchSwitch:OnDisable()
@@ -131,6 +124,7 @@ end
 --                                  Config Update to never version
 --##########################################################################################################################
 
+-- IF version has 2 . it concatenates the last dots so 3.1.1 = 3.11 and 3.0.1 = 3.01 ect
 local function GetVersionNumber(str)
     if(str == nil) then
         return 0.0
@@ -154,18 +148,17 @@ function SwitchSwitch:Update()
     local profileConfigVerison = GetVersionNumber(self.db.profile.Version)
     local characterConfigVerison = GetVersionNumber(self.db.profile.Version)
 
-    -- Internal version to release version
-    -- 2.0 - 2.0,2.01
-    -- 20 - 2.02
-
     --Update Global table
     if(globalConfigVersion ~= -1 and globalConfigVersion ~= self.InternalVersion) then
-
+        -- Update the tables after 3.0 (dragon flight) as talents changed
+        if(globalConfigVersion < 3.00) then
+            self.db.global.TalentProfiles = {}
+            self.db.global.TalentSuggestions = {}
+        end
     end
 
     -- Update profile table
     if(profileConfigVerison ~= -1 and profileConfigVerison ~= self.InternalVersion) then
-
     end
 
     -- Update character table

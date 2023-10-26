@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 local ProfilesEditorPage = SwitchSwitch:RegisterMenuEntry(L["Current Profiles"])
 local DropDownGroup
 local CurrentEditSpec
@@ -176,70 +176,26 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
     end)
     scroll:AddChild(gearSetDropDown)
 
-    -- Shadowlands change active soulbind
-    scroll:AddChild(self:CreateHeader(L["Preferred Soulbind"]))
-    scroll:AddChild(self:CreateLabel(L["Change preferred soulbind when changing talents."] .. ".\n" .. "|cFFFF0000".. L["Warning: This setting is per character, renaming this profile means you will need to re-set this on each character for this profile"] .. ".|r"))
-    local preferredSoulbindDropDown = AceGUI:Create("Dropdown")
-    preferredSoulbindDropDown:SetLabel(L["Soulbind"])
-    preferredSoulbindDropDown:SetText(L["None"])
-
-    local covenantDataID = C_Covenants.GetActiveCovenantID();
-    if(covenantDataID == 0) then
-        scroll:AddChild(self:CreateLabel("|cFFFF0000" .. L["You do not have a covenant"] .. ".|r"))
-    else
-        local covenantData = C_Covenants.GetCovenantData(covenantDataID);
-
-        local possibleSoulbinds = {}
-        possibleSoulbinds["none"] = L["None"]
-        for _, id in ipairs(covenantData.soulbindIDs) do
-            local name = C_Soulbinds.GetSoulbindData(id).name
-            possibleSoulbinds[id] = name
-        end
-
-        preferredSoulbindDropDown:SetList(possibleSoulbinds)
-        preferredSoulbindDropDown:SetUserData("ProfileName", group)
-        preferredSoulbindDropDown:SetValue("none")
-        if(type(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()]) == "table" and SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][group] ~= nil) then
-            preferredSoulbindDropDown:SetValue(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][group])
-        end
-
-        preferredSoulbindDropDown:SetCallback("OnValueChanged", function(self, _, id)
+    scroll:AddChild(self:CreateHeader(L["Talents"]))
+    local talentsDrowpodn = AceGUI:Create("Dropdown")
+    local possibleTalents = {}
+    possibleTalents["none"] = L["Default"]
+    local configs = C_ClassTalents.GetConfigIDsBySpecID(CurrentEditSpec)
+    for _, configID in ipairs(configs) do
+        local id, _, name, _, _ = C_Traits.GetConfigInfo(configID)
+        possibleTalents[id] = name;
+    end
+    talentsDrowpodn:SetUserData("ProfileName", group)
+    gearSetDropDown:SetCallback("OnValueChanged", function(self, _, id)
+        local t = SwitchSwitch:GetProfileData(self:GetUserData("ProfileName"), nil, CurrentEditSpec);
+        if(t ~= nil) then
             if(id == "none") then
                 id = nil
             end
-            if(type(SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()]) ~= "table") then
-                SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()] = {}
-            end
-            SwitchSwitch.db.char.preferredSoulbind[SwitchSwitch:GetCurrentSpec()][self:GetUserData("ProfileName")] = id
-        end)
-        scroll:AddChild(preferredSoulbindDropDown)
-    end
-
-
-    scroll:AddChild(self:CreateHeader(L["Talents"]))
-
-    local talentFrameGroup = AceGUI:Create("SimpleGroup")
-    talentFrameGroup:SetLayout("Flow")
-    talentFrameGroup:SetFullWidth(true)
-    local selectedProfileTalents = SwitchSwitch:GetProfileData(group, nil, CurrentEditSpec)
-    for tier, rowData in pairs(SwitchSwitch.TalentsData[CurrentEditSpec]) do
-        local uiRow = AceGUI:Create("TalentRow")
-        uiRow:SetLevel(rowData["requiredLevel"])
-        uiRow:SetColumnSelected(selectedProfileTalents["pva"][tier]["column"])
-        uiRow:SetUserData("Row", tier)
-        uiRow:SetUserData("ProfileName", group)
-
-        for column, talentData  in pairs(SwitchSwitch.TalentsData[CurrentEditSpec][tier]["data"]) do
-            uiRow:SetTalentIcon(column, talentData.textureID)
-            uiRow:SetTalentName(column, talentData.name)
-            uiRow:SetTalentID(column, talentData.talentID)
+            t.talentConfigId = id
         end
-
-        uiRow:SetCallback("TalentSelected", OnTalentSelected)
-        talentFrameGroup:AddChild(uiRow)
-    end
-
-    scroll:AddChild(talentFrameGroup)
+    end)
+    scroll:AddChild(talentsDrowpodn)
 end
 
 function ProfilesEditorPage:CreateHeader(Text)

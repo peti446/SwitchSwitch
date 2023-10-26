@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 local TalentsSuggestionPage = SwitchSwitch:RegisterMenuEntry(L["Talents Suggestion"])
 local treeGroup, CurrentSelectedPath
 
@@ -197,7 +197,7 @@ local function DrawMythicPlusSection(frame, expansion, contentType, jurnalInstan
         --Render dropboxes
         local currentWeekID = SwitchSwitch:GetCurrentWeeksMythicID()
         for i, packedData in pairs(currentSeasonData) do
-            local compressedID, label = unpack(packedData)
+            local compressedID, label =unpack(packedData)
             local dropDown = AceGUI:Create("Dropdown")
             local labelText = label;
             if(compressedID == currentWeekID) then
@@ -344,7 +344,7 @@ local function OnGroupSelected(frame, _, group)
             --Render dropboxes
             local currentWeekID = SwitchSwitch:GetCurrentWeeksMythicID()
             for i, packedData in pairs(currentSeasonData) do
-                local compressedID, label = unpack(packedData)
+                local compressedID, label =unpack(packedData)
                 local dropDown = AceGUI:Create("Dropdown")
                 local labelText = label;
                 if(compressedID == currentWeekID) then

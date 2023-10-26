@@ -17,11 +17,10 @@ local InstancesData = {}
 
 function BossDetection:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:HookScript(GameTooltip, "OnTooltipSetUnit")
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, Test)
 end
 
 function BossDetection:OnDisable()
-    self:Unhook(GameTooltip, "OnTooltipSetUnit")
     self:UnregisterEvent("PLAYER_STARTED_MOVING")
     self:UnregisterEvent("PLAYER_STOPPED_MOVING")
     self:UnregisterBucket("BOSS_KILL")
@@ -103,18 +102,16 @@ function BossDetection:SetDetectionForBossEnabled(BossID, InstanceID, enabled)
     end
 end
 
-function BossDetection:OnTooltipSetUnit(tooltip)
-    if(UnitAffectingCombat("player") or UnitIsDeadOrGhost("player")) then
+function Test(tooltip, data)
+    BossDetection:OnTooltipSetUnit(tooltip, data)
+end
+
+function BossDetection:OnTooltipSetUnit(tooltip, data)
+    if(UnitAffectingCombat("player") or UnitIsDeadOrGhost("player") or tooltip ~= GameTooltip) then
         return
     end
 
-    local _, unit = tooltip:GetUnit()
-    if(not unit) then
-        return
-    end
-
-    local guid = UnitGUID(unit)
-    local npcType,_,_,_,_,npcID = strsplit("-", guid)
+    local npcType,_,_,_,_,npcID = strsplit("-", data.guid)
     if(not npcID) then
         return
     end

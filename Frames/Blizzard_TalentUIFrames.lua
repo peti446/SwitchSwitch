@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
 local parent
 local dropDown
 local saveButton
@@ -32,10 +32,10 @@ function SwitchSwitch:EmbedUIIntoTalentFrame()
           space = 2,
           align = "LEFT"
     })
-    parent.frame:SetParent(PlayerTalentFrameTalents)
+    parent.frame:SetParent(ClassTalentFrame)
     parent:ClearAllPoints()
-    parent:SetPoint("TOPLEFT", PlayerTalentFrame.TopTileStreaks, "TOPLEFT", 115, 0)
-    parent:SetPoint("BOTTOMRIGHT", PlayerTalentFrame.TopTileStreaks, "BOTTOMRIGHT", -145, 5)
+    parent:SetPoint("TOPLEFT", ClassTalentFrame.TopTileStreaks, "TOPLEFT", 115, 0)
+    parent:SetPoint("BOTTOMRIGHT", ClassTalentFrame.TopTileStreaks, "BOTTOMRIGHT", -145, 5)
     parent.frame:Show()
     dropDown = AceGUI:Create("Dropdown")
     dropDown:SetLabel(L["Profiles"] .. ":")
@@ -53,7 +53,7 @@ function SwitchSwitch:EmbedUIIntoTalentFrame()
     saveButton:SetCallback("OnClick", OnSaveClicked)
     parent:AddChild(saveButton)
     self:DebugPrint("Talent Frame has been shown embedded frame")
-    self:HookScript(PlayerTalentFrame, "OnHide", "BlizzardTalentUIHidden")
+    self:HookScript(ClassTalentFrame, "OnHide", "BlizzardTalentUIHidden")
     SwitchSwitch:RefreshTalentUI()
 end
 
@@ -63,7 +63,7 @@ function SwitchSwitch:BlizzardTalentUIHidden()
     parent = nil
     dropDown = nil
     saveButton = nil
-    self:Unhook(PlayerTalentFrame, "OnHide")
+    self:Unhook(ClassTalentFrame, "OnHide")
 end
 
 function SwitchSwitch:RefreshTalentUI()

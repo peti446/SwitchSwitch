@@ -4,16 +4,16 @@ local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local LastInstanceID = -1
 
 function SwitchSwitch:ADDON_LOADED(event, arg1)
-    if(arg1 == "Blizzard_TalentUI") then
+    if(arg1 == "Blizzard_ClassTalentUI") then
         self:PLAYER_SPECIALIZATION_CHANGED()
-        self:HookScript(PlayerTalentFrame, "OnShow", "EmbedUIIntoTalentFrame")
+        self:HookScript(ClassTalentFrame, "OnShow", "EmbedUIIntoTalentFrame")
         return
     end
 end
 
 function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
-    if(not IsAddOnLoaded("Blizzard_TalentUI")) then
-        LoadAddOn("Blizzard_TalentUI")
+    if(not IsAddOnLoaded("Blizzard_ClassTalentUI")) then
+        LoadAddOn("Blizzard_ClassTalentUI")
         return
     end
 
@@ -22,7 +22,7 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
     end
 
     local playerSpec = SwitchSwitch:GetCurrentSpec()
-    if(playerSpec ==  self.lastUpdatePlayerSpec) then
+    if(playerSpec == self.lastUpdatePlayerSpec) then
         return
     end
     self.lastUpdatePlayerSpec = playerSpec
