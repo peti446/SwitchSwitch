@@ -111,11 +111,60 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
             ["instanceID"] = 2522,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {
-                [184972] = {
+                [184972] = { -- Eranog
                     ["requieres"] = {},
                     ["zoneID"] = 2119,
                     ["jurnalIndex"] = 1,
                     ["encounterID"] = 2480,
+                    ["otherBossIDs"] = {},
+                },
+                [190496] = { -- Terros
+                    ["requieres"] = {184972},
+                    ["zoneID"] = 2122,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2500,
+                    ["otherBossIDs"] = {},
+                },
+                [187771] = { -- Primal Council
+                    ["requieres"] = {184972},
+                    ["zoneID"] = 2120,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2486,
+                    ["otherBossIDs"] = {},
+                },
+                [187967] = { -- Sennarth
+                    ["requieres"] = {190496},
+                    ["zoneID"] = 2122,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2482,
+                    ["otherBossIDs"] = {},
+                },
+                [189813] = { -- Dathea
+                    ["requieres"] = {187771},
+                    ["zoneID"] = 2121,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2502,
+                    ["otherBossIDs"] = {},
+                },
+                [181378] = { -- Kurog
+                    ["requieres"] = {187967},
+                    ["zoneID"] = 2124,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2491,
+                    ["otherBossIDs"] = {},
+                },
+                [190245] = { -- Bloodkeeper
+                    ["requieres"] = {181378, 189813},
+                    ["zoneID"] = 2126,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2493,
+                    ["otherBossIDs"] = {},
+                },
+                [189492] = { -- Raszageth
+                    ["requieres"] = {190245},
+                    ["zoneID"] = 2125,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2499,
                     ["otherBossIDs"] = {},
                 }
             },
@@ -124,6 +173,69 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
             ["instanceID"] = 2569,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {
+                [201261] = { -- Kazzara
+                    ["requieres"] = {},
+                    ["zoneID"] = 2166,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2522,
+                    ["otherBossIDs"] = {} 
+                },
+                [201774] = { -- Amalgamation Chamber
+                    ["requieres"] = {201261},
+                    ["zoneID"] = 2167,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2529,
+                    ["otherBossIDs"] = {},
+                },
+                [200912] = { -- Forgotten Experiments
+                    ["requieres"] = {201774},
+                    ["zoneID"] = 2166,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2530,
+                    ["otherBossIDs"] = {} 
+                },
+                [199659] = { -- Zaqali Assault
+                    ["requieres"] = {201261},
+                    ["zoneID"] =  2168,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2524,
+                    ["otherBossIDs"] = {}
+                },
+                [201320] = { -- Rashok
+                    ["requieres"] = {199659},
+                    ["zoneID"] = 2166,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2525,
+                    ["otherBossIDs"] =  {}
+                },
+                [202637] = { -- Zskarn
+                    ["requieres"] = {201320, 200912},
+                    ["zoneID"] = 2166,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2532,
+                    ["otherBossIDs"] = {}
+                },
+                [201579] = { -- Magmorax
+                    ["requieres"] = {202637},
+                    ["zoneID"] = 2166,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2527,
+                    ["otherBossIDs"] =  {}
+                },
+                [201668] = { -- Echo of Neltharion
+                    ["requieres"] = {201579},
+                    ["zoneID"] = 2169,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2523,
+                    ["otherBossIDs"] = {},
+                },
+                [201754] = { -- Sarkareth
+                    ["requieres"] = {201668},
+                    ["zoneID"] = 2170,
+                    ["jurnalIndex"] = 9,
+                    ["encounterID"] = 2520,
+                    ["otherBossIDs"] = {}
+                },
             },
         },
         [1207] = { -- Amirdrassil
