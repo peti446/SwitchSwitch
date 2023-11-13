@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local ProfilesEditorPage = SwitchSwitch:RegisterMenuEntry(L["Current Profiles"])
 local DropDownGroup
 local CurrentEditSpec
@@ -36,7 +36,7 @@ function ProfilesEditorPage:OnClose()
 end
 
 function ProfilesEditorPage:SetDropDownGroupList()
-    local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
+    local talentsProfiles = SwitchSwitch:GetAllCurrentSpecProfiles()
     local dropDownData = {}
     local count = 0
     local oldGroup = DropDownGroup.status or DropDownGroup.localstatus
@@ -48,10 +48,10 @@ function ProfilesEditorPage:SetDropDownGroupList()
     end
 
     local oldGroupExitsInNew = false
-    for name, data in pairs(talentsProfiles) do
-        dropDownData[name] = name
+    for id, data in pairs(talentsProfiles) do
+        dropDownData[id] = data.name
         count = count + 1
-        if(oldGroup == name) then
+        if(oldGroup == id) then
             oldGroupExitsInNew = true
         end
     end
@@ -60,13 +60,12 @@ function ProfilesEditorPage:SetDropDownGroupList()
         oldGroup = nil
     end
 
-
     DropDownGroup:SetGroupList(dropDownData)
     if(count > 0) then
         if(oldGroup ~= nil) then
             DropDownGroup:SetGroup(oldGroup)
-        elseif(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.defaultProfileName and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsProfile, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
-            DropDownGroup:SetGroup(SwitchSwitch.CurrentActiveTalentsProfile)
+        elseif(SwitchSwitch.CurrentActiveTalentsConfigID ~= SwitchSwitch.defaultProfileID and SwitchSwitch:DoesProfileExits(SwitchSwitch.CurrentActiveTalentsConfigID, SwitchSwitch:GetPlayerClass(), CurrentEditSpec)) then
+            DropDownGroup:SetGroup(SwitchSwitch.CurrentActiveTalentsConfigID)
         else
             DropDownGroup:SetGroup(select(1, next(dropDownData, nil)))
         end
@@ -88,7 +87,7 @@ local function OnRenameProfile(self, _)
     local newName = editBox:GetText()
     if(SwitchSwitch:RenameProfile(originalName, newName, nil, CurrentEditSpec)) then
         DropDownGroup.status = DropDownGroup.status or {}
-        DropDownGroup.status["selected"] = newName:lower()
+        DropDownGroup.status["selected"] = SwitchSwitch:ToLower(newName)
         ProfilesEditorPage:SetDropDownGroupList()
     end
 end
@@ -101,16 +100,10 @@ local function OnDeleteProfile(self)
     end
 end
 
-local function OnTalentSelected(self, _, newColumn, oldColumn)
-    local t = SwitchSwitch:GetProfileData(self:GetUserData("ProfileName"), nil, CurrentEditSpec)
-    local row = self:GetUserData("Row")
-    t["pva"][row]["column"] = newColumn
-    t["pva"][row]["id"] = self:GetTalentID(newColumn)
-    SwitchSwitch:PLAYER_TALENT_UPDATE()
-end
-
 function ProfilesEditorPage:OnGroupSelected(frame, group)
     SwitchSwitch:DebugPrint("Displaying profile to edit: " .. group)
+
+    local talentProfileData = SwitchSwitch:GetProfileData(group, nil, CurrentEditSpec)
 
     frame:ReleaseChildren()
     frame:SetLayout("Fill")
@@ -128,24 +121,31 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
     renameBox:SetHeight(30)
     renameBox:SetLabel(L["Profile Name"])
     renameBox:DisableButton(true)
-    renameBox:SetText(group)
+    renameBox:SetText(talentProfileData.name)
     renameBox:SetUserData("OriginalText", group)
     renameBox:SetCallback("OnTextChanged", OnRenameTextChanged)
+    if(talentProfileData.type == "blizzard") then
+       renameBox:SetDisabled(true)
+    end
     scroll:AddChild(renameBox)
 
-    local renameButton = AceGUI:Create("Button")
-    renameButton:SetText(L["Rename"])
-    renameButton:SetCallback("OnClick", OnRenameProfile)
-    renameButton:SetUserData("EditBox", renameBox)
-    renameBox:SetUserData("AcceptButton",renameButton)
-    renameButton:SetDisabled(true)
-    scroll:AddChild(renameButton)
+    if(talentProfileData.type ~= "blizzard") then
+        local renameButton = AceGUI:Create("Button")
+        renameButton:SetText(L["Rename"])
+        renameButton:SetCallback("OnClick", OnRenameProfile)
+        renameButton:SetUserData("EditBox", renameBox)
+        renameBox:SetUserData("AcceptButton",renameButton)
+        renameButton:SetDisabled(true)
+        scroll:AddChild(renameButton)
 
-    local deleteButton = AceGUI:Create("Button")
-    deleteButton:SetText(L["Delete Profile"])
-    deleteButton:SetUserData("profile", group)
-    deleteButton:SetCallback("OnClick",OnDeleteProfile)
-    scroll:AddChild(deleteButton)
+        local deleteButton = AceGUI:Create("Button")
+        deleteButton:SetText(L["Delete Profile"])
+        deleteButton:SetUserData("profile", group)
+        deleteButton:SetCallback("OnClick",OnDeleteProfile)
+        scroll:AddChild(deleteButton)
+    else
+        scroll:AddChild(self:CreateLabel("|cFFFF0000"..L["This is a Blizzard profile, it can not be renamed or deleted in this window, use the Blizzard UI to do so." .. "|r"]))
+    end
 
     scroll:AddChild(self:CreateHeader(L["Gear Set"]))
     scroll:AddChild(self:CreateLabel(L["Gear set to equip automaticly when activating this profile set (Blizzard gear set, needs to be created beforehand)"] .. ".\n" .. "|cFFFF0000".. L["Warning: This setting is per character, renaming this profile means you will need to re-set this on each character for this profile"] .. ".|r"))
@@ -176,16 +176,7 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
     end)
     scroll:AddChild(gearSetDropDown)
 
-    scroll:AddChild(self:CreateHeader(L["Talents"]))
-    local talentsDrowpodn = AceGUI:Create("Dropdown")
-    local possibleTalents = {}
-    possibleTalents["none"] = L["Default"]
-    local configs = C_ClassTalents.GetConfigIDsBySpecID(CurrentEditSpec)
-    for _, configID in ipairs(configs) do
-        local id, _, name, _, _ = C_Traits.GetConfigInfo(configID)
-        possibleTalents[id] = name;
-    end
-    talentsDrowpodn:SetUserData("ProfileName", group)
+    -- Event Handling
     gearSetDropDown:SetCallback("OnValueChanged", function(self, _, id)
         local t = SwitchSwitch:GetProfileData(self:GetUserData("ProfileName"), nil, CurrentEditSpec);
         if(t ~= nil) then
@@ -195,7 +186,6 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
             t.talentConfigId = id
         end
     end)
-    scroll:AddChild(talentsDrowpodn)
 end
 
 function ProfilesEditorPage:CreateHeader(Text)

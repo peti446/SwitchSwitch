@@ -85,7 +85,7 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
         SwitchSwitch:DebugPrint("Create profile")
         --If talent spec table does not exist create one
         SwitchSwitch:SetProfileData(profileName, SwitchSwitch:GetCurrentTalents(savePVPTalents), data.class, data.spec)
-        SwitchSwitch:PLAYER_TALENT_UPDATE(true)
+        SwitchSwitch:TRAIT_CONFIG_UPDATED(true)
 
         --Let the user know that the profile has been created
         SwitchSwitch:Print(L["Talent profile %s created!"]:format(profileName))
@@ -98,7 +98,7 @@ StaticPopupDialogs["SwitchSwitch_NewTalentProfilePopUp"] =
         button:Enable()
         --Check if text is not nill or not empty
         if(data ~= nil and data ~= '') then
-            if(data:lower() == SwitchSwitch.defaultProfileName:lower()) then
+            if(SwitchSwitch:ToLower(data) == SwitchSwitch:ToLower(SwitchSwitch.defaultProfileID)) then
                 --Text is "custom" so disable the Create button and give a warning
                 label:SetText(label:GetText() .. "\n\n|cFFFF0000" .. L["'Custom' cannot be used as name!"])
                 button:Disable()
@@ -136,7 +136,7 @@ StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
         SwitchSwitch:DebugPrint("Create profile")
         --If talent spec table does not exist create one
         SwitchSwitch:SetProfileData(data.profile, SwitchSwitch:GetCurrentTalents(data.savePVP), data.class, data.spec)
-        SwitchSwitch:PLAYER_TALENT_UPDATE(true)
+        SwitchSwitch:TRAIT_CONFIG_UPDATED(true)
     end,
     OnCancel = function(self, data)
         local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
@@ -154,7 +154,7 @@ StaticPopupDialogs["SwitchSwitch_ConfirmTalemtsSavePopUp"] =
 
 function SwitchSwitch.GetSuggestedProfileNames(currentString)
     local returnNames = {};
-    for name, _ in pairs(SwitchSwitch:GetProfilesTable()) do
+    for name, _ in pairs(SwitchSwitch:GetCustomProfilesTable()) do
         if(name:find(currentString) ~= nil) then
             table.insert(returnNames, {
                 ["name"] = name,

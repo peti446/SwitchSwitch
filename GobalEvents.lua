@@ -6,7 +6,7 @@ local LastInstanceID = -1
 function SwitchSwitch:ADDON_LOADED(event, arg1)
     if(arg1 == "Blizzard_ClassTalentUI") then
         self:PLAYER_SPECIALIZATION_CHANGED()
-        self:HookScript(ClassTalentFrame, "OnShow", "EmbedUIIntoTalentFrame")
+  --      self:HookScript(ClassTalentFrame, "OnShow", "EmbedUIIntoTalentFrame")
         return
     end
 end
@@ -51,33 +51,48 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
     end
 
     --Update all the UI that is dependend on spec
-    self:PLAYER_TALENT_UPDATE(true)
+    self:TRAIT_CONFIG_UPDATED(true)
 end
 
 -- When true is passed in we will only update the current active profile,
 -- other wise do full update if the player is changing talents or the talbe is null (manually called)
-function SwitchSwitch:PLAYER_TALENT_UPDATE(units)
-    local tempActiveProfile = self.CurrentActiveTalentsProfile
-    self.CurrentActiveTalentsProfile = self:GetCurrentActiveProfile()
-    if(self.CurrentActiveTalentsProfile ~= tempActiveProfile) then
-        self:SendMessage("SWITCHSWITCH_CURRENT_TALENT_PROFILE_UPDATED")
-        self:UpdateLDBText()
-        self:RefreshTalentUI()
-    end
-    if(type(units) ~= "boolean" or not units) then
-        return
-    end
+function SwitchSwitch:TRAIT_CONFIG_UPDATED(units, configID)
+    if configID ~= C_ClassTalents.GetActiveConfigID() then return; end
+    SwitchSwitch:DebugPrint("TRAIT_CONFIG_UPDATED Triggered Updating next frame")
 
-    -- If we reach here its means
-    self:RefreshProfilesEditorPage()
-    self:RefreshTalentsSuggestionUI()
-    self:RefreshExportUI()
+    if(SwitchSwitch.TalentsUpdate.UpdatePending == true) then
+        local pendingProfileID = SwitchSwitch.TalentsUpdate.PendingProfileID
+        RunNextFrame(function() 
+            SwitchSwitch.TalentsUpdate.UpdatePending = false
+            SwitchSwitch.TalentsUpdate.PendingProfileID = nil
+
+            -- Lests update the UI as Blizzard does not do it by themselves
+            C_ClassTalents.UpdateLastSelectedSavedConfigID(SwitchSwitch:GetCurrentSpec(), pendingProfileID);
+            local _ = ClassTalentFrame
+                and ClassTalentFrame.TalentsTab
+                and ClassTalentFrame.TalentsTab.LoadoutDropDown
+                and ClassTalentFrame.TalentsTab.LoadoutDropDown.SetSelectionID
+                and ClassTalentFrame.TalentsTab.LoadoutDropDown:SetSelectionID(pendingProfileID)
+
+            if(not InCombatLockdown() and ClassTalentFrame and ClassTalentFrame:IsShown()) then
+                HideUIPanel(ClassTalentFrame);
+                ShowUIPanel(ClassTalentFrame);
+                SwitchSwitch:DebugPrint("class frame updated")
+            end
+
+            SwitchSwitch:RefreshCurrentConfigID()
+        end)
+    else
+        RunNextFrame(function() 
+            SwitchSwitch:RefreshCurrentConfigID()
+        end)
+    end
 end
 
 
 function SwitchSwitch:SWITCHSWITCH_INSTANCE_TYPE_DETECTED(event_name, contentType)
     if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= nil) then
-        if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= self.CurrentActiveTalentsProfile) then
+        if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= self.CurrentActiveTalentsConfigID) then
             self:ToggleSuggestionFrame(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"])
         end
     end
@@ -98,13 +113,13 @@ function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficu
             suggestedProfileName = allSuggestionsForInstance["difficulties"][difficultyID]
         end
         -- If we are in mythic/mythic+ we want to see the week specific data
-        if(difficultyID == self.PreMythicPlusDificulty and allSuggestionsForInstance["mythic+"] ~= nil and allSuggestionsForInstance["mythic+"][self:GetCurrentWeeksMythicID()] ~= nil) then
-            suggestedProfileName = allSuggestionsForInstance["mythic+"][self:GetCurrentWeeksMythicID()]
+        if(difficultyID == self.PreMythicPlusDificulty and allSuggestionsForInstance["mythic+"] ~= nil and allSuggestionsForInstance["mythic+"][self:GetCurrentMythicPlusAfixHash()] ~= nil) then
+            suggestedProfileName = allSuggestionsForInstance["mythic+"][self:GetCurrentMythicPlusAfixHash()]
         end
     end
 
     if(suggestedProfileName ~= nil) then
-        if(suggestedProfileName ~= self.CurrentActiveTalentsProfile) then
+        if(suggestedProfileName ~= self.CurrentActiveTalentsConfigID) then
             self:ToggleSuggestionFrame(suggestedProfileName)
         end
     end

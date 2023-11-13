@@ -25,6 +25,12 @@
         "PlayerUtil",
         "ClassTalentFrame",
         "TooltipDataProcessor",
-        "TooltipUtil"
+        "TooltipUtil",
+        "GetAddOnMetadata",
+        "Talents",
+        "RunNextFrame"
+    ],
+    "Lua.diagnostics.disable": [
+        "deprecated"
     ]
 }

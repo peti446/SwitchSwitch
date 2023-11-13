@@ -66,7 +66,7 @@ local function HandleSlashCommands(str)
 
 	for id, arg in ipairs(args) do
 		if (#arg > 0) then -- if string length is greater than 0.
-			arg = arg:lower()
+			arg = SwitchSwitch:ToLower(arg)
 			if (path[arg]) then
 				if (type(path[arg]) == "function") then
 					-- all remaining args passed to our function

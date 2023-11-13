@@ -125,10 +125,10 @@ function MenuEntry:SetDropDownProfileList()
     if(ProfilesDropDown == nil) then
         return
     end
-    local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
+    local talentsProfiles = SwitchSwitch:GetAllCurrentSpecProfiles()
     local ProfilesDropDownData = {}
-    for name, data in pairs(talentsProfiles) do
-        ProfilesDropDownData[name] = name
+    for id, data in pairs(talentsProfiles) do
+        ProfilesDropDownData[id] = data.name
     end
     ProfilesDropDown:SetList(ProfilesDropDownData)
     ProfilesDropDown:Fire("OnValueChanged", next(ProfilesDropDownData), false)

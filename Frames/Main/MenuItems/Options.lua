@@ -24,14 +24,7 @@ end
 
 function OptionsPage:PrintOptions()
     scrollFrameParent:AddChild(self:CreateHeader(L["General"]));
-
-    local cb = self:CreateCheckBox(L["Ask to automatically use tome when trying to change talents"])
-    cb:SetValue(SwitchSwitch.db.profile.autoUseTomes)
-    cb:SetCallback("OnValueChanged", function(_, _, newVal)
-        SwitchSwitch.db.profile.autoUseTomes = newVal
-    end)
-    scrollFrameParent:AddChild(cb)
-
+    
     local cbForSlider = self:CreateCheckBox(L["Suggest talent changes based on zone/boss"])
     cbForSlider:SetValue(SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
     cbForSlider:SetCallback("OnValueChanged", function(self, _, newVal)

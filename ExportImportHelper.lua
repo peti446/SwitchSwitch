@@ -38,7 +38,7 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
                 local className = select(1, GetClassInfo(classID))
                 for specID, profilesData in pairs(classData) do
                     local specName = select(2, GetSpecializationInfoByID(specID))
-                    local currentSavedData = self:GetProfilesTable(classID, specID)
+                    local currentSavedData = self:GetCustomProfilesTable(classID, specID)
                     local profilesCount = 0
                     local namesList = ""
                     for name, data in pairs(profilesData) do
@@ -62,7 +62,7 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
         return false
     end
 
-    self:PLAYER_TALENT_UPDATE(true)
+    self:TRAIT_CONFIG_UPDATED(true)
     self:Print(infoText)
     return true, infoText
 end

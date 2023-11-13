@@ -1,14 +1,16 @@
 --############################################
 -- Namespace
 --############################################
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 local SuggestionFrame
 --##########################################################################################################################
 --                                  Frames Init
 --##########################################################################################################################
-local function CreateSuggestionFrame(profileName)
+local function CreateSuggestionFrame(profileID)
     local frame = AceGUI:Create("Window")
     local frameLocation = SwitchSwitch.db.profile.talentsSuggestionFrame.location
+    local profileData = SwitchSwitch:GetProfileData(profileID)
+
     frame:SetPoint(frameLocation.point, UIParent, frameLocation.relativePoint, frameLocation.frameX, frameLocation.frameY)
     frame:SetLayout("Flow")
     frame:SetWidth(275)
@@ -18,7 +20,7 @@ local function CreateSuggestionFrame(profileName)
 
     local descriptionLabel = AceGUI:Create("Label")
     descriptionLabel:SetFullWidth(true)
-    descriptionLabel:SetText(L["Would you like to activate the profile '%s?'"]:format(profileName) .. "\n\n")
+    descriptionLabel:SetText(L["Would you like to activate the profile '%s?'"]:format(profileData.name) .. "\n\n")
     descriptionLabel:SetFontObject(GameFontWhite)
     descriptionLabel:SetJustifyH("CENTER")
     frame:AddChild(descriptionLabel)
@@ -47,10 +49,10 @@ local function CreateSuggestionFrame(profileName)
     local acceptButton = AceGUI:Create("Button")
     acceptButton:SetText(L["Change Talents"])
     acceptButton:SetUserData("Parent", frame)
-    acceptButton:SetUserData("ProfileName", profileName)
+    acceptButton:SetUserData("profileID", profileID)
     acceptButton:SetCallback("OnClick", function(self)
-        local profileName = self:GetUserData("ProfileName")
-        SwitchSwitch:ActivateTalentProfile(profileName)
+        local profileID = self:GetUserData("profileID")
+        SwitchSwitch:ActivateTalentProfile(profileID)
         self:GetUserData("Parent"):Hide()
     end)
     buttonGroup:AddChild(acceptButton);
@@ -109,19 +111,21 @@ function SwitchSwitch:PLAYER_REGEN_ENABLED(arg1)
     SwitchSwitch:ToggleSuggestionFrame(arg1)
 end
 
-function SwitchSwitch:ToggleSuggestionFrame(profileToActivate)
+function SwitchSwitch:ToggleSuggestionFrame(profileID)
     --First check if the profile is valid and exists
-    if(not profileToActivate or profileToActivate == "" or not self:DoesProfileExits(profileToActivate)) then
+    if(not profileID or profileID == "" or not self:DoesProfileExits(profileID)) then
         self:DebugPrint("Could not open 'Sugestion frame' as either the profile is null or does not exist")
         return
     end
-    self:DebugPrint("Showing Toggle suggestion frame with profile: " .. profileToActivate)
+
+    local profileData = SwitchSwitch:GetProfileData(profileID)
+    self:DebugPrint("Showing Toggle suggestion frame with profile: " .. profileData.name)
     --Set the frame or create it, set data and show the frame.
     if(SuggestionFrame ~= nil) then
         SuggestionFrame:Hide()
     end
-    SuggestionFrame = CreateSuggestionFrame(profileToActivate)
+    SuggestionFrame = CreateSuggestionFrame(profileID)
     SuggestionFrame:Show()
 
-    self:RegisterEvent("PLAYER_REGEN_DISABLED", nil, profileToActivate)
+    self:RegisterEvent("PLAYER_REGEN_DISABLED", nil, profileID)
 end

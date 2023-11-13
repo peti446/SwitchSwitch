@@ -1,7 +1,7 @@
 local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
 local function BuildMythicPlusTitle(week, affix1, affix2, affix3)
-    return L["Week"] .. " " .. week .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix2))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix3))   ..")";
+    return L["Week"] .. " " .. tostring(week) .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix2))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix3))   ..")";
 end
 
 SwitchSwitch.InstancesBossData = {}
@@ -36,15 +36,19 @@ SwitchSwitch.DificultyStrings =
 }
 
 SwitchSwitch.PreMythicPlusDificulty = 23
-
+SwitchSwitch.DefaultMythicPlusSeason = 11
+SwitchSwitch.MythicPlusDungeons = {
+    -- Season 3 Dragonflight
+    [11] = {1209, 968, 1021, 740, 762, 556, 65}
+}
 SwitchSwitch.MythicPlusAffixes = {
-    -- Sesion got by C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
+    -- Sesion got by /dump C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
     -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
     -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
-    -- Season 2 DragonFlight
-    [10] = {
-
+    [11] = {
+        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]  = BuildMythicPlusTitle("1", 9, 7, 13),
     },
+    -- Missed all the other seasons as I stopped updating the addon Feel free to add them
     -- Sesason 3 Shadowlands
     [7] = {
         [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]  = BuildMythicPlusTitle("1", 9, 7, 13),
@@ -95,14 +99,6 @@ SwitchSwitch.MythicPlusAffixes = {
 -- To obtain the JurnalID look at https://wago.tools/db2/JournalInstance?sort[ID]=desc&page=1 and look at the id for the raid and the instance ID is the MapID
 -- To obtain bosses data look at https://wago.tools/db2/JournalEncounter?page=1, the UiMapID is the zone, ID is encounterid, jurnalIndex is OrderIndex
 -- The boss entry ID is the boss npc ID wich is what we search for in the tooltip
-
--- Note: Should always be the first
---SwitchSwitch.InstancesBossData[L["Mythic+"]] = {
---    [10] = {
---
---    }
---}
-
 
 SwitchSwitch.InstancesBossData["Dragonflight"] = {
     -- Raids
@@ -242,6 +238,69 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
             ["instanceID"] = 2549,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {
+                [1] = { -- Gnarlroot
+                    ["requieres"] = {},
+                    ["zoneID"] = 2232,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2820,
+                    ["otherBossIDs"] = {} 
+                },
+                [206689] = { -- Igira
+                    ["requieres"] = {},
+                    ["zoneID"] = 2232,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2709,
+                    ["otherBossIDs"] = {} 
+                },
+                [1] = { -- Volcoross
+                    ["requieres"] = {},
+                    ["zoneID"] = 2244,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2737,
+                    ["otherBossIDs"] = {} 
+                },
+                [1] = { -- Council of Dreams
+                    ["requieres"] = {},
+                    ["zoneID"] = 2240,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2728,
+                    ["otherBossIDs"] = {} 
+                },
+                [205136] = { -- Larodar
+                    ["requieres"] = {},
+                    ["zoneID"] = 2244,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2731,
+                    ["otherBossIDs"] = {} 
+                },
+                [1] = { -- Nymue
+                    ["requieres"] = {},
+                    ["zoneID"] = 2240,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2708,
+                    ["otherBossIDs"] = {} 
+                },
+                [1] = { -- Smolderon
+                    ["requieres"] = {},
+                    ["zoneID"] = 2233,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2824,
+                    ["otherBossIDs"] = {} 
+                },
+                [1] = { -- Tindral Sageswift
+                    ["requieres"] = {},
+                    ["zoneID"] = 2234,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2786,
+                    ["otherBossIDs"] = {} 
+                },
+                [1] = { -- Fyrakk The Blazing
+                    ["requieres"] = {},
+                    ["zoneID"] = 2238,
+                    ["jurnalIndex"] = 9,
+                    ["encounterID"] = 2677,
+                    ["otherBossIDs"] = {} 
+                },
             },
         }
     },

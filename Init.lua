@@ -1,7 +1,7 @@
 --############################################
 -- Namespace
 --############################################
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
 
 --##########################################################################################################################
 --                                  Default configurations
@@ -47,16 +47,13 @@ local dbDefaults =
 --                                  Initialization
 --##########################################################################################################################
 function SwitchSwitch:OnInitialize()
-    self:DebugPrint("Addon Initializing")
     self.db = LibStub("AceDB-3.0"):New("SwitchSwitchDB", dbDefaults)
 
     -- Register events we will liten to
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-    self:RegisterBucketEvent({"PLAYER_TALENT_UPDATE"}, 0.75, "PLAYER_TALENT_UPDATE")
-
-    --Update the tables in case they are not updated
-    SwitchSwitch:Update();
+    self:RegisterEvent("TRAIT_CONFIG_UPDATED")
+    --self:RegisterBucketEvent({"TRAIT_CONFIG_UPDATED"}, 0.75, "TRAIT_CONFIG_UPDATED")
 
     -- Set up Settings for profiles settings
     local aceOptionTable = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -65,6 +62,13 @@ function SwitchSwitch:OnInitialize()
     self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
     self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
     self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
+
+    self:DebugPrint("Addon Initializing")
+
+    --Update the tables in case they are not updated
+    SwitchSwitch:Update()
+
+    self:DebugPrint("Addon Initialized")
 end
 
 function SwitchSwitch:OnEnable()
@@ -113,7 +117,7 @@ function SwitchSwitch:OnEnable()
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("arena", data["all"] ~= nil)
 
     -- Lets refresh all the UIS
-    self:PLAYER_TALENT_UPDATE(true)
+    self:TRAIT_CONFIG_UPDATED(true)
 end
 
 function SwitchSwitch:OnDisable()
@@ -150,7 +154,7 @@ function SwitchSwitch:Update()
 
     --Update Global table
     if(globalConfigVersion ~= -1 and globalConfigVersion ~= self.InternalVersion) then
-        -- Update the tables after 3.0 (dragon flight) as talents changed
+        -- Update the tables after 3.0 (dragonflight) as talents changed
         if(globalConfigVersion < 3.00) then
             self.db.global.TalentProfiles = {}
             self.db.global.TalentSuggestions = {}

@@ -83,6 +83,24 @@ local function OnDropDownGroupSelected(frame, _, group)
     end
 end
 
+local function OnDropDownGroupSelectedForMythycPlus(frame, _, group)
+    local InstanceIDs = frame:GetUserData("InstanceIDs")
+    local MythicAffixHash = frame:GetUserData("MythicAffixHash")
+    local SeasonID = frame:GetUserData("MythicSeasonID");
+
+    if(group == "None") then
+        group = nil
+    end
+
+    for _, id in ipairs(InstanceIDs) do
+        local savedSuggestions = SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(id, SeasonID, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
+        savedSuggestions[MythicAffixHash] = group;
+        SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(id, 
+            SwitchSwitch.PreMythicPlusDificulty, 
+            group ~= nil)
+    end
+end
+
 local function DrawDificultiesSection(frame, expansion, contentType, jurnalInstanceID, validProfilesList)
     if(SwitchSwitch.InstancesBossData[expansion] == nil
         or SwitchSwitch.InstancesBossData[expansion][contentType] == nil
@@ -166,59 +184,62 @@ local function DrawBossesSection(frame, expansion, contentType, jurnalInstanceID
     end
 end
 
-local function DrawMythicPlusSection(frame, expansion, contentType, jurnalInstanceID, validProfilesList)
-    if(SwitchSwitch.InstancesBossData[expansion] == nil
-        or SwitchSwitch.InstancesBossData[expansion][contentType] == nil
-        or SwitchSwitch.InstancesBossData[expansion][contentType][jurnalInstanceID] == nil) then
-        return
+local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesList)
+
+    --local instanceData = SwitchSwitch.My[expansion][contentType][jurnalInstanceID]
+    --local savedProfileSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData["instanceID"])
+    
+    -- Render header
+    frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
+    local label = AceGUI:Create("Label")
+    label:SetFullWidth(true)
+    label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
+    frame:AddChild(label)
+
+    -- Sort the week data so that it always appers in same order as ID are all over the palce
+    local mythicPlusWeekData = SwitchSwitch.MythicPlusAffixes[season] or {}
+    local currentSeasonData = {}
+    for compressedID, label in pairs(mythicPlusWeekData) do
+        currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
     end
 
-    local instanceData = SwitchSwitch.InstancesBossData[expansion][contentType][jurnalInstanceID]
-    local savedProfileSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData["instanceID"])
-    if(instanceData["hasMythic+"] == true) then
-        -- Render header
-        frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
-        local label = AceGUI:Create("Label")
-        label:SetFullWidth(true)
-        label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
-        frame:AddChild(label)
-
-        -- Sort the week data so that it always appers in same order as ID are all over the palce
-        local currentSeasonData = {}
-        local currentSeasonID = C_MythicPlus.GetCurrentSeason()
-        -- IF we are not 60 it will return -1 so manually setting it to current season
-        if(currentSeasonID == -1) then
-            currentSeasonID = 7
+    --Render dropboxes
+    local currentWeekAfixHash = SwitchSwitch:GetCurrentMythicPlusAfixHash()
+    for i, packedData in pairs(currentSeasonData) do
+        local compressedID, label = unpack(packedData)
+        local dropDown = AceGUI:Create("Dropdown")
+        local labelText = label;
+        if(compressedID == currentWeekAfixHash) then
+            labelText = "|cFF00FF00" .. label .. "|r"
         end
-        for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[currentSeasonID] or {}) do
-            currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
+        dropDown:SetLabel(labelText)
+        dropDown:SetUserData("InstanceIDs", instancesIDs)
+        dropDown:SetUserData("MythicAffixHash", compressedID)
+        dropDown:SetUserData("MythicSeasonID", season)
+        dropDown.alignoffset = 25
+        dropDown:SetList(validProfilesList)
+        local setValue = nil
+        for _, id in ipairs(instancesIDs) do
+            local savedSuggestions = SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(id, season, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
+            if(savedSuggestions[compressedID] ~= nil) then
+                if(setValue == nil) then
+                    setValue = savedSuggestions[compressedID]
+                else
+                    if(setValue ~= savedSuggestions[compressedID]) then
+                        setValue = "Multiple"
+                        break;
+                    end
+                end
+            end
         end
-
-        --Render dropboxes
-        local currentWeekID = SwitchSwitch:GetCurrentWeeksMythicID()
-        for i, packedData in pairs(currentSeasonData) do
-            local compressedID, label =unpack(packedData)
-            local dropDown = AceGUI:Create("Dropdown")
-            local labelText = label;
-            if(compressedID == currentWeekID) then
-                labelText = "|cFF00FF00" .. label .. "|r"
-            end
-            dropDown:SetLabel(labelText)
-            dropDown:SetUserData("InstanceID", instanceData["instanceID"])
-            dropDown:SetUserData("Expansion", expansion)
-            dropDown:SetUserData("ContentType", contentType)
-            dropDown:SetUserData("JurnalInstanceID", jurnalInstanceID)
-            dropDown:SetUserData("mythicID", compressedID)
-            dropDown.alignoffset = 25
-            dropDown:SetList(validProfilesList)
-            local setValue = "None"
-            if(savedProfileSuggestions ~= nil and savedProfileSuggestions["mythic+"] ~= nil and savedProfileSuggestions["mythic+"][compressedID] ~= nil) then
-                setValue = savedProfileSuggestions["mythic+"][compressedID]
-            end
+        if(setValue == "Multiple") then
+            dropDown:SetText(L["Multiple values"])
+        else
+            if(setValue == nil) then setValue = "None"; end
             dropDown:SetValue(setValue)
-            dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelected)
-            frame:AddChild(dropDown)
         end
+        dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelectedForMythycPlus)
+        frame:AddChild(dropDown)
     end
 end
 
@@ -242,8 +263,8 @@ local function OnGroupSelected(frame, _, group)
     -- Prepare and sanitize data
     local validProfilesList = {}
     validProfilesList["None"] = L["None"]
-    for profileName, _ in pairs(SwitchSwitch:GetCurrentSpecProfilesTable()) do
-        validProfilesList[profileName] = profileName
+    for id, data in pairs(SwitchSwitch:GetAllCurrentSpecProfiles()) do
+        validProfilesList[id] = data.name
     end
 
     if(ContentType) then
@@ -253,13 +274,61 @@ local function OnGroupSelected(frame, _, group)
         JurnalInstanceID = tonumber(JurnalInstanceID)
     end
 
-    if(type(JurnalInstanceID) == "number") then
+    if(Expansion == "Mythic+") then
+        local currentMythicPlusSeasonID = SwitchSwitch:GetMythicPlusSeason()
+        if(ContentType ~= nil) then
+            -- Draw dungoen specific sections
+            DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, {ContentType}, validProfilesList)
+        else
+            -- Draw Overall Mytic+ section
+            frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
+            local label = AceGUI:Create("Label")
+            label:SetFullWidth(true)
+            label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
+            frame:AddChild(label)
+        
+            DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, SwitchSwitch.MythicPlusDungeons[currentMythicPlusSeasonID], validProfilesList)
+        end
+    elseif(Expansion == "PVP") then
+        scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On enter PVP Instance"]))
+        local label = AceGUI:Create("Label")
+        label:SetFullWidth(true)
+        label:SetText(L["Will suggest a talent build when entering a PVP instance of the specific type"] .. ".")
+        scroll:AddChild(label)
+
+        local arenasSuggestion = SwitchSwitch:GetProfilesSuggestionInstanceData("arena");
+        local battlegroundsSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData("pvp")
+
+        local battlegroundsDropDown = AceGUI:Create("Dropdown")
+        battlegroundsDropDown:SetLabel(L["Battlegrounds"])
+        battlegroundsDropDown:SetUserData("PVP", "pvp")
+        battlegroundsDropDown.alignoffset = 15
+        battlegroundsDropDown:SetList(validProfilesList)
+        local battlegroundSetValue = "None"
+        if(battlegroundsSuggestions["all"] ~= nil) then
+            battlegroundSetValue = battlegroundsSuggestions["all"]
+        end
+        battlegroundsDropDown:SetValue(battlegroundSetValue)
+        battlegroundsDropDown:SetCallback("OnValueChanged", OnPVPDownGroupSelected)
+        scroll:AddChild(battlegroundsDropDown)
+
+        local arenasDropDown = AceGUI:Create("Dropdown")
+        arenasDropDown:SetLabel(L["Arenas"])
+        arenasDropDown:SetUserData("PVP", "arena")
+        arenasDropDown.alignoffset = 15
+        arenasDropDown:SetList(validProfilesList)
+        local arenasSetValue = "None"
+        if(arenasSuggestion["all"] ~= nil) then
+            arenasSetValue = arenasSuggestion["all"]
+        end
+        arenasDropDown:SetValue(arenasSetValue)
+        arenasDropDown:SetCallback("OnValueChanged", OnPVPDownGroupSelected)
+        scroll:AddChild(arenasDropDown)
+    elseif(type(JurnalInstanceID) == "number") then
         -- We are rendering instance specific data so lets draw all posibilities that it might contian
         DrawDificultiesSection(scroll, Expansion, ContentType, JurnalInstanceID, validProfilesList)
         DrawBossesSection(scroll, Expansion, ContentType, JurnalInstanceID, validProfilesList)
-        DrawMythicPlusSection(scroll, Expansion, ContentType, JurnalInstanceID, validProfilesList)
     elseif(type(ContentType) == "number") then
-
         -- Get the data
         local difficulties = {}
         local contentData = SwitchSwitch.InstancesBossData[Expansion][ContentType]
@@ -321,107 +390,6 @@ local function OnGroupSelected(frame, _, group)
                 scroll:AddChild(dropDown)
             end
         end
-
-
-        if(hasMythicplus) then
-            -- Render header
-            scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
-            local label = AceGUI:Create("Label")
-            label:SetFullWidth(true)
-            label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` for the specific dungeon will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. "." ..  "\n\n|cffff0000" .. L["Changes here will affect all %s of %s"]:format(SwitchSwitch.ContentTypeStrings[ContentType], Expansion) .. "|r")
-            scroll:AddChild(label)
-
-            local currentSeasonData = {}
-            local currentSeasonID = C_MythicPlus.GetCurrentSeason()
-            -- IF we are not 60 it will return -1 so manually setting it to current season
-            if(currentSeasonID == -1) then
-                currentSeasonID = 5
-            end
-            for compressedID, label in pairs(SwitchSwitch.MythicPlusAffixes[currentSeasonID] or {}) do
-                currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
-            end
-
-            --Render dropboxes
-            local currentWeekID = SwitchSwitch:GetCurrentWeeksMythicID()
-            for i, packedData in pairs(currentSeasonData) do
-                local compressedID, label =unpack(packedData)
-                local dropDown = AceGUI:Create("Dropdown")
-                local labelText = label;
-                if(compressedID == currentWeekID) then
-                    labelText = "|cFF00FF00" .. label .. "|r"
-                end
-                dropDown:SetLabel(labelText)
-                dropDown:SetUserData("Expansion", Expansion)
-                dropDown:SetUserData("ContentType", ContentType)
-                dropDown:SetUserData("mythicID", compressedID)
-                dropDown:SetUserData("DifficultyID", SwitchSwitch.PreMythicPlusDificulty)
-                dropDown.alignoffset = 25
-                dropDown:SetList(validProfilesList)
-                local setValue = nil
-                local firstSuggestion = true
-                for jurnalID, instanceData in pairs(contentData) do
-                    if(instanceData["hasMythic+"]) then
-                        local savedProfileSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData["instanceID"])
-                        local suggestedProfileName = (savedProfileSuggestions["mythic+"] or {})[compressedID]
-                        if(firstSuggestion) then
-                            setValue = suggestedProfileName
-                            firstSuggestion = false
-                        else
-                            if(setValue ~= suggestedProfileName) then
-                                setValue = "Multiple"
-                                break;
-                            end
-                        end
-                    end
-                end
-                if(setValue == nil) then
-                    setValue = "None"
-                end
-
-                if(setValue == "Multiple") then
-                    dropDown:SetText(L["Multiple values"])
-                else
-                    dropDown:SetValue(setValue)
-                end
-                dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelectedForType)
-                scroll:AddChild(dropDown)
-            end
-        end
-    elseif(Expansion == "PVP") then
-        scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On enter PVP Instance"]))
-        local label = AceGUI:Create("Label")
-        label:SetFullWidth(true)
-        label:SetText(L["Will suggest a talent build when entering a PVP instance of the specific type"] .. ".")
-        scroll:AddChild(label)
-
-        local arenasSuggestion  = SwitchSwitch:GetProfilesSuggestionInstanceData("arena");
-        local battlegroundsSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData("pvp")
-
-        local battlegroundsDropDown = AceGUI:Create("Dropdown")
-        battlegroundsDropDown:SetLabel(L["Battlegrounds"])
-        battlegroundsDropDown:SetUserData("PVP", "pvp")
-        battlegroundsDropDown.alignoffset = 15
-        battlegroundsDropDown:SetList(validProfilesList)
-        local battlegroundSetValue = "None"
-        if(battlegroundsSuggestions["all"] ~= nil) then
-            battlegroundSetValue = battlegroundsSuggestions["all"]
-        end
-        battlegroundsDropDown:SetValue(battlegroundSetValue)
-        battlegroundsDropDown:SetCallback("OnValueChanged", OnPVPDownGroupSelected)
-        scroll:AddChild(battlegroundsDropDown)
-
-        local arenasDropDown = AceGUI:Create("Dropdown")
-        arenasDropDown:SetLabel(L["Arenas"])
-        arenasDropDown:SetUserData("PVP", "arena")
-        arenasDropDown.alignoffset = 15
-        arenasDropDown:SetList(validProfilesList)
-        local arenasSetValue = "None"
-        if(arenasSuggestion["all"] ~= nil) then
-            arenasSetValue = arenasSuggestion["all"]
-        end
-        arenasDropDown:SetValue(arenasSetValue)
-        arenasDropDown:SetCallback("OnValueChanged", OnPVPDownGroupSelected)
-        scroll:AddChild(arenasDropDown)
     end
 
     scroll:DoLayout()
@@ -471,6 +439,31 @@ function TalentsSuggestionPage:SetTreeData()
     end
 
     local treeData = {}
+
+
+    -- Generate Mythic+ Layout
+    do
+        local currentMythicPlusSeasonID = SwitchSwitch:GetMythicPlusSeason()
+        local dungeons = SwitchSwitch.MythicPlusDungeons[currentMythicPlusSeasonID]
+        local mythicPlusTree = {
+            text = L["Mythic+"],
+            value = "Mythic+",
+            children = {}
+        }
+        if(dungeons ~= nil) then
+            for _, dungeonID in ipairs(dungeons) do
+                local dungeonName = GetInstanceNameByID(dungeonID, false)
+                local dungeonTree = {
+                    text = dungeonName,
+                    value = dungeonID,
+                }
+                table.insert(mythicPlusTree.children, dungeonTree)
+            end
+        end
+        table.insert(treeData, mythicPlusTree)
+    end
+
+    -- Generate Expanisons Layout
     for expansion, expansionData in pairs(SwitchSwitch.InstancesBossData) do
         local expansionTree = {
             text = expansion,
@@ -496,19 +489,20 @@ function TalentsSuggestionPage:SetTreeData()
         table.insert( treeData, expansionTree )
     end
 
-    -- We handle PVP separate as it is not per expansion but global
+    -- Generate PVP
     table.insert( treeData, {
         text = L["PVP"],
         value = "PVP",
     })
 
+    -- Actually set
     treeGroup:SetTree(treeData)
-    CurrentSelectedPath = CurrentSelectedPath or "Shadowlands\0011\0011195"
+    CurrentSelectedPath = CurrentSelectedPath or "Dragonflight\0011\0011207"
     local treeStatus = {
         groups= {
-            ["Shadowlands"] = true,
-            ["Shadowlands\0011"] = true,
-            ["Shadowlands\0012"] = true,
+            ["Mythic+"] = true,
+            ["Dragonflight"] = true,
+            ["Dragonflight\0011"] = true,
             ["PVP"] = true
         },
         selected = CurrentSelectedPath

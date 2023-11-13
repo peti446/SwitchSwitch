@@ -4,7 +4,7 @@ local LDBSwitchSwitch = LibStub("LibDataBroker-1.1"):NewDataObject("SwitchSwitch
     type = "data source",
     label = "Switch Switch",
     icon = "Interface\\Icons\\INV_Artifact_Tome02",
-    text = SwitchSwitch.CurrentActiveTalentsProfile,
+    text = ("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]) .. "|r",
 });
 local mmIcon = LibStub("LibDBIcon-1.0")
 local AlreadyRegistered = false
@@ -17,8 +17,8 @@ function LDBSwitchSwitch:OnTooltipShow()
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Left Click"], NORMAL_FONT_COLOR_CODE, L["Show config panel"]))
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Right Click"], NORMAL_FONT_COLOR_CODE, L["Quick talents profile change"]))
     tooltip:AddLine(" ")
-    if(SwitchSwitch.CurrentActiveTalentsProfile ~= SwitchSwitch.defaultProfileName) then
-        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsProfile) .. "|r")
+    if(SwitchSwitch.CurrentActiveTalentsConfigID ~= SwitchSwitch.defaultProfileID) then
+        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsConfigID) .. "|r")
     else
         tooltip:AddLine(("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]) .. "|r")
     end
@@ -31,19 +31,19 @@ function LDBSwitchSwitch:OnClick(button, down)
         end
         UIDropDownMenu_SetWidth(MenuFrame, 200)
         UIDropDownMenu_Initialize(MenuFrame, function(self, level, menuList)
-            local talentsProfiles = SwitchSwitch:GetCurrentSpecProfilesTable()
+            local talentsProfiles = SwitchSwitch:GetAllCurrentSpecProfiles()
             local titleIcon = UIDropDownMenu_CreateInfo()
             titleIcon.text = "Switch Switch - " .. L["Change Talents"]
             titleIcon.isTitle = true
             titleIcon.notClickable = true
             titleIcon.notCheckable = true
             UIDropDownMenu_AddButton(titleIcon, level)
-            for name, data in pairs(talentsProfiles) do
+            for id, data in pairs(talentsProfiles) do
                 local info = UIDropDownMenu_CreateInfo()
-                info.text = name
-                info.arg1 = name
-                info.checked = name == SwitchSwitch.CurrentActiveTalentsProfile
-                info.func = function(self, profileName) SwitchSwitch:ActivateTalentProfile(profileName) end
+                info.text = data.name
+                info.arg1 = id
+                info.checked = naidme == SwitchSwitch.CurrentActiveTalentsConfigID
+                info.func = function(self, id) SwitchSwitch:ActivateTalentProfile(id) end
                 UIDropDownMenu_AddButton(info, level)
             end
         end, "MENU")
@@ -55,7 +55,8 @@ function LDBSwitchSwitch:OnClick(button, down)
 end
 
 function SwitchSwitch:UpdateLDBText()
-    LDBSwitchSwitch.text = SwitchSwitch.CurrentActiveTalentsProfile
+    local profileData = SwitchSwitch:GetProfileData(SwitchSwitch.CurrentActiveTalentsConfigID)
+    LDBSwitchSwitch.text = profileData.name
 end
 
 function SwitchSwitch:InitMinimapIcon()
