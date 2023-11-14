@@ -6,19 +6,19 @@ jobs:
     Lint-Project:
       runs-on: ubuntu-latest
       steps:
-       - uses: actions/checkout@v1
+       - uses: actions/checkout@v4
          with:
            fetch-depth: 50
        - name: Lint lua files
-         uses: nebularg/actions-luacheck@v1
+         uses: nebularg/actions-luacheck@v1.1.2
          with:
-           config: https://gist.githubusercontent.com/peti446/d8fd2298d1db58191dc189f022624895/raw/7c47c83c5382cd6b0456691607977149ef3b3ffa/.luacheckrc
+           config: https://raw.githubusercontent.com/peti446/wow-luacheckrc/mainline/.luacheckrc
            args: "--no-color -q --no-self"
            annotate: warning
        - name: Create alpha package
          uses: BigWigsMods/packager@master
        - name: Upload alpha package to artifacts
-         uses: actions/upload-artifact@v2
+         uses: actions/upload-artifact@v3
          with:
            name: SwitchSwitch.zip
            path: |
@@ -35,7 +35,7 @@ jobs:
       runs-on: ubuntu-latest
       needs: Lint-Project
       steps:
-       - uses: actions/checkout@v1
+       - uses: actions/checkout@v4
          with:
            fetch-depth: 50
        - name: Upload locales strings to CurseForge
