@@ -95,8 +95,8 @@ local function OnDropDownGroupSelectedForMythycPlus(frame, _, group)
     for _, id in ipairs(InstanceIDs) do
         local savedSuggestions = SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(id, SeasonID, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
         savedSuggestions[MythicAffixHash] = group;
-        SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(id, 
-            SwitchSwitch.PreMythicPlusDificulty, 
+        SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(id,
+            SwitchSwitch.PreMythicPlusDificulty,
             group ~= nil)
     end
 end
@@ -162,8 +162,21 @@ local function DrawBossesSection(frame, expansion, contentType, jurnalInstanceID
     label:SetText(L["Allows you to set specific talents build when mouse hovering a boss in the instance, set to none to disable for specific boss."])
     frame:AddChild(label)
 
-    -- Render boss data
+
+    -- TODO: Maybe search another way to better do this so we dont need to copy npcID
+    -- Sorting so they are displayed correctly
+    local sortedTable = {}
     for npcID, bossData in pairs(instanceData["bossData"]) do
+        bossData.npcID = npcID
+        table.insert(sortedTable, bossData)
+    end
+    table.sort(sortedTable, function(a, b)
+        return a.jurnalIndex < b.jurnalIndex
+    end)
+
+    -- Render boss data
+    for _, bossData in ipairs(sortedTable) do
+        local npcID = bossData.npcID
         local name = EJ_GetEncounterInfo(bossData.encounterID)
         local dropDown = AceGUI:Create("Dropdown")
         dropDown:SetLabel(name)
@@ -188,7 +201,7 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
 
     --local instanceData = SwitchSwitch.My[expansion][contentType][jurnalInstanceID]
     --local savedProfileSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData["instanceID"])
-    
+
     -- Render header
     frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
     local label = AceGUI:Create("Label")
@@ -286,7 +299,6 @@ local function OnGroupSelected(frame, _, group)
             label:SetFullWidth(true)
             label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
             frame:AddChild(label)
-        
             DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, SwitchSwitch.MythicPlusDungeons[currentMythicPlusSeasonID], validProfilesList)
         end
     elseif(Expansion == "PVP") then
