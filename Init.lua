@@ -74,6 +74,9 @@ end
 function SwitchSwitch:OnEnable()
     self:DebugPrint("Addon Enabling")
 
+    -- Request Mythic+ data from server
+    C_MythicPlus.RequestMapInfo()
+
     --Load Commands
     SwitchSwitch.Commands:Init()
 
