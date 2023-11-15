@@ -1,9 +1,5 @@
 local SwitchSwitch, L = unpack(select(2, ...))
 
-local function BuildMythicPlusTitle(week, affix1, affix2, affix3)
-    return L["Week"] .. " " .. tostring(week) .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix2))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix3))   ..")";
-end
-
 SwitchSwitch.InstancesBossData = {}
 SwitchSwitch.ContentTypeStrings =
 {
@@ -41,58 +37,61 @@ SwitchSwitch.MythicPlusDungeons = {
     -- Season 3 Dragonflight
     [11] = {1209, 968, 1021, 740, 762, 556, 65}
 }
+
+--  \[(SwitchSwitch:encodeMythicPlusAffixesIDs\(\d+, \d+, \d+\))]  = BuildMythicPlusTitle\("(\d+)", \d+, \d+, \d+\),
+
 SwitchSwitch.MythicPlusAffixes = {
     -- Sesion got by /dump C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
     -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
     -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
     [11] = {
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 136, 8)]  = BuildMythicPlusTitle("1", 10, 136, 8),
+        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 136, 8)
     },
     -- Missed all the other seasons as I stopped updating the addon Feel free to add them
     -- Sesason 3 Shadowlands
     [7] = {
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]  = BuildMythicPlusTitle("1", 9, 7, 13),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]      = BuildMythicPlusTitle("2", 10, 11, 124),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]  = BuildMythicPlusTitle("3", 9, 6, 3),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12)]  = BuildMythicPlusTitle("4", 10, 122, 12),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4)]    = BuildMythicPlusTitle("5", 9, 123, 4),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14)]    = BuildMythicPlusTitle("6", 10, 7, 14),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124)]    = BuildMythicPlusTitle("7", 9, 8, 124),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13)]    = BuildMythicPlusTitle("8", 10, 6, 13),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3)]    = BuildMythicPlusTitle("9", 9, 11, 3),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 4)]    = BuildMythicPlusTitle("10", 10, 123, 4),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("11", 9, 122, 14),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12)]     = BuildMythicPlusTitle("12", 10, 8, 12),
+        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13),
+        [2] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124),
+        [3] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3),
+        [4] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12),
+        [5] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4),
+        [6] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14),
+        [7] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124),
+        [8] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13),
+        [9] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3),
+        [10] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 4),
+        [11] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14),
+        [12] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12),
     },
     -- Sesason 2 Shadowlands
     [6] = {
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124)]  = BuildMythicPlusTitle("1", 10, 11, 124),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3)]      = BuildMythicPlusTitle("2", 9, 6, 3),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12)]  = BuildMythicPlusTitle("3", 10, 122, 12),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4)]    = BuildMythicPlusTitle("4", 9, 123, 4),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14)]    = BuildMythicPlusTitle("5", 10, 7, 14),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124)]    = BuildMythicPlusTitle("6", 9, 8, 124),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13)]    = BuildMythicPlusTitle("7", 10, 6, 13),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3)]    = BuildMythicPlusTitle("8", 9, 11, 3),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12)]    = BuildMythicPlusTitle("9", 10, 123, 12),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14)]    = BuildMythicPlusTitle("10", 9, 122, 14),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 4)]    = BuildMythicPlusTitle("11", 10, 8, 4),
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13)]     = BuildMythicPlusTitle("12", 9, 7, 13),
+        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 124),
+        [2] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 3),
+        [3] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 12),
+        [4] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 123, 4),
+        [5] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 7, 14),
+        [6] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 8, 124),
+        [7] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 6, 13),
+        [8] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 3),
+        [9] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12),
+        [10] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 14),
+        [11] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 4),
+        [12] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 13),
     },
     -- Sesason 1 Shadowlands
     [5] = {
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 3)]    = L["Week"] .. " 1"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(11))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(3))   ..")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 124)]    = L["Week"] .. " 2"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(7))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(124)) ..")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12)]  = L["Week"] .. " 3"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(123)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(12))  .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 4)]    = L["Week"] .. " 4"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(122)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(4))   .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 14)]    = L["Week"] .. " 5"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(8))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(14))  .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 13)]     = L["Week"] .. " 6"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(6))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(13))  .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 3)]   = L["Week"] .. " 7"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(123)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(13))  .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 4)]      = L["Week"] .. " 8"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(7))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(4))   .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 124)] = L["Week"] .. " 9"  .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(122)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(124)) .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 13)]    = L["Week"] .. " 10" .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(11))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(13))  .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12)]    = L["Week"] .. " 11" .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(10)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(8))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(12))  .. ")",
-        [SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 14)]     = L["Week"] .. " 12" .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(9))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(6))   .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(14))  .. ")",
+        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 11, 3),
+        [2] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 124),
+        [3] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 12),
+        [4] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 122, 4),
+        [5] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 14),
+        [6] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 13),
+        [7] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 123, 3),
+        [8] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 7, 4),
+        [9] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 122, 124),
+        [10] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 11, 13),
+        [11] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 8, 12),
+        [12] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 6, 14),
     },
 }
 

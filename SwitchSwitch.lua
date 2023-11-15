@@ -474,7 +474,7 @@ function SwitchSwitch:encodeMythicPlusAffixesIDs(id1, id2, id3)
     assert(id1 < 256, "To long number to compres into 32 bit")
     assert(id2 < 256, "To long number to compres into 32 bit")
     assert(id3 < 256, "To long number to compres into 32 bit")
-    return bit.bor(bit.band(id1, 0xFF), bit.lshift(bit.band(id2, 0xFF), 8), bit.lshift(bit.band(id3, 0xFF), 16))
+        return bit.bor(bit.band(id1, 0xFF), bit.lshift(bit.band(id2, 0xFF), 8), bit.lshift(bit.band(id3, 0xFF), 16))
 end
 
 function SwitchSwitch:decodeMythicPlusAffixesID(encoded)
@@ -519,13 +519,13 @@ function SwitchSwitch:GetSelectedLoadoutConfigID()
         selectionID = nil
     end
 
-    return selectionID 
+    return selectionID
 --    if(not ClassTalentFrame or not ClassTalentFrame.TalentsTab or not ClassTalentFrame.TalentsTab.LoadoutDropDown or not ClassTalentFrame.TalentsTab.LoadoutDropDown.GetSelectionID) then
 --        self:DebugPrint("Class TalentFrame is not valid returning last selected config id")
 --        local lastSelected = PlayerUtil.GetCurrentSpecID() and C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
 --        return lastSelected or nil;
 --    end
--- 
+--
 --    local selectionID = ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
 --    if(C_ClassTalents.GetStarterBuildActive()) then
 --        selectionID = nil
@@ -652,7 +652,7 @@ function SwitchSwitch:LearnTalents(profileID)
     if(not profileData) then
         return
     end
-    
+
     SwitchSwitch:Print(L["Changing talents"] .. ": " .. profileData.name)
 
     --Check if the talent addon is up
@@ -730,7 +730,7 @@ end
 
 -- TODO: Maybe use the profile data in one go ?
 --- Check if a talent profileID is currently equiped
---- @param profileID number|string The Profile ID 
+--- @param profileID number|string The Profile ID
 --- @param checkGear boolean If we should check if the right gear set is equiped to mark the talent set as used
 --- @return boolean If the profile is currently equiped
 function SwitchSwitch:IsCurrentTalentProfile(profileID, checkGear)

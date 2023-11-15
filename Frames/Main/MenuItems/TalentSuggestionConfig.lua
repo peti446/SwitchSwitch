@@ -211,34 +211,39 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
 
     -- Sort the week data so that it always appers in same order as ID are all over the palce
     local mythicPlusWeekData = SwitchSwitch.MythicPlusAffixes[season] or {}
+
+    local function BuildMythicPlusTitle(week, affix1, affix2, affix3)
+        return L["Week"] .. " " .. tostring(week) .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix2))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix3))   ..")";
+    end
+
     local currentSeasonData = {}
-    for compressedID, label in pairs(mythicPlusWeekData) do
-        currentSeasonData[tonumber(select(1,string.match( label,L["Week"] .. " (%d+) %(.+")))] = {compressedID,label}
+    for week, mythicPlusHash in pairs(mythicPlusWeekData) do
+        table.insert(currentSeasonData, {mythicPlusHash, BuildMythicPlusTitle(week, SwitchSwitch:decodeMythicPlusAffixesID(mythicPlusHash))})
     end
 
     --Render dropboxes
     local currentWeekAfixHash = SwitchSwitch:GetCurrentMythicPlusAfixHash()
-    for i, packedData in pairs(currentSeasonData) do
-        local compressedID, label = unpack(packedData)
+    for _, packedData in pairs(currentSeasonData) do
+        local mythicPlusHash, label = unpack(packedData)
         local dropDown = AceGUI:Create("Dropdown")
         local labelText = label;
-        if(compressedID == currentWeekAfixHash) then
+        if(mythicPlusHash == currentWeekAfixHash) then
             labelText = "|cFF00FF00" .. label .. "|r"
         end
         dropDown:SetLabel(labelText)
         dropDown:SetUserData("InstanceIDs", instancesIDs)
-        dropDown:SetUserData("MythicAffixHash", compressedID)
+        dropDown:SetUserData("MythicAffixHash", mythicPlusHash)
         dropDown:SetUserData("MythicSeasonID", season)
         dropDown.alignoffset = 25
         dropDown:SetList(validProfilesList)
         local setValue = nil
         for _, id in ipairs(instancesIDs) do
             local savedSuggestions = SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(id, season, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
-            if(savedSuggestions[compressedID] ~= nil) then
+            if(savedSuggestions[mythicPlusHash] ~= nil) then
                 if(setValue == nil) then
-                    setValue = savedSuggestions[compressedID]
+                    setValue = savedSuggestions[mythicPlusHash]
                 else
-                    if(setValue ~= savedSuggestions[compressedID]) then
+                    if(setValue ~= savedSuggestions[mythicPlusHash]) then
                         setValue = "Multiple"
                         break;
                     end
