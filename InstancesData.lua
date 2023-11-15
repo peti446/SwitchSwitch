@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L = unpack(select(2, ...))
 
 local function BuildMythicPlusTitle(week, affix1, affix2, affix3)
     return L["Week"] .. " " .. tostring(week) .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix2))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix3))   ..")";
@@ -29,7 +29,7 @@ SwitchSwitch.DificultyStrings =
     [1] = L["Normal"],
     [2] = L["Heroic"],
     [23] = L["Mythic"],
-    -- Raid 
+    -- Raid
     [14] = L["Normal"],
     [15] = L["Heroic"],
     [16] = L["Mythic"],
@@ -174,7 +174,7 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
                     ["zoneID"] = 2166,
                     ["jurnalIndex"] = 1,
                     ["encounterID"] = 2522,
-                    ["otherBossIDs"] = {} 
+                    ["otherBossIDs"] = {}
                 },
                 [201774] = { -- Amalgamation Chamber
                     ["requieres"] = {201261},
@@ -188,7 +188,7 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
                     ["zoneID"] = 2166,
                     ["jurnalIndex"] = 3,
                     ["encounterID"] = 2530,
-                    ["otherBossIDs"] = {} 
+                    ["otherBossIDs"] = {}
                 },
                 [199659] = { -- Zaqali Assault
                     ["requieres"] = {201261},
@@ -238,68 +238,68 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
             ["instanceID"] = 2549,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {
-                [1] = { -- Gnarlroot
+                [209333] = { -- Gnarlroot
                     ["requieres"] = {},
                     ["zoneID"] = 2232,
                     ["jurnalIndex"] = 1,
-                    ["encounterID"] = 2820,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2564,
+                    ["otherBossIDs"] = {}
                 },
-                [206689] = { -- Igira
+                [200926] = { -- Igira
                     ["requieres"] = {},
                     ["zoneID"] = 2232,
                     ["jurnalIndex"] = 2,
-                    ["encounterID"] = 2709,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2554,
+                    ["otherBossIDs"] = {}
                 },
-                [1] = { -- Volcoross
+                [208478] = { -- Volcoross
                     ["requieres"] = {},
                     ["zoneID"] = 2244,
                     ["jurnalIndex"] = 3,
-                    ["encounterID"] = 2737,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2557,
+                    ["otherBossIDs"] = {}
                 },
-                [1] = { -- Council of Dreams
+                [208363] = { -- Council of Dreams
                     ["requieres"] = {},
                     ["zoneID"] = 2240,
                     ["jurnalIndex"] = 4,
-                    ["encounterID"] = 2728,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2555,
+                    ["otherBossIDs"] = {208365, 213390}
                 },
-                [205136] = { -- Larodar
+                [208445] = { -- Larodar
                     ["requieres"] = {},
                     ["zoneID"] = 2244,
                     ["jurnalIndex"] = 5,
-                    ["encounterID"] = 2731,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2553,
+                    ["otherBossIDs"] = {}
                 },
-                [1] = { -- Nymue
+                [206172] = { -- Nymue
                     ["requieres"] = {},
                     ["zoneID"] = 2240,
                     ["jurnalIndex"] = 6,
-                    ["encounterID"] = 2708,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2556,
+                    ["otherBossIDs"] = {}
                 },
-                [1] = { -- Smolderon
+                [200927] = { -- Smolderon
                     ["requieres"] = {},
                     ["zoneID"] = 2233,
                     ["jurnalIndex"] = 7,
-                    ["encounterID"] = 2824,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2563,
+                    ["otherBossIDs"] = {}
                 },
-                [1] = { -- Tindral Sageswift
+                [209090] = { -- Tindral Sageswift
                     ["requieres"] = {},
                     ["zoneID"] = 2234,
                     ["jurnalIndex"] = 8,
-                    ["encounterID"] = 2786,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2565,
+                    ["otherBossIDs"] = {}
                 },
-                [1] = { -- Fyrakk The Blazing
+                [204931] = { -- Fyrakk The Blazing
                     ["requieres"] = {},
                     ["zoneID"] = 2238,
                     ["jurnalIndex"] = 9,
-                    ["encounterID"] = 2677,
-                    ["otherBossIDs"] = {} 
+                    ["encounterID"] = 2519,
+                    ["otherBossIDs"] = {}
                 },
             },
         }
@@ -308,13 +308,13 @@ SwitchSwitch.InstancesBossData["Dragonflight"] = {
     [2] = {
         [1209] = {
             ["instanceID"] = 2579,
-            ["difficulties"] = {23},  
+            ["difficulties"] = {23},
         },
         [1204] = { -- Halls of Infusion
             ["instanceID"] = 2527,
             ["difficulties"] = {1,2,23},
         },
-        [1203] = { -- The Azure Vault	
+        [1203] = { -- The Azure Vault
             ["instanceID"] = 2515,
             ["difficulties"] = {1,2,23},
         },
