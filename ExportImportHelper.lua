@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L = unpack(select(2, ...))
 local LibDeflate = LibStub("LibDeflate")
 
 function SwitchSwitch:ProfilesToString(profilesList, includePVP)
@@ -62,7 +62,6 @@ function SwitchSwitch:ImportEncodedProfiles(encoded)
         return false
     end
 
-    self:TRAIT_CONFIG_UPDATED(true)
-    self:Print(infoText)
+    SwitchSwitch:RefreshCurrentConfigID()
     return true, infoText
 end

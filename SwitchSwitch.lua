@@ -203,7 +203,7 @@ function SwitchSwitch:GetBlizzardSavedTalentsProfiles()
     local profiles = {}
     for _, configID in pairs(C_ClassTalents.GetConfigIDsBySpecID(self:GetCurrentSpec())) do
         local data = C_Traits.GetConfigInfo(configID);
-        local id, type, name, treeID, usesSharedActionBars = data.id, data.type, data.name, data.treeId, data.usesSharedActionBars;
+        local _id, _type, name, treeID, usesSharedActionBars = data.id, data.type, data.name, data.treeId, data.usesSharedActionBars;
         if(name ~= nil) then
             profiles[configID] = {
                 type =  'blizzard',
@@ -326,7 +326,7 @@ function SwitchSwitch:DeleteProfileData(name, class, spec)
             SwitchSwitch.CurrentActiveTalentsConfigID = SwitchSwitch:ToLower(SwitchSwitch.defaultProfileID)
         end
 
-        self:TRAIT_CONFIG_UPDATED(true)
+        SwitchSwitch:RefreshCurrentConfigID()
         return true
     end
     return false
@@ -362,7 +362,7 @@ function SwitchSwitch:RenameProfile(name, newName, class, spec)
         -- Need to delete after as it will delete the suggestion entries
         self:DeleteProfileData(name, class, spec)
 
-        self:TRAIT_CONFIG_UPDATED(true)
+        SwitchSwitch:RefreshCurrentConfigID()
         return true
     end
 
@@ -534,7 +534,7 @@ function SwitchSwitch:GetSelectedLoadoutConfigID()
 --    return selectionID;
 end
 
-function GetCurrentTalentsInfoList()
+local function GetCurrentTalentsInfoList()
     local list = {}
 
     local configID = C_ClassTalents.GetActiveConfigID()
@@ -580,7 +580,7 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
         --Iterate trought the 2 columnds
         for Column = 1, 3 do
             --Get talent info
-            local talentID, name, texture, selected, available = GetTalentInfo(Tier, Column, GetActiveSpecGroup())
+            local talentID, _name, _texture, selected, _available = GetTalentInfo(Tier, Column, GetActiveSpecGroup())
             --If the talent is selected store the nececary information
             if(selected) then
                 talentSet["pva"][Tier]["id"] = talentID
@@ -597,12 +597,14 @@ function SwitchSwitch:GetCurrentTalents(saveTalentsPVP)
         --Iterate over pvp talents
         for Tier = 1, 3 do
             local pvpTalentInfo = C_SpecializationInfo.GetPvpTalentSlotInfo(Tier)
-            talentSet["pvp"][Tier] =
-            {
-                ["unlocked"] = pvpTalentInfo.enabled,
-                ["id"] = pvpTalentInfo.selectedTalentID,
-                ["tier"] = Tier
-            }
+            if(pvpTalentInfo ~= nil) then
+                talentSet["pvp"][Tier] =
+                {
+                    ["unlocked"] = pvpTalentInfo.enabled,
+                    ["id"] = pvpTalentInfo.selectedTalentID,
+                    ["tier"] = Tier
+                }
+            end
         end
     end
 
@@ -656,8 +658,8 @@ function SwitchSwitch:LearnTalents(profileID)
     SwitchSwitch:Print(L["Changing talents"] .. ": " .. profileData.name)
 
     --Check if the talent addon is up
-    if(not IsAddOnLoaded("Blizzard_ClassTalentUI")) then
-        LoadAddOn("Blizzard_ClassTalentUI")
+    if(not C_AddOns.IsAddOnLoaded("Blizzard_ClassTalentUI")) then
+        C_AddOns.LoadAddOn("Blizzard_ClassTalentUI")
     end
 
     if(not SwitchSwitch:DoesProfileExits(profileID)) then
@@ -669,16 +671,17 @@ function SwitchSwitch:LearnTalents(profileID)
         -- When result is 2 any other requried change need to happen after TRAIT_CONFIG_UPDATED or CONFIG_COMMIT_FAILED
         local result, changeError, _ = C_ClassTalents.LoadConfig(profileID, true)
         SwitchSwitch:DebugPrint("Result: " .. tostring(result) .. " Error: " .. tostring(changeError))
-        if(result == Enum.LoadConfigResult.Error) then
+        if(result == 0) then
             return
-        elseif(result == Enum.LoadConfigResult.NoChangeNecessary) then
+        elseif(result == 1) then
             SwitchSwitch:DebugPrint("No change necessary")
             return
-        elseif(result == Enum.LoadConfigResult.LoadInProgress) then
+        elseif(result == 2) then
             SwitchSwitch.TalentsUpdate.UpdatePending = true
             SwitchSwitch.TalentsUpdate.PendingProfileID = profileID
         end
     else
+        self:DebugPrint("Chromie is that you? AGAIN!?!?!?!")
         --Learn talents normal talents
         --if(profileData.pva ~= nil) then
         --    for i, talentTbl in ipairs(profileData.pva) do
@@ -697,6 +700,7 @@ function SwitchSwitch:LearnTalents(profileID)
 
     -- SoonTM
     if(profileData.pvp ~= nil) then
+        self:DebugPrint("PvP Talents Not Supported Yet. How did you save them?")
         --Leanr pvp talent
         --for i, pvpTalentTabl in ipairs(profileData.pvp) do
         --    if(pvpTalentTabl.unlocked and pvpTalentTabl.id ~= nil) then
@@ -717,7 +721,7 @@ function SwitchSwitch:LearnTalents(profileID)
     -- Gear set
     if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileID] ~= nil) then
         local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileID])
-        local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+        local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
         if(name ~= nil and not isEquipped) then
             C_EquipmentSet.UseEquipmentSet(itemSetID)
         end
@@ -740,7 +744,6 @@ function SwitchSwitch:IsCurrentTalentProfile(profileID, checkGear)
         return false
     end
 
-    local currentActiveTalents = SwitchSwitch:GetCurrentTalents()
     local currentprofile = SwitchSwitch:GetProfileData(profileID)
     if(currentprofile == nil) then
         return false
@@ -757,6 +760,7 @@ function SwitchSwitch:IsCurrentTalentProfile(profileID, checkGear)
         end
     elseif(currentprofile.type == "custom") then
         -- TODO: Add for custom Talents
+        self:DebugPrint("How did we manage to get here? Custom talents are not available yet, Chromie is that you??")
         --if(currentprofile.pva ~= nil) then
         --    --Check normal talents
         --    for i, talentInfo in ipairs(currentprofile.pva) do
@@ -791,9 +795,9 @@ function SwitchSwitch:IsCurrentTalentProfile(profileID, checkGear)
 
     if(checkGear) then
         -- Gear set
-        if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileName] ~= nil) then
-            local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileName])
-            local name, iconFileID, setID, isEquipped, numItems, numEquipped, numInInventory, numLost, numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+        if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileID] ~= nil) then
+            local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileID])
+            local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
             if(name ~= nil and not isEquipped) then
                 return false
             end

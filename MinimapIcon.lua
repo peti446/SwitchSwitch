@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L =unpack(select(2, ...))
 
 local LDBSwitchSwitch = LibStub("LibDataBroker-1.1"):NewDataObject("SwitchSwitchIcon", {
     type = "data source",
@@ -12,7 +12,7 @@ local MenuFrame = nil
 
 function LDBSwitchSwitch:OnTooltipShow()
     local tooltip = self
-    tooltip:AddLine("Switch Switch " .. GetAddOnMetadata("SwitchSwitch", "Version"))
+    tooltip:AddLine("Switch Switch " .. C_AddOns.GetAddOnMetadata("SwitchSwitch", "Version"))
     tooltip:AddLine(" ")
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Left Click"], NORMAL_FONT_COLOR_CODE, L["Show config panel"]))
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Right Click"], NORMAL_FONT_COLOR_CODE, L["Quick talents profile change"]))
@@ -42,7 +42,7 @@ function LDBSwitchSwitch:OnClick(button, down)
                 local info = UIDropDownMenu_CreateInfo()
                 info.text = data.name
                 info.arg1 = id
-                info.checked = naidme == SwitchSwitch.CurrentActiveTalentsConfigID
+                info.checked = id == SwitchSwitch.CurrentActiveTalentsConfigID
                 info.func = function(self, id) SwitchSwitch:ActivateTalentProfile(id) end
                 UIDropDownMenu_AddButton(info, level)
             end

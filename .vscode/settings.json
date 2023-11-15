@@ -28,7 +28,8 @@
         "TooltipUtil",
         "GetAddOnMetadata",
         "Talents",
-        "RunNextFrame"
+        "RunNextFrame",
+        "split"
     ],
     "Lua.diagnostics.disable": [
         "deprecated"

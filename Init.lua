@@ -1,7 +1,7 @@
 --############################################
 -- Namespace
 --############################################
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch = unpack(select(2, ...))
 
 --##########################################################################################################################
 --                                  Default configurations
@@ -84,8 +84,8 @@ function SwitchSwitch:OnEnable()
     SwitchSwitch:InitMinimapIcon()
 
     --Load the UI if not currently loaded
-    if(not IsAddOnLoaded("Blizzard_ClassTalentUI")) then
-        LoadAddOn("Blizzard_ClassTalentUI")
+    if(not C_AddOns.IsAddOnLoaded("Blizzard_ClassTalentUI")) then
+        C_AddOns.LoadAddOn("Blizzard_ClassTalentUI")
     end
 
     -- Enable Boss detection and register instances
@@ -120,7 +120,7 @@ function SwitchSwitch:OnEnable()
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("arena", data["all"] ~= nil)
 
     -- Lets refresh all the UIS
-    self:TRAIT_CONFIG_UPDATED(true)
+    SwitchSwitch:RefreshCurrentConfigID()
 end
 
 function SwitchSwitch:OnDisable()

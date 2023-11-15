@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, _, AceGUI = unpack(select(2, ...))
 local AuthorList = "|cffff7d0aGeloch-Sanguino(EU)|r"
 local FrameName = "SwitchSwitchFrame"
 local frame, menuContainer, tabContainer, UISpecialFramesCurrentID, LastFramePosition
@@ -23,7 +23,7 @@ function SwitchSwitch:RegisterMenuEntry(menuName)
     return entry
 end
 
-local function OnMainFrameClosed(frame)
+local function OnMainFrameClosed(_)
     if UISpecialFrames[UISpecialFramesCurrentID] == FrameName then
         tremove(UISpecialFrames, UISpecialFramesCurrentID)
     end
@@ -81,7 +81,7 @@ function SwitchSwitch:GetMainFrame()
 
     --Start setup
     frame:SetTitle("SwitchSwitch")
-    frame:SetStatusText("Created by: " .. AuthorList .. " Version: " .. GetAddOnMetadata("SwitchSwitch", "Version"):sub(2))
+    frame:SetStatusText("Created by: " .. AuthorList .. " Version: " .. C_AddOns.GetAddOnMetadata("SwitchSwitch", "Version"):sub(2))
     frame:SetLayout("Flow")
     frame:SetCallback("OnClose", OnMainFrameClosed)
     frame:SetHeight(600)

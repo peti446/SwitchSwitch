@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
 local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Export"])
 local ProfilesDropDown
 
@@ -8,7 +8,7 @@ local function ExportButtonClicked(button)
     local exportPVPTalents = button:GetUserData("PVPCheckBox"):GetValue()
 
     local profileList = {}
-    for i, widget in dropdown.pullout:IterateItems() do
+    for _, widget in dropdown.pullout:IterateItems() do
         if widget.type == "Dropdown-Item-Toggle" then
             if widget:GetValue() then
                 table.insert( profileList, widget.userdata.value )

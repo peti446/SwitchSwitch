@@ -1,7 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
-
--- Private variables
-local LastInstanceID = -1
+local SwitchSwitch = unpack(select(2, ...))
 
 function SwitchSwitch:ADDON_LOADED(event, arg1)
     if(arg1 == "Blizzard_ClassTalentUI") then
@@ -12,8 +9,8 @@ function SwitchSwitch:ADDON_LOADED(event, arg1)
 end
 
 function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
-    if(not IsAddOnLoaded("Blizzard_ClassTalentUI")) then
-        LoadAddOn("Blizzard_ClassTalentUI")
+    if(not C_AddOns.IsAddOnLoaded("Blizzard_ClassTalentUI")) then
+        C_AddOns.LoadAddOn("Blizzard_ClassTalentUI")
         return
     end
 
@@ -34,7 +31,7 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
     local spec = GetActiveSpecGroup()
     for row=1,MAX_TALENT_TIERS do
         SwitchSwitch.TalentsData[playerSpec][row] = {}
-        local tierAvailable, selectedTalent, tierUnlockLevel = GetTalentTierInfo(row, spec)
+        local _tierAvailable, _selectedTalent, tierUnlockLevel = GetTalentTierInfo(row, spec)
 
         SwitchSwitch.TalentsData[playerSpec][row]["requiredLevel"] = tierUnlockLevel
         SwitchSwitch.TalentsData[playerSpec][row]["data"] = {}
@@ -51,18 +48,18 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
     end
 
     --Update all the UI that is dependend on spec
-    self:TRAIT_CONFIG_UPDATED(true)
+    SwitchSwitch:RefreshCurrentConfigID()
 end
 
 -- When true is passed in we will only update the current active profile,
 -- other wise do full update if the player is changing talents or the talbe is null (manually called)
-function SwitchSwitch:TRAIT_CONFIG_UPDATED(units, configID)
-    if configID ~= C_ClassTalents.GetActiveConfigID() then return; end
+function SwitchSwitch:TRAIT_CONFIG_UPDATED(configID)
+    if (configID ~= C_ClassTalents.GetActiveConfigID()) then return; end
     SwitchSwitch:DebugPrint("TRAIT_CONFIG_UPDATED Triggered Updating next frame")
 
     if(SwitchSwitch.TalentsUpdate.UpdatePending == true) then
         local pendingProfileID = SwitchSwitch.TalentsUpdate.PendingProfileID
-        RunNextFrame(function() 
+        RunNextFrame(function()
             SwitchSwitch.TalentsUpdate.UpdatePending = false
             SwitchSwitch.TalentsUpdate.PendingProfileID = nil
 
@@ -83,7 +80,7 @@ function SwitchSwitch:TRAIT_CONFIG_UPDATED(units, configID)
             SwitchSwitch:RefreshCurrentConfigID()
         end)
     else
-        RunNextFrame(function() 
+        RunNextFrame(function()
             SwitchSwitch:RefreshCurrentConfigID()
         end)
     end

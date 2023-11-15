@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
 local TalentsSuggestionPage = SwitchSwitch:RegisterMenuEntry(L["Talents Suggestion"])
 local treeGroup, CurrentSelectedPath
 
@@ -54,11 +54,10 @@ local function OnDropDownGroupSelected(frame, _, group)
     local DifficultyID = frame:GetUserData("DifficultyID")
     local npcID = frame:GetUserData("npcID")
     local mythicplusID = frame:GetUserData("mythicID")
-    local Expansion = frame:GetUserData("Expansion")
-    local ContentType = frame:GetUserData("ContentType")
-    local JurnalInstanceID = frame:GetUserData("JurnalInstanceID")
+    --local Expansion = frame:GetUserData("Expansion")
+    --local ContentType = frame:GetUserData("ContentType")
+    --local JurnalInstanceID = frame:GetUserData("JurnalInstanceID")
     local savedSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(InstanceID)
-    local bossRegisterData = SwitchSwitch.InstancesBossData[Expansion][ContentType][JurnalInstanceID]["bossData"]
 
     -- If group is settet to none we consider it as nill
     if(group == "None") then
@@ -264,8 +263,8 @@ end
 local function OnGroupSelected(frame, _, group)
     local Expansion, ContentType, JurnalInstanceID = ("\001"):split(group)
     CurrentSelectedPath = group
-    if(not IsAddOnLoaded("Blizzard_EncounterJournal")) then
-        LoadAddOn("Blizzard_EncounterJournal")
+    if(not C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal")) then
+        C_AddOns.LoadAddOn("Blizzard_EncounterJournal")
     end
 
     -- Reset the frame as we are now in a new instance
@@ -413,8 +412,8 @@ local function OnGroupSelected(frame, _, group)
 end
 
 local function GetInstanceNameByID(ID, isRaid)
-    if(not IsAddOnLoaded("Blizzard_EncounterJournal")) then
-        LoadAddOn("Blizzard_EncounterJournal")
+    if(not C_AddOns.IsAddOnLoaded("Blizzard_EncounterJournal")) then
+        C_AddOns.LoadAddOn("Blizzard_EncounterJournal")
     end
 
     for tier = 1, EJ_GetNumTiers() do

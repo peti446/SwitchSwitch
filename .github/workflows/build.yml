@@ -6,24 +6,28 @@ jobs:
     Lint-Project:
       runs-on: ubuntu-latest
       steps:
+       - name: "Update Image"
+         if: ${{ env.ACT }}
+         run: |
+            sudo apt update
        - uses: actions/checkout@v4
          with:
            fetch-depth: 50
        - name: Lint lua files
          uses: nebularg/actions-luacheck@v1.1.2
          with:
-           config: https://raw.githubusercontent.com/peti446/wow-luacheckrc/mainline/.luacheckrc
            args: "--no-color -q --no-self"
            annotate: warning
        - name: Create alpha package
          uses: BigWigsMods/packager@master
+         with:
+            args: -d -z
        - name: Upload alpha package to artifacts
          uses: actions/upload-artifact@v3
          with:
            name: SwitchSwitch.zip
            path: |
              .release/*
-             !.release/*.zip
        - name: Remove old artifacts
          uses: c-hive/gha-remove-artifacts@v1
          with:

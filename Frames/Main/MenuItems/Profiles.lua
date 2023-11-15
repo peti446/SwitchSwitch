@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
 local ProfilesEditorPage = SwitchSwitch:RegisterMenuEntry(L["Current Profiles"])
 local DropDownGroup
 local CurrentEditSpec

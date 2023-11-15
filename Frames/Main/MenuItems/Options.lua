@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon =unpack(select(2, ...))
+local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
 local OptionsPage = SwitchSwitch:RegisterMenuEntry(L["Options"])
 local scrollFrameParent
 
@@ -23,8 +23,8 @@ function OptionsPage:OnClose()
 end
 
 function OptionsPage:PrintOptions()
-    scrollFrameParent:AddChild(self:CreateHeader(L["General"]));
-    
+    scrollFrameParent:AddChild(self:CreateHeader(L["General"]))
+
     local cbForSlider = self:CreateCheckBox(L["Suggest talent changes based on zone/boss"])
     cbForSlider:SetValue(SwitchSwitch.db.profile.talentsSuggestionFrame.enabled)
     cbForSlider:SetCallback("OnValueChanged", function(self, _, newVal)
@@ -47,7 +47,7 @@ function OptionsPage:PrintOptions()
 
     scrollFrameParent:AddChild(self:CreateHeader(L["Misc"]));
 
-    cb = self:CreateCheckBox(L["Enable minimap button"])
+    local cb = self:CreateCheckBox(L["Enable minimap button"])
     cb:SetValue(not SwitchSwitch.db.profile.minimap.hide)
     cb:SetCallback("OnValueChanged", function(_, _, newVal)
         SwitchSwitch.db.profile.minimap.hide = not newVal

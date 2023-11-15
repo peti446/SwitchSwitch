@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI, LibDBIcon = unpack(select(2, ...))
+local SwitchSwitch = unpack(select(2, ...))
 local BossDetection = SwitchSwitch:NewModule("BossDetection", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0", "AceBucket-3.0")
 local CurrentInstanceData = {}
 local CurrentInstanceBossesDefeated = {}
@@ -15,9 +15,14 @@ local ActiveDetection = {
 }
 local InstancesData = {}
 
+
+local function InternalCallToTooltip(tooltip, data)
+    BossDetection:OnTooltipSetUnit(tooltip, data)
+end
+
 function BossDetection:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, Test)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, InternalCallToTooltip)
 end
 
 function BossDetection:OnDisable()
@@ -100,10 +105,6 @@ function BossDetection:SetDetectionForBossEnabled(BossID, InstanceID, enabled)
     if(next(ActiveDetection.instances[InstanceID]["bossIDs"], nil) == nil and next(ActiveDetection.instances[InstanceID]["difficulites"] or {}, nil) == nil) then
         ActiveDetection.instances[InstanceID] = nil
     end
-end
-
-function Test(tooltip, data)
-    BossDetection:OnTooltipSetUnit(tooltip, data)
 end
 
 function BossDetection:OnTooltipSetUnit(tooltip, data)
@@ -267,7 +268,7 @@ end
 
 function BossDetection:GetInstanceIDFromSavedOutIndex(index)
     local link = GetSavedInstanceChatLink(index) or ""
-    local id, name = link:match(":(%d+):%d+:%d+\124h%[(.+)%]\124h")
+    local id, _name = link:match(":(%d+):%d+:%d+\124h%[(.+)%]\124h")
     if(not id) then
         return 0
     end
