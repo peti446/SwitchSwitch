@@ -670,7 +670,7 @@ function SwitchSwitch:LearnTalents(profileID)
     -- Gear set
     if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileID] ~= nil) then
         local itemSetID = self.db.char.gearSets[self:GetCurrentSpec()][profileID]
-        local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+        local _name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
         if(itemSetID ~= nil  and not isEquipped) then
             C_EquipmentSet.UseEquipmentSet(itemSetID)
         end
