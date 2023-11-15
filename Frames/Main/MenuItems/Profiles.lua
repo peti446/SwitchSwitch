@@ -157,7 +157,7 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
     gearSets["none"] = L["None"]
     for _, id in ipairs(C_EquipmentSet.GetEquipmentSetIDs()) do
         local name = C_EquipmentSet.GetEquipmentSetInfo(id)
-        gearSets[name] = name
+        gearSets[id] = name
     end
     gearSetDropDown:SetList(gearSets)
     gearSetDropDown:SetUserData("ProfileName", group)
@@ -183,7 +183,10 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
             if(id == "none") then
                 id = nil
             end
-            t.talentConfigId = id
+            if(type(SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()]) ~= "table") then
+                SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()] = {}
+            end
+            SwitchSwitch.db.char.gearSets[SwitchSwitch:GetCurrentSpec()][self:GetUserData("ProfileName")] = id
         end
     end)
 end

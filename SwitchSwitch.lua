@@ -666,6 +666,16 @@ function SwitchSwitch:LearnTalents(profileID)
         return
     end
 
+    -- TODO: Move this to after the talents are changed using a globla variable to set the callback
+    -- Gear set
+    if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileID] ~= nil) then
+        local itemSetID = self.db.char.gearSets[self:GetCurrentSpec()][profileID]
+        local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+        if(itemSetID ~= nil  and not isEquipped) then
+            C_EquipmentSet.UseEquipmentSet(itemSetID)
+        end
+    end
+
     if(profileData.type == "blizzard") then
         -- Result can be 0 - Error, 1 - NoChangeNecesary, 2 - LoadInProgress, 3 - Finished
         -- When result is 2 any other requried change need to happen after TRAIT_CONFIG_UPDATED or CONFIG_COMMIT_FAILED
@@ -716,15 +726,6 @@ function SwitchSwitch:LearnTalents(profileID)
         --        LearnPvpTalent(pvpTalentTabl.id, pvpTalentTabl.tier)
         --    end
         --end
-    end
-
-    -- Gear set
-    if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileID] ~= nil) then
-        local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileID])
-        local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
-        if(name ~= nil and not isEquipped) then
-            C_EquipmentSet.UseEquipmentSet(itemSetID)
-        end
     end
 
     --Print and return
@@ -796,8 +797,7 @@ function SwitchSwitch:IsCurrentTalentProfile(profileID, checkGear)
     if(checkGear) then
         -- Gear set
         if(type(self.db.char.gearSets[self:GetCurrentSpec()]) == "table" and self.db.char.gearSets[self:GetCurrentSpec()][profileID] ~= nil) then
-            local itemSetID = C_EquipmentSet.GetEquipmentSetID(self.db.char.gearSets[self:GetCurrentSpec()][profileID])
-            local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(itemSetID)
+            local name, _iconFileID, _setID, isEquipped, _numItems, _numEquipped, _numInInventory, _numLost, _numIgnored = C_EquipmentSet.GetEquipmentSetInfo(self.db.char.gearSets[self:GetCurrentSpec()][profileID])
             if(name ~= nil and not isEquipped) then
                 return false
             end
