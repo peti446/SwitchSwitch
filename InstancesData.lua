@@ -45,7 +45,16 @@ SwitchSwitch.MythicPlusAffixes = {
     -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
     -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
     [11] = {
-        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 136, 8)
+        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 136, 8),
+        [2] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 134, 11),
+        [3] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 3, 123),
+        [4] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 124, 2),
+        [5] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 134, 7),
+        [6] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 136, 123),
+        [7] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 135, 2),
+        [8] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 3, 8),
+        [9] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 124, 11),
+        [10] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 135, 7),
     },
     -- Missed all the other seasons as I stopped updating the addon Feel free to add them
     -- Sesason 3 Shadowlands

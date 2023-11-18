@@ -197,17 +197,6 @@ local function DrawBossesSection(frame, expansion, contentType, jurnalInstanceID
 end
 
 local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesList)
-
-    --local instanceData = SwitchSwitch.My[expansion][contentType][jurnalInstanceID]
-    --local savedProfileSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData["instanceID"])
-
-    -- Render header
-    frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
-    local label = AceGUI:Create("Label")
-    label:SetFullWidth(true)
-    label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
-    frame:AddChild(label)
-
     -- Sort the week data so that it always appers in same order as ID are all over the palce
     local mythicPlusWeekData = SwitchSwitch.MythicPlusAffixes[season] or {}
 
@@ -217,12 +206,12 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
 
     local currentSeasonData = {}
     for week, mythicPlusHash in pairs(mythicPlusWeekData) do
-        table.insert(currentSeasonData, {mythicPlusHash, BuildMythicPlusTitle(week, SwitchSwitch:decodeMythicPlusAffixesID(mythicPlusHash))})
+        currentSeasonData[week] =  {mythicPlusHash, BuildMythicPlusTitle(week, SwitchSwitch:decodeMythicPlusAffixesID(mythicPlusHash))};
     end
 
     --Render dropboxes
     local currentWeekAfixHash = SwitchSwitch:GetCurrentMythicPlusAfixHash()
-    for _, packedData in pairs(currentSeasonData) do
+    for _, packedData in ipairs(currentSeasonData) do
         local mythicPlusHash, label = unpack(packedData)
         local dropDown = AceGUI:Create("Dropdown")
         local labelText = label;
@@ -292,17 +281,35 @@ local function OnGroupSelected(frame, _, group)
     end
 
     if(Expansion == "Mythic+") then
+
         local currentMythicPlusSeasonID = SwitchSwitch:GetMythicPlusSeason()
         if(ContentType ~= nil) then
+            -- Render header
+            scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["Per Mythic+ Week profiles"]))
+            local label = AceGUI:Create("Label")
+            label:SetFullWidth(true)
+            label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"]
+             .. ".\n"
+             .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
+            scroll:AddChild(label)
             -- Draw dungoen specific sections
             DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, {ContentType}, validProfilesList)
         else
-            -- Draw Overall Mytic+ section
-            frame:AddChild(TalentsSuggestionPage:CreateHeader(L["Profiles per Mythic+ Week"]))
+            -- Render header
+            scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["Global Mythic+ profiles per Week"]))
             local label = AceGUI:Create("Label")
             label:SetFullWidth(true)
-            label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"].. ".\n" .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
-            frame:AddChild(label)
+            label:SetText(L["Allows to suggest a talent profile based on the current weeks affixes when entering a instance in mythic difficulty (before starting the key)"]
+             .. ".\n"
+             .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
+             scroll:AddChild(label)
+
+            label = AceGUI:Create("Label")
+            label:SetFullWidth(true)
+            label:SetText("|cffff0000" .. L["Changes here will overwrite all specific data set in any specific mythic+"] .. "|r")
+            scroll:AddChild(label)
+
+            -- Draw Overall Mytic+ section
             DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, SwitchSwitch.MythicPlusDungeons[currentMythicPlusSeasonID], validProfilesList)
         end
     elseif(Expansion == "PVP") then
