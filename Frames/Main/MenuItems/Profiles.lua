@@ -7,7 +7,8 @@ function ProfilesEditorPage:OnOpen(parent)
     SwitchSwitch:DebugPrint("Selected Profiles tab")
     CurrentEditSpec = SwitchSwitch:GetCurrentSpec()
 
-    local newButton = AceGUI:Create("Button")
+    -- TODO: Disabled for beta!
+    --[[local newButton = AceGUI:Create("Button")
     newButton:SetText(L["New Profile"])
     newButton:SetCallback("OnClick", function(self)
         local dialog = StaticPopup_Show("SwitchSwitch_NewTalentProfilePopUp")
@@ -18,7 +19,7 @@ function ProfilesEditorPage:OnOpen(parent)
             }
         end
     end)
-    parent:AddChild(newButton)
+    parent:AddChild(newButton)]]--
 
     DropDownGroup = AceGUI:Create("DropdownGroup")
     DropDownGroup:SetFullWidth(true)

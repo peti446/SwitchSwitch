@@ -1,5 +1,8 @@
 local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
-local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Export"])
+-- TODO: Disabled for beta!
+--local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Export"])
+local MenuEntry = {}
+
 local ProfilesDropDown
 
 local function ExportButtonClicked(button)

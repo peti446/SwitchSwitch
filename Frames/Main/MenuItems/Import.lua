@@ -1,5 +1,7 @@
 local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
-local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Import"])
+-- TODO: Disabled for beta!
+--local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Import"])
+local MenuEntry = {}
 
 function MenuEntry:OnOpen(parent)
     SwitchSwitch:DebugPrint("Selected Import tab")
