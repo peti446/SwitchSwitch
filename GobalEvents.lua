@@ -57,36 +57,42 @@ end
 
 
 function SwitchSwitch:SWITCHSWITCH_INSTANCE_TYPE_DETECTED(event_name, contentType)
-    if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= nil) then
-        if(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"] ~= self.CurrentActiveTalentsConfigID) then
-            self:ToggleSuggestionFrame(SwitchSwitch:GetProfilesSuggestionInstanceData(contentType)["all"])
-        end
+    local allSuggestionsForInstance = self:GetProfilesSuggestionInstanceData(contentType)
+    local suggestedProfileId = nil
+    if(allSuggestionsForInstance ~= nil) then
+        suggestedProfileId = allSuggestionsForInstance["all"]
+    end
+
+    if(suggestedProfileId ~= nil and suggestedProfileId ~= self.CurrentActiveTalentsConfigID) then
+        self:ToggleSuggestionFrame(suggestedProfileId)
     end
 end
 
 
 function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficultyID, npcID)
     local allSuggestionsForInstance = self:GetProfilesSuggestionInstanceData(instanceID)
-    local suggestedProfileName = nil
+    local suggestedProfileId = nil
     if(npcID ~= nil) then
         -- We are in npc zone or mousovered it
         if(allSuggestionsForInstance["bosses"] ~= nil) then
-            suggestedProfileName = allSuggestionsForInstance["bosses"][npcID]
+            suggestedProfileId = allSuggestionsForInstance["bosses"][npcID]
         end
     else
         -- We entered an instance !!
         if(allSuggestionsForInstance["difficulties"] ~= nil) then
-            suggestedProfileName = allSuggestionsForInstance["difficulties"][difficultyID]
+            suggestedProfileId = allSuggestionsForInstance["difficulties"][difficultyID]
         end
+
         -- If we are in mythic/mythic+ we want to see the week specific data
-        if(difficultyID == self.PreMythicPlusDificulty and allSuggestionsForInstance["mythic+"] ~= nil and allSuggestionsForInstance["mythic+"][self:GetCurrentMythicPlusAfixHash()] ~= nil) then
-            suggestedProfileName = allSuggestionsForInstance["mythic+"][self:GetCurrentMythicPlusAfixHash()]
+        local mythicPlusProfileId = self:GetMythicPlusProfileSuggestion(instanceID)
+        if(difficultyID == self.PreMythicPlusDificulty and mythicPlusProfileId ~= nil) then
+            suggestedProfileId = mythicPlusProfileId
         end
     end
 
-    if(suggestedProfileName ~= nil) then
-        if(suggestedProfileName ~= self.CurrentActiveTalentsConfigID) then
-            self:ToggleSuggestionFrame(suggestedProfileName)
+    if(suggestedProfileId ~= nil) then
+        if(suggestedProfileId ~= self.CurrentActiveTalentsConfigID) then
+            self:ToggleSuggestionFrame(suggestedProfileId)
         end
     end
 end

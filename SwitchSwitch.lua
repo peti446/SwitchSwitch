@@ -185,15 +185,27 @@ function SwitchSwitch:ToLower(k)
     return k;
 end
 
+--- Makes sure a table path object exists and creates it if it does not
+---@param t table
+---@param ... any
+function SwitchSwitch:EnsureTablePath(t, ...)
+    local currentTable = t
+    for i = 1,select("#", ...) do
+        local key = select(i, ...)
+        currentTable[key] = currentTable[key] or {}
+        currentTable = currentTable[key]
+    end
+
+    return currentTable
+end
+
 -------------------------------------------------------------------- Talent table edition
 
 function SwitchSwitch:GetCustomProfilesTable(class, spec)
     local profileTable = {}
     if(spec ~= nil and class ~= nil) then
         -- Update the data
-        self.db.global.TalentProfiles[class] = self.db.global.TalentProfiles[class] or {}
-        self.db.global.TalentProfiles[class][spec] = self.db.global.TalentProfiles[class][spec] or {}
-        profileTable = self.db.global.TalentProfiles[class][spec]
+        profileTable = SwitchSwitch:EnsureTablePath( self.db.global.TalentProfiles, class, spec);
     end
 
     return profileTable
@@ -371,81 +383,92 @@ end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-function SwitchSwitch:DoesClassProfilesSuggestionTableExits(class)
-    if(class == nil) then
-        return false
-    end
-
-    if(self.db.global.TalentSuggestions[class] == nil) then
-        return false
-    end
-
-    return true
-end
-
-function SwitchSwitch:DoesSpecProfilesSuggestionTableExits(class, spec)
-    if(not self:DoesClassProfilesSuggestionTableExits(class)) then
-        return false
-    end
-
-    if(spec == nil) then
-        return false
-    end
-
-    if(self.db.global.TalentSuggestions[class][spec] == nil) then
-        return false
-    end
-
-    return true
-end
-
+-- TODO: Make Private!
 function SwitchSwitch:GetProfilesSuggestionTable(class, spec)
     local profileTable = {}
     class = class or self:GetPlayerClass()
     spec = spec or self:GetCurrentSpec()
 
     if(spec ~= nil and class ~= nil) then
-        if(not self:DoesClassProfilesSuggestionTableExits(class)) then
-            self.db.global.TalentSuggestions[class] = {}
-        end
-
-        if(not self:DoesSpecProfilesSuggestionTableExits(class, spec)) then
-            self.db.global.TalentSuggestions[class][spec] = {}
-        end
-
-        profileTable = self.db.global.TalentSuggestions[class][spec]
+        profileTable = SwitchSwitch:EnsureTablePath(self.db.global.TalentSuggestions, class, spec)
     end
 
     return profileTable
 end
 
-function SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(instanceID, season, class, spec)
+--- Gets all mythic+ profiles for a specific instance for a specific season, season, class and spec can be left null to use current config
+---@param instanceID number
+---@param season number | nil
+---@param class number | nil
+---@param spec number | nil
+---@return table | nil
+function SwitchSwitch:GetProfilesSuggestionMythicPlusInstance(instanceID, season, class, spec)
     spec = spec or self:GetCurrentSpec()
     class = class or self:GetPlayerClass()
+    season = season or self:GetCurrentMythicPlusSeason()
+
     local t = self:GetProfilesSuggestionTable(class, spec)
     if(t["mythic+"] == nil) then
-        t["mythic+"] = {}
+       return nil
     end
     if(t["mythic+"][season] == nil) then
-        t["mythic+"][season] = {}
+        return nil;
     end
     if(t["mythic+"][season][instanceID] == nil) then
-        t["mythic+"][season][instanceID] = {}
+       return {}
     end
 
-    return t["mythic+"][season][instanceID];
+    return self:deepcopy(t["mythic+"][season][instanceID]);
 end
 
+--- Gets the profile suggestion for a mythic plus for a specific instance and affix combination, affix, season, class and spec can be left null to use current config
+---@param instanceID number
+---@param affixHash number | nil
+---@param season number | nil
+---@param class number | nil
+---@param spec number | nil
+---@return table | nil
+function SwitchSwitch:GetMythicPlusProfileSuggestion(instanceID, affixHash, season, class, spec)
+    local t = self:GetProfilesSuggestionMythicPlusInstance(instanceID, season, class, spec) or {}
+    return t[affixHash]
+end
+
+
+--- Gets the profile suggestion for a mythic plus for a specific instance and affix combination, affix, season, class and spec can be left null to use current config
+---@param instanceID number
+---@param affixHash number | nil
+---@param season number | nil
+---@param class number | nil
+---@param spec number | nil
+---@return table | nil
+function SwitchSwitch:SetMythicPlusProfileSuggestion(instanceID, profileID, affixHash, season, class, spec)
+    local t = self:GetProfilesSuggestionTable(class, spec)
+    season = season or self:GetCurrentMythicPlusSeason()
+    affixHash = affixHash or self:GetCurrentMythicPlusAfixHash()
+
+    local createdObject = SwitchSwitch:EnsureTablePath(t, "mythic+", season, instanceID)
+    createdObject[affixHash] = profileID
+end
+
+--- Gets the profile sugestion for specific instance ID, returns a copy so you need to modify it via the set command
+---@param instanceID any The isntance ID
+---@param class any The class id, if null current class is used
+---@param spec any The class Spec, if null current spec is used
+---@return table | nil
 function SwitchSwitch:GetProfilesSuggestionInstanceData(instanceID, class, spec)
+    if(instanceID == nil) then
+        return nil
+    end
+
     spec = spec or self:GetCurrentSpec()
     class = class or self:GetPlayerClass()
     local t = self:GetProfilesSuggestionTable(class, spec)
 
     if(t[instanceID] == nil) then
-        t[instanceID] = {}
+        return {}
     end
 
-    return t[instanceID]
+    return self:deepcopy(t[instanceID])
 end
 
 function SwitchSwitch:SetProfilesSuggestionInstanceData(instanceID, newTable, class, spec)
@@ -486,7 +509,7 @@ end
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 
-function SwitchSwitch:GetMythicPlusSeason()
+function SwitchSwitch:GetCurrentMythicPlusSeason()
     local currentSeasonID = C_MythicPlus.GetCurrentSeason()
     -- IF we are not max level it will return -1 so manually setting it to current season
     if(currentSeasonID == -1) then
@@ -805,7 +828,7 @@ end
 function SwitchSwitch:GetCurrentActiveProfile()
     --Iterate trough every talent profile
     local lowPrioDetectedID = nil
-    for id, talentData in pairs(SwitchSwitch:GetAllCurrentSpecProfiles()) do
+    for id, _talentData in pairs(SwitchSwitch:GetAllCurrentSpecProfiles()) do
         if(SwitchSwitch:IsCurrentTalentProfile(id, true)) then
             --Return the currentprofilename
             SwitchSwitch:DebugPrint("Detected Profile With ID: " .. id)

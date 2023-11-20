@@ -11,6 +11,8 @@ local function OnPVPDownGroupSelected(frame, _, group)
 
     local data = SwitchSwitch:GetProfilesSuggestionInstanceData(pvpType)
     data["all"] = group
+    SwitchSwitch:SetProfilesSuggestionInstanceData(pvpType, data)
+
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled(pvpType, group ~= nil)
 end
 
@@ -18,33 +20,18 @@ local function OnDropDownGroupSelectedForType(frame, _, group)
     local DifficultyID = frame:GetUserData("DifficultyID")
     local Expansion = frame:GetUserData("Expansion")
     local ContentType = frame:GetUserData("ContentType")
-    local mythicID = frame:GetUserData("mythicID")
 
     if(group == "None") then
         group = nil
     end
-
-    if(mythicID ~= nil) then
-        for JurnalInstanceID, instanceData in pairs(SwitchSwitch.InstancesBossData[Expansion][ContentType]) do
-            if(instanceData["hasMythic+"] == true) then
-                local savedSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData.instanceID)
-                savedSuggestions["mythic+"] = savedSuggestions["mythic+"] or {}
-                savedSuggestions["mythic+"][mythicID] = group
-                local difficultyData = savedSuggestions["difficulties"] or {}
-                -- Register or unregister
-                SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(instanceData.instanceID, DifficultyID, group ~= nil or difficultyData[SwitchSwitch.PreMythicPlusDificulty] ~= nil)
-            end
-        end
-    else
-        for JurnalInstanceID, instanceData in pairs(SwitchSwitch.InstancesBossData[Expansion][ContentType]) do
-            if(SwitchSwitch:table_has_value(SwitchSwitch.InstancesBossData[Expansion][ContentType][JurnalInstanceID]["difficulties"], DifficultyID)) then
-                local savedSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData.instanceID)
-                savedSuggestions["difficulties"] = savedSuggestions["difficulties"] or {}
-                savedSuggestions["difficulties"][DifficultyID] = group
-                local mythicPlusData  = savedSuggestions["mythic+"] or {}
-                -- Register or unregister
-                SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(instanceData.instanceID, DifficultyID, group ~= nil or next(mythicPlusData, nil) ~= nil)
-            end
+    for JurnalInstanceID, instanceData in pairs(SwitchSwitch.InstancesBossData[Expansion][ContentType]) do
+        if(SwitchSwitch:table_has_value(SwitchSwitch.InstancesBossData[Expansion][ContentType][JurnalInstanceID]["difficulties"], DifficultyID)) then
+            local savedSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData.instanceID)
+            savedSuggestions["difficulties"] = savedSuggestions["difficulties"] or {}
+            savedSuggestions["difficulties"][DifficultyID] = group
+            SwitchSwitch:SetProfilesSuggestionInstanceData(instanceData.instanceID, savedSuggestions)
+            -- Register or unregister
+            SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(instanceData.instanceID, DifficultyID, group ~= nil)
         end
     end
 end
@@ -53,7 +40,6 @@ local function OnDropDownGroupSelected(frame, _, group)
     local InstanceID = frame:GetUserData("InstanceID")
     local DifficultyID = frame:GetUserData("DifficultyID")
     local npcID = frame:GetUserData("npcID")
-    local mythicplusID = frame:GetUserData("mythicID")
     --local Expansion = frame:GetUserData("Expansion")
     --local ContentType = frame:GetUserData("ContentType")
     --local JurnalInstanceID = frame:GetUserData("JurnalInstanceID")
@@ -69,17 +55,14 @@ local function OnDropDownGroupSelected(frame, _, group)
         savedSuggestions["bosses"] = savedSuggestions["bosses"] or {}
         savedSuggestions["bosses"][npcID] = group
         SwitchSwitch:GetModule("BossDetection"):SetDetectionForBossEnabled(npcID, InstanceID, group ~= nil)
-    elseif(mythicplusID ~= nil) then
-        savedSuggestions["mythic+"]  = savedSuggestions["mythic+"] or {}
-        savedSuggestions["mythic+"][mythicplusID] = group
-        local difficultyData = savedSuggestions["difficulties"] or {}
-        SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(InstanceID, SwitchSwitch.PreMythicPlusDificulty, group ~= nil or difficultyData[SwitchSwitch.PreMythicPlusDificulty] ~= nil)
     else
         savedSuggestions["difficulties"] = savedSuggestions["difficulties"] or {}
         savedSuggestions["difficulties"][DifficultyID] = group
         local mythicPlusData = savedSuggestions["mythic+"] or {}
         SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(InstanceID, DifficultyID, group ~= nil or next(mythicPlusData, nil) ~= nil)
     end
+
+    SwitchSwitch:SetProfilesSuggestionInstanceData(InstanceID, savedSuggestions)
 end
 
 local function OnDropDownGroupSelectedForMythycPlus(frame, _, group)
@@ -91,10 +74,9 @@ local function OnDropDownGroupSelectedForMythycPlus(frame, _, group)
         group = nil
     end
 
-    for _, id in ipairs(InstanceIDs) do
-        local savedSuggestions = SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(id, SeasonID, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
-        savedSuggestions[MythicAffixHash] = group;
-        SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(id,
+    for _journalId, instanceId in pairs(InstanceIDs) do
+        SwitchSwitch:SetMythicPlusProfileSuggestion(instanceId, group, MythicAffixHash, SeasonID, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
+        SwitchSwitch:GetModule("BossDetection"):SetDetectionForInstanceEnabled(instanceId,
             SwitchSwitch.PreMythicPlusDificulty,
             group ~= nil)
     end
@@ -225,13 +207,13 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
         dropDown.alignoffset = 25
         dropDown:SetList(validProfilesList)
         local setValue = nil
-        for _, id in ipairs(instancesIDs) do
-            local savedSuggestions = SwitchSwitch:GetGetProfilesSuggestionMythicPlusInstance(id, season, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
-            if(savedSuggestions[mythicPlusHash] ~= nil) then
+        for _journalID, instanceID in pairs(instancesIDs) do
+            local savedSuggestions = SwitchSwitch:GetMythicPlusProfileSuggestion(instanceID, mythicPlusHash, season, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
+            if(savedSuggestions ~= nil) then
                 if(setValue == nil) then
-                    setValue = savedSuggestions[mythicPlusHash]
+                    setValue = savedSuggestions
                 else
-                    if(setValue ~= savedSuggestions[mythicPlusHash]) then
+                    if(setValue ~= savedSuggestions) then
                         setValue = "Multiple"
                         break;
                     end
@@ -282,7 +264,7 @@ local function OnGroupSelected(frame, _, group)
 
     if(Expansion == "Mythic+") then
 
-        local currentMythicPlusSeasonID = SwitchSwitch:GetMythicPlusSeason()
+        local currentMythicPlusSeasonID = SwitchSwitch:GetCurrentMythicPlusSeason()
         if(ContentType ~= nil) then
             -- Render header
             scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["Per Mythic+ Week profiles"]))
@@ -293,7 +275,10 @@ local function OnGroupSelected(frame, _, group)
              .. L["If any value below is set to none the fallback `%s` will be used for that week"]:format(SwitchSwitch.DificultyStrings[SwitchSwitch.PreMythicPlusDificulty]) .. ".")
             scroll:AddChild(label)
             -- Draw dungoen specific sections
-            DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, {ContentType}, validProfilesList)
+            local tableToRender = {
+                [ContentType] = SwitchSwitch.MythicPlusDungeons[currentMythicPlusSeasonID][ContentType]
+            }
+            DrawMythicPlusSection(scroll, currentMythicPlusSeasonID, tableToRender, validProfilesList)
         else
             -- Render header
             scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["Global Mythic+ profiles per Week"]))
@@ -466,7 +451,7 @@ function TalentsSuggestionPage:SetTreeData()
 
     -- Generate Mythic+ Layout
     do
-        local currentMythicPlusSeasonID = SwitchSwitch:GetMythicPlusSeason()
+        local currentMythicPlusSeasonID = SwitchSwitch:GetCurrentMythicPlusSeason()
         local dungeons = SwitchSwitch.MythicPlusDungeons[currentMythicPlusSeasonID]
         local mythicPlusTree = {
             text = L["Mythic+"],
@@ -474,11 +459,11 @@ function TalentsSuggestionPage:SetTreeData()
             children = {}
         }
         if(dungeons ~= nil) then
-            for _, dungeonID in ipairs(dungeons) do
-                local dungeonName = GetInstanceNameByID(dungeonID, false)
+            for journalDungeonID, _ in pairs(dungeons) do
+                local dungeonName = GetInstanceNameByID(journalDungeonID, false)
                 local dungeonTree = {
                     text = dungeonName,
-                    value = dungeonID,
+                    value = journalDungeonID,
                 }
                 table.insert(mythicPlusTree.children, dungeonTree)
             end

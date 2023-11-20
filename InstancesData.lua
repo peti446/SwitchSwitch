@@ -33,11 +33,20 @@ SwitchSwitch.DificultyStrings =
 
 SwitchSwitch.PreMythicPlusDificulty = 23
 SwitchSwitch.DefaultMythicPlusSeason = 11
+
+-- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
     -- Season 3 Dragonflight
-    [11] = {1209, 968, 1021, 740, 762, 556, 65}
+    [11] = {
+        [1209] = 2579,
+        [968] = 1763,
+        [1021] = 1862,
+        [740] = 1501,
+        [762] = 1466,
+        [556] = 1279,
+        [65] = 643
+    }
 }
-
 --  \[(SwitchSwitch:encodeMythicPlusAffixesIDs\(\d+, \d+, \d+\))]  = BuildMythicPlusTitle\("(\d+)", \d+, \d+, \d+\),
 
 SwitchSwitch.MythicPlusAffixes = {
