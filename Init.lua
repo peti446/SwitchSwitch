@@ -105,11 +105,14 @@ function SwitchSwitch:OnEnable()
                 for id,_ in pairs(suggestions["bosses"] or {}) do
                     detectionModule:SetDetectionForBossEnabled(id, InstanceData["instanceID"], true)
                 end
-                -- For mythic plus we are not going to detext each sesson we just detect the mythic+ dificulty (normal mythic dificulty in this case 23)
-                if(next(suggestions["mythic+"] or {},nil) ~= nil) then
-                    detectionModule:SetDetectionForInstanceEnabled(InstanceData["instanceID"], self.PreMythicPlusDificulty, true)
-                end
             end
+        end
+    end
+
+    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons) do
+        detectionModule:RegisterInstance(instanceID, {})
+        if(self:GetMythicPlusProfileSuggestion(instanceID) ~= nil) then
+            detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)
         end
     end
     -- Enable boss detection for pvp and arenas
