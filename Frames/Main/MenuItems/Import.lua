@@ -1,4 +1,4 @@
-local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
+-- local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
 -- TODO: Disabled for beta!
 --local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Import"])
 --[[local MenuEntry = {}
