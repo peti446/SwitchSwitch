@@ -109,7 +109,7 @@ function SwitchSwitch:OnEnable()
         end
     end
 
-    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons) do
+    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons[self:GetCurrentMythicPlusSeason()]) do
         detectionModule:RegisterInstance(instanceID, {})
         if(self:GetMythicPlusProfileSuggestion(instanceID) ~= nil) then
             detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)

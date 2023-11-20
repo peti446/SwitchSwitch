@@ -430,6 +430,7 @@ end
 ---@return table | nil
 function SwitchSwitch:GetMythicPlusProfileSuggestion(instanceID, affixHash, season, class, spec)
     local t = self:GetProfilesSuggestionMythicPlusInstance(instanceID, season, class, spec) or {}
+    affixHash = affixHash or self:GetCurrentMythicPlusAfixHash()
     return t[affixHash]
 end
 
