@@ -698,12 +698,11 @@ function SwitchSwitch:LearnTalents(profileID)
     if(profileData.type == "blizzard") then
         -- Result can be 0 - Error, 1 - NoChangeNecesary, 2 - LoadInProgress, 3 - Finished
         -- When result is 2 any other requried change need to happen after TRAIT_CONFIG_UPDATED or CONFIG_COMMIT_FAILED
-        local result, changeError, _ = C_ClassTalents.LoadConfig(profileID, true)
+        local result, _changeError, _ = C_ClassTalents.LoadConfig(profileID, true)
         if(result == 0) then
             return
         elseif(result == 1) then
             SwitchSwitch:DebugPrint("No change necessary")
-            return
         elseif(result == 2) then
             SwitchSwitch.TalentsUpdate.UpdatePending = true
             SwitchSwitch.TalentsUpdate.PendingProfileID = profileID

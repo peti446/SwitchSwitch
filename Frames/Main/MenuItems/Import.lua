@@ -1,7 +1,7 @@
 local SwitchSwitch, L, AceGUI = unpack(select(2, ...))
 -- TODO: Disabled for beta!
 --local MenuEntry = SwitchSwitch:RegisterMenuEntry(L["Import"])
-local MenuEntry = {}
+--[[local MenuEntry = {}
 
 function MenuEntry:OnOpen(parent)
     SwitchSwitch:DebugPrint("Selected Import tab")
@@ -81,4 +81,4 @@ function MenuEntry:CreateLabel(Text)
     label:SetFullWidth(true)
     label:SetText(Text)
     return label
-end
+end]]
