@@ -53,7 +53,6 @@ function SwitchSwitch:OnInitialize()
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterEvent("TRAIT_CONFIG_UPDATED")
-    --self:RegisterBucketEvent({"TRAIT_CONFIG_UPDATED"}, 0.75, "TRAIT_CONFIG_UPDATED")
 
     -- Set up Settings for profiles settings
     local aceOptionTable = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)

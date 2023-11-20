@@ -1,4 +1,4 @@
-local SwitchSwitch, L =unpack(select(2, ...))
+local SwitchSwitch, L = unpack(select(2, ...))
 
 local LDBSwitchSwitch = LibStub("LibDataBroker-1.1"):NewDataObject("SwitchSwitchIcon", {
     type = "data source",
@@ -18,7 +18,8 @@ function LDBSwitchSwitch:OnTooltipShow()
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Right Click"], NORMAL_FONT_COLOR_CODE, L["Quick talents profile change"]))
     tooltip:AddLine(" ")
     if(SwitchSwitch.CurrentActiveTalentsConfigID ~= SwitchSwitch.defaultProfileID) then
-        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], SwitchSwitch.CurrentActiveTalentsConfigID) .. "|r")
+        local profileData = SwitchSwitch:GetProfileData(SwitchSwitch.CurrentActiveTalentsConfigID)
+        tooltip:AddLine(("%s%s: |cffa0522d%s|r"):format(NORMAL_FONT_COLOR_CODE, L["Current Profile"], profileData.name) .. "|r")
     else
         tooltip:AddLine(("%s%s. |r"):format(NORMAL_FONT_COLOR_CODE, L["No profile is active, select or create one"]) .. "|r")
     end
@@ -56,7 +57,7 @@ end
 
 function SwitchSwitch:UpdateLDBText()
     local profileData = SwitchSwitch:GetProfileData(SwitchSwitch.CurrentActiveTalentsConfigID)
-    LDBSwitchSwitch.text = profileData.name
+    LDBSwitchSwitch.text = (profileData and profileData.name) or L["None"]
 end
 
 function SwitchSwitch:InitMinimapIcon()

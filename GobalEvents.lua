@@ -8,13 +8,8 @@ function SwitchSwitch:ADDON_LOADED(event, arg1)
     end
 end
 
-function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
-    if(not C_AddOns.IsAddOnLoaded("Blizzard_ClassTalentUI")) then
-        C_AddOns.LoadAddOn("Blizzard_ClassTalentUI")
-        return
-    end
-
-    if(type(units) == "table" and units["player"] == nil) then
+function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(_event, unitTarget)
+    if(unitTarget ~= "player" or (type(unitTarget) == "table" and unitTarget["player"] == nil)) then
         return
     end
 
@@ -24,40 +19,14 @@ function SwitchSwitch:PLAYER_SPECIALIZATION_CHANGED(units)
     end
     self.lastUpdatePlayerSpec = playerSpec
 
-    if(type(SwitchSwitch.TalentsData) ~= "table") then
-        SwitchSwitch.TalentsData = {}
-    end
-    SwitchSwitch.TalentsData[playerSpec] = {}
-    local spec = GetActiveSpecGroup()
-    for row=1,MAX_TALENT_TIERS do
-        SwitchSwitch.TalentsData[playerSpec][row] = {}
-        local _tierAvailable, _selectedTalent, tierUnlockLevel = GetTalentTierInfo(row, spec)
-
-        SwitchSwitch.TalentsData[playerSpec][row]["requiredLevel"] = tierUnlockLevel
-        SwitchSwitch.TalentsData[playerSpec][row]["data"] = {}
-        for column=1,NUM_TALENT_COLUMNS do
-            local talentID, name, texture, _, _, spellID = GetTalentInfo(row, column, spec)
-            SwitchSwitch.TalentsData[playerSpec][row]["data"][column] =
-            {
-                ["talentID"] = talentID,
-                ["textureID"] = texture,
-                ["spellID"] = spellID,
-                ["name"] = name
-            }
-        end
-    end
-
     --Update all the UI that is dependend on spec
     SwitchSwitch:RefreshCurrentConfigID()
 end
 
 -- When true is passed in we will only update the current active profile,
 -- other wise do full update if the player is changing talents or the talbe is null (manually called)
-function SwitchSwitch:TRAIT_CONFIG_UPDATED(configID)
-    if (configID ~= C_ClassTalents.GetActiveConfigID()) then return; end
-    SwitchSwitch:DebugPrint("TRAIT_CONFIG_UPDATED Triggered Updating next frame")
-
-    if(SwitchSwitch.TalentsUpdate.UpdatePending == true) then
+function SwitchSwitch:TRAIT_CONFIG_UPDATED(_eventName, configID)
+    if(SwitchSwitch.TalentsUpdate.UpdatePending == true and configID == C_ClassTalents.GetActiveConfigID()) then
         local pendingProfileID = SwitchSwitch.TalentsUpdate.PendingProfileID
         RunNextFrame(function()
             SwitchSwitch.TalentsUpdate.UpdatePending = false

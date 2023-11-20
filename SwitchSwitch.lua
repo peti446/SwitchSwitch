@@ -497,12 +497,8 @@ function SwitchSwitch:GetMythicPlusSeason()
 end
 
 function SwitchSwitch:RefreshCurrentConfigID()
-    local tempActiveProfile = self.CurrentActiveTalentsConfigID
     self.CurrentActiveTalentsConfigID = self:GetCurrentActiveProfile()
-    if(self.CurrentActiveTalentsConfigID ~= tempActiveProfile) then
-        self:UpdateLDBText()
-    end
-
+    self:UpdateLDBText()
     self:RefreshProfilesEditorPage()
     self:RefreshTalentsSuggestionUI()
     self:RefreshExportUI()
@@ -680,7 +676,6 @@ function SwitchSwitch:LearnTalents(profileID)
         -- Result can be 0 - Error, 1 - NoChangeNecesary, 2 - LoadInProgress, 3 - Finished
         -- When result is 2 any other requried change need to happen after TRAIT_CONFIG_UPDATED or CONFIG_COMMIT_FAILED
         local result, changeError, _ = C_ClassTalents.LoadConfig(profileID, true)
-        SwitchSwitch:DebugPrint("Result: " .. tostring(result) .. " Error: " .. tostring(changeError))
         if(result == 0) then
             return
         elseif(result == 1) then
