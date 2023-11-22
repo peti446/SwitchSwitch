@@ -1,4 +1,4 @@
-name: CI
+name: Deploy
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - '*'
 
 jobs:
-    Deploy-Release-Packages:
+    Deploy-Packages:
       runs-on: ubuntu-latest
       steps:
        - uses: actions/checkout@v4
@@ -16,7 +16,7 @@ jobs:
          run: ./CurseForge_UpldateTranslations.sh
          env:
            CF_API_KEY: ${{ secrets.CF_API_KEY }}
-       - name: Create and uploat to curseforge
+       - name: Create and Deploy to curseforge
          uses: BigWigsMods/packager@master
          env:
            CF_API_KEY: ${{ secrets.CF_API_KEY }}
