@@ -35,7 +35,7 @@ result=$( curl -sS -0 -o /dev/null -X POST -w "%{http_code}" \
 -H "X-Api-Token: $CF_API_KEY" \
 -F "metadata={ language: \"enUS\", formatType: \"TableAdditions\", \"missing-phrase-handling\": \"DeletePhrase\" }" \
 -F "localizations=<$translationTempFile" \
-"https://www.curseforge.com/api/projects/$projectID/localization/import"
+"https://legacy.curseforge.com/api/projects/$projectID/localization/import"
 ) || exit 1
 
 case $result in

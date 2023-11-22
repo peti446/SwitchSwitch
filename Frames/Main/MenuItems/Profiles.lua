@@ -145,7 +145,7 @@ function ProfilesEditorPage:OnGroupSelected(frame, group)
         deleteButton:SetCallback("OnClick",OnDeleteProfile)
         scroll:AddChild(deleteButton)
     else
-        scroll:AddChild(self:CreateLabel("|cFFFF0000"..L["This is a Blizzard profile, it can not be renamed or deleted in this window, use the Blizzard UI to do so." .. "|r"]))
+        scroll:AddChild(self:CreateLabel("|cFFFF0000"..L["This is a Blizzard profile, it can not be renamed or deleted in this window, use the Blizzard UI to do so."] .. "|r"))
     end
 
     scroll:AddChild(self:CreateHeader(L["Gear Set"]))
