@@ -134,18 +134,41 @@ end
 --##########################################################################################################################
 
 -- IF version has 2 . it concatenates the last dots so 3.1.1 = 3.11 and 3.0.1 = 3.01 ect
+-- 3.0.0 -> 3.0030 (this is release)
+-- 3.0.0b -> 3.0020
+-- 3.0.0b1 -> 3.0021
+-- 3.0.0a -> 3.0010
+-- 3.0.0a1 -> 3.0011
 local function GetVersionNumber(str)
     if(str == nil) then
         return 0.0
     end
 
+
     if(type(str) == "string") then
+        -- Remove beta and alpha form string and add respective number to the str
+        local extraNumber = 0.003
+        local typeMatch, subVer = string.match(str, "([ab])(%d*)")
+        if(subVer == nil or #subVer == 0) then
+           subVer = 0
+        end
+
+        if(typeMatch == "b") then
+            -- The maximum of betas we can have is 9
+            extraNumber = 0.002 + tonumber('0.000' .. subVer)
+            str = string.gsub(str, "b(%d*)", "")
+        elseif(typeMatch == "a") then
+            extraNumber = 0.001 + tonumber('0.000' .. subVer)
+            str = string.gsub(str, "a(%d*)", "")
+        end
+
+        -- Conver .0.0 to .00
         if(SwitchSwitch:Repeats(str, "%.") == 2) then
             local index = SwitchSwitch:findLastInString(str, "%.")
             str = string.sub( str, 1, index-1) .. string.sub( str, index+1)
         end
 
-        str = tonumber(str)
+        str = tonumber(str) + extraNumber
     end
 
     return str
