@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+    Deploy-Release-Packages:
+      runs-on: ubuntu-latest
+      steps:
+       - uses: actions/checkout@v4
+         with:
+           fetch-depth: 50
+       - name: Upload locales strings to CurseForge
+         run: ./CurseForge_UpldateTranslations.sh
+         env:
+           CF_API_KEY: ${{ secrets.CF_API_KEY }}
+       - name: Create and uploat to curseforge
+         uses: BigWigsMods/packager@master
+         env:
+           CF_API_KEY: ${{ secrets.CF_API_KEY }}
+           WOWI_API_TOKEN : ${{ secrets.WOWI_API_TOKEN }}
+           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
