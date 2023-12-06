@@ -12,7 +12,12 @@ local MenuFrame = nil
 
 function LDBSwitchSwitch:OnTooltipShow()
     local tooltip = self
-    tooltip:AddLine("Switch Switch " .. C_AddOns.GetAddOnMetadata("SwitchSwitch", "Version"))
+    local projectVersion = C_AddOns.GetAddOnMetadata("SwitchSwitch", "Version")
+    if (projectVersion == '@project-version@') then
+        projectVersion = SwitchSwitch.InternalVersion
+    end
+
+    tooltip:AddLine("Switch Switch " .. projectVersion)
     tooltip:AddLine(" ")
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Left Click"], NORMAL_FONT_COLOR_CODE, L["Show config panel"]))
     tooltip:AddLine(("%s%s: %s%s|r"):format(RED_FONT_COLOR_CODE, L["Right Click"], NORMAL_FONT_COLOR_CODE, L["Quick talents profile change"]))

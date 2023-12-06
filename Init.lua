@@ -154,6 +154,11 @@ local function GetVersionNumber(str)
 
 
     if(type(str) == "string") then
+        if(str:match('^v%d+%.%d+%.%d+a?b?%d*$') == nil) then
+            SwitchSwitch:Print("Invalid version string: " .. str)
+            return -1
+        end
+
         -- Remove beta and alpha form string and add respective number to the str
         local extraNumber = 0.003
         local typeMatch, subVer = string.match(str, "([ab])(%d*)")
@@ -170,6 +175,9 @@ local function GetVersionNumber(str)
             str = string.gsub(str, "a(%d*)", "")
         end
 
+        -- remove V
+        str = string.gsub(str, "^v", "")
+
         -- Conver .0.0 to .00
         if(SwitchSwitch:Repeats(str, "%.") == 2) then
             local index = SwitchSwitch:findLastInString(str, "%.")
@@ -182,6 +190,13 @@ local function GetVersionNumber(str)
     return str
 end
 
+
+--[===[@non-debug@
+SwitchSwitch.InternalVersion = GetVersionNumber("@project-version@")
+--@end-non-debug@]===]
+--@debug@
+SwitchSwitch.InternalVersion = GetVersionNumber("v3.0.0b3")
+--@end-debug@
 function SwitchSwitch:Update()
     --Get old version string
     local globalConfigVersion = GetVersionNumber(self.db.global.Version)

@@ -32,7 +32,6 @@ SwitchSwitch.TalentsUpdate = {
     PendingProfileID = nil,
 }
 
-SwitchSwitch.InternalVersion = 30
 SwitchSwitch.defaultProfileID = "profile_not_set"
 SwitchSwitch.CurrentActiveTalentsConfigID = SwitchSwitch.defaultProfileID
 
