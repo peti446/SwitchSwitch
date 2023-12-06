@@ -517,7 +517,7 @@ function SwitchSwitch:GetCurrentMythicPlusSeason()
         currentSeasonID = SwitchSwitch.DefaultMythicPlusSeason
     end
 
-    return currentSeasonID
+    return currentSeasonID or -1
 end
 
 function SwitchSwitch:RefreshCurrentConfigID()

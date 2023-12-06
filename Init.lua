@@ -53,6 +53,7 @@ function SwitchSwitch:OnInitialize()
     self:RegisterEvent("ADDON_LOADED")
     self:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
     self:RegisterEvent("TRAIT_CONFIG_UPDATED")
+    self:RegisterEvent("CHALLENGE_MODE_MAPS_UPDATE")
 
     -- Set up Settings for profiles settings
     local aceOptionTable = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
@@ -68,6 +69,16 @@ function SwitchSwitch:OnInitialize()
     SwitchSwitch:Update()
 
     self:DebugPrint("Addon Initialized")
+end
+
+function SwitchSwitch:RegisterMyticPlusDungeonsDetection()
+    local detectionModule = self:GetModule("BossDetection")
+    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons[self:GetCurrentMythicPlusSeason()]) do
+        detectionModule:RegisterInstance(instanceID, {})
+        if(self:GetMythicPlusProfileSuggestion(instanceID) ~= nil) then
+            detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)
+        end
+    end
 end
 
 function SwitchSwitch:OnEnable()
@@ -92,6 +103,7 @@ function SwitchSwitch:OnEnable()
     self:RegisterMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED")
     self:EnableModule("BossDetection")
     local detectionModule = self:GetModule("BossDetection")
+    self:DebugPrint("Starting to register instances")
     for expansion, data in pairs(SwitchSwitch.InstancesBossData) do
         for contentType, contentData in pairs(data) do
             for jurnalID, InstanceData in pairs(contentData) do
@@ -109,12 +121,8 @@ function SwitchSwitch:OnEnable()
         end
     end
 
-    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons[self:GetCurrentMythicPlusSeason()]) do
-        detectionModule:RegisterInstance(instanceID, {})
-        if(self:GetMythicPlusProfileSuggestion(instanceID) ~= nil) then
-            detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)
-        end
-    end
+    self:RegisterMyticPlusDungeonsDetection()
+
     -- Enable boss detection for pvp and arenas
     local data = SwitchSwitch:GetProfilesSuggestionInstanceData("pvp")
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("pvp", data["all"] ~= nil)

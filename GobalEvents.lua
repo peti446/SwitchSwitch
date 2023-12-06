@@ -96,3 +96,8 @@ function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficu
         end
     end
 end
+
+function SwitchSwitch:CHALLENGE_MODE_MAPS_UPDATE(_event_name)
+    self:DebugPrint("CHALLENGE_MODE_MAPS_UPDATE")
+    self:RegisterMyticPlusDungeonsDetection()
+end
