@@ -73,7 +73,13 @@ end
 
 function SwitchSwitch:RegisterMyticPlusDungeonsDetection()
     local detectionModule = self:GetModule("BossDetection")
-    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons[self:GetCurrentMythicPlusSeason()]) do
+    local seasonID = self:GetCurrentMythicPlusSeason()
+    if(SwitchSwitch.MythicPlusDungeons[seasonID] == nil) then
+        self:Print(("No entry for seasonID %d"):format(seasonID))
+        self:PrintTable(SwitchSwitch.MythicPlusDungeons)
+        return
+    end
+    for _journalID, instanceID in pairs(SwitchSwitch.MythicPlusDungeons[seasonID]) do
         detectionModule:RegisterInstance(instanceID, {})
         if(self:GetMythicPlusProfileSuggestion(instanceID) ~= nil) then
             detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)

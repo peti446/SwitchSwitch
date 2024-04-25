@@ -66,7 +66,7 @@ local function OnDropDownGroupSelected(frame, _, group)
 end
 
 local function OnDropDownGroupSelectedForMythycPlus(frame, _, group)
-    local InstanceIDs = frame:GetUserData("InstanceIDs")
+    local InstanceIDs = frame:GetUserData("InstanceIDs") or {}
     local MythicAffixHash = frame:GetUserData("MythicAffixHash")
     local SeasonID = frame:GetUserData("MythicSeasonID");
 
@@ -207,7 +207,7 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
         dropDown.alignoffset = 25
         dropDown:SetList(validProfilesList)
         local setValue = nil
-        for _journalID, instanceID in pairs(instancesIDs) do
+        for _journalID, instanceID in pairs(instancesIDs or {}) do
             local savedSuggestions = SwitchSwitch:GetMythicPlusProfileSuggestion(instanceID, mythicPlusHash, season, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
             if(savedSuggestions ~= nil) then
                 if(setValue == nil) then

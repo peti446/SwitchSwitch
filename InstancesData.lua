@@ -32,10 +32,21 @@ SwitchSwitch.DificultyStrings =
 }
 
 SwitchSwitch.PreMythicPlusDificulty = 23
-SwitchSwitch.DefaultMythicPlusSeason = 11
+SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
+    -- Season 4 Dragonflight
+    [12] = {
+        [1201] = 2526, --Academy
+        [1196] = 2520, -- Brackenhide hallow
+        [1204] = 2527, -- Hakks if Infusion
+        [1199] = 2519, -- Neltarhius
+        [1202] = 2521, -- Ruby Life Pools
+        [1203] = 2515, -- Azure Vaults
+        [1198] = 2516, -- Nokhud Offensive
+        [1197] = 2451, -- Uldaman
+    },
     -- Season 3 Dragonflight
     [11] = {
         [1209] = 2579,
@@ -48,11 +59,24 @@ SwitchSwitch.MythicPlusDungeons = {
     }
 }
 --  \[(SwitchSwitch:encodeMythicPlusAffixesIDs\(\d+, \d+, \d+\))]  = BuildMythicPlusTitle\("(\d+)", \d+, \d+, \d+\),
-
+-- Sesion got by /dump C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
+-- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
+-- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
-    -- Sesion got by /dump C_MythicPlus.GetCurrentSeason() then we got a list of bit shifted int based on the 3 affixes active
-    -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
-    -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
+    -- Season 4 Dragonflight
+    [12] = {
+        [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 124, 6),
+        [2] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 134, 7),
+        [3] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 136, 123),
+        [4] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 135, 6),
+        [5] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 3, 8),
+        [6] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 124, 11),
+        [7] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 135, 7),
+        [8] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 136, 8),
+        [9] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 134, 11),
+        [10] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 3, 123),
+    },
+    -- Season 3 Dragonflight
     [11] = {
         [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(10, 136, 8),
         [2] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 134, 11),
