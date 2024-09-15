@@ -36,6 +36,17 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
+    -- Season 1 TWW
+    [13] = {
+        [1271] = 2660, -- Ara-Jara
+        [1274] = 2669, -- City of Threads
+        [1270] = 2662, -- The Dawnbreaker
+        [1269] = 2652, -- The Stonevault
+        [1184] = 2290, -- Mist of tirna Scithe
+        [1182] = 2286, -- The Necrotic Wake
+        [1023] = 1822, -- Siege of Boralus
+        [71] = 670, -- Grim Batol
+    },
     -- Season 4 Dragonflight
     [12] = {
         [1201] = 2526, --Academy
@@ -63,6 +74,10 @@ SwitchSwitch.MythicPlusDungeons = {
 -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
 -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
+    -- Season 1 TWW
+    [13] = {
+
+    },
     -- Season 4 Dragonflight
     [12] = {
         [1] = SwitchSwitch:encodeMythicPlusAffixesIDs(9, 124, 6),
@@ -137,10 +152,112 @@ SwitchSwitch.MythicPlusAffixes = {
     },
 }
 
+-- To obtain the bossData key look at wowhead and searh for the npc the ID is the key
 -- To obtain the JurnalID look at https://wago.tools/db2/JournalInstance?sort[ID]=desc&page=1 and look at the id for the raid and the instance ID is the MapID
 -- To obtain bosses data look at https://wago.tools/db2/JournalEncounter?page=1, the UiMapID is the zone, ID is encounterid, jurnalIndex is OrderIndex
+-- To obtain duneons data look at https://wago.tools/db2/Map?filter[ExpansionID]=10&filter[InstanceType]=1&page=1&sort[Directory]=asc ID is the instanceID
 -- The boss entry ID is the boss npc ID wich is what we search for in the tooltip
-
+SwitchSwitch.InstancesBossData["The War Within"] = {
+    -- Raids
+    [1] = {
+        [1273] = {
+            ["instanceID"] = 2657,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+                [215657] = { -- Ulgrax
+                    ["requieres"] = {},
+                    ["zoneID"] = 2292,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2607,
+                    ["otherBossID"] = {}, 
+                },
+                [214502] = { -- The bloodbound horror
+                    ["requieres"] = {215657},
+                    ["zoneID"] = 2291,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2611,
+                    ["otherBossID"] = {}, 
+                },
+                [214503] = { -- Sikran
+                    ["requieres"] = {214502},
+                    ["zoneID"] = 2293,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2599,
+                    ["otherBossID"] = {}, 
+                },
+                [224552] = { -- Rasha'nan
+                    ["requieres"] = {214503},
+                    ["zoneID"] = 2292,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2609,
+                    ["otherBossID"] = {}, 
+                },
+                [214506] = { -- Broodtwister Ovi'nax
+                    ["requieres"] = {224552},
+                    ["zoneID"] = 2294,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2612,
+                    ["otherBossID"] = {}, 
+                },
+                [218425] = { -- Nexus-Princess Ky'veza
+                    ["requieres"] = {224552},
+                    ["zoneID"] = 2294,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2601,
+                    ["otherBossID"] = {}, 
+                },
+                [223779] = { -- The sIlken Court
+                    ["requieres"] = {218425, 214506},
+                    ["zoneID"] = 2294,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2608,
+                    ["otherBossID"] = {219878}, 
+                },
+                [219778] = { -- Queen Ansurek
+                    ["requieres"] = {223779},
+                    ["zoneID"] = 2295,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2602,
+                    ["otherBossID"] = {}, 
+                },
+            }
+        },
+    },
+    [2] = {
+        [1271] = { 
+            ["instanceID"] = 2660,
+            ["difficulties"] = {1,2,23},
+        }, -- Ara-Kara
+        [1274] = { 
+            ["instanceID"] = 2669,
+            ["difficulties"] = {1,2,23},
+        }, -- City of Threads
+        [1270] = { 
+            ["instanceID"] = 2662,
+            ["difficulties"] = {1,2,23},
+        }, -- The Dawnbreaker
+        [1268] = { 
+            ["instanceID"] = 2648,
+            ["difficulties"] = {1,2,23},
+        }, -- The Rookery
+        [1267] = { 
+            ["instanceID"] = 2649,
+            ["difficulties"] = {1,2,23},
+        }, -- Priory of the Sacred Flame
+        [1210] = { 
+            ["instanceID"] = 2651,
+            ["difficulties"] = {1,2,23},
+        }, -- Darkflame Cleft
+        [1269] = { 
+            ["instanceID"] = 2652,
+            ["difficulties"] = {1,2,23},
+        }, -- The Stonevault
+        [1272] = { 
+            ["instanceID"] = 2661,
+            ["difficulties"] = {1,2,23},
+        }, -- Cinderbrew Meadery
+    },
+}
 SwitchSwitch.InstancesBossData["Dragonflight"] = {
     -- Raids
     [1] = {
