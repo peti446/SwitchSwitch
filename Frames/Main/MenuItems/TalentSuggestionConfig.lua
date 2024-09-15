@@ -67,7 +67,8 @@ end
 
 local function OnDropDownGroupSelectedForMythycPlus(frame, _, group)
     local InstanceIDs = frame:GetUserData("InstanceIDs") or {}
-    local MythicAffixHash = frame:GetUserData("MythicAffixHash")
+    local IsGeneral = frame:GetUserData("IsGeneral");
+    local MythicAffixHash = IsGeneral and -1 or frame:GetUserData("MythicAffixHash")
     local SeasonID = frame:GetUserData("MythicSeasonID");
 
     if(group == "None") then
@@ -190,6 +191,36 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
     for week, mythicPlusHash in pairs(mythicPlusWeekData) do
         currentSeasonData[week] =  {mythicPlusHash, BuildMythicPlusTitle(week, SwitchSwitch:decodeMythicPlusAffixesID(mythicPlusHash))};
     end
+
+    local GeneralDropdown = AceGUI:Create("Dropdown")
+    GeneralDropdown:SetLabel(L["General Mythic+"])
+    GeneralDropdown:SetUserData("InstanceIDs", instancesIDs)
+    GeneralDropdown:SetUserData("IsGeneral", true)
+    GeneralDropdown:SetUserData("MythicSeasonID", season)
+    GeneralDropdown.alignoffset = 25
+    GeneralDropdown:SetList(validProfilesList)
+    GeneralDropdown:SetCallback("OnValueChanged", OnDropDownGroupSelectedForMythycPlus)
+    local GeneralSetValue = nil
+    for _journalID, instanceID in pairs(instancesIDs or {}) do
+        local savedSuggestions = SwitchSwitch:GetMythicPlusProfileSuggestion(instanceID, -1, season, SwitchSwitch:GetPlayerClass(), SwitchSwitch:GetCurrentSpec())
+        if(savedSuggestions ~= nil) then
+            if(GeneralSetValue == nil) then
+                GeneralSetValue = savedSuggestions
+            else
+                if(GeneralSetValue ~= savedSuggestions) then
+                    GeneralSetValue = "Multiple"
+                    break;
+                end
+            end
+        end
+    end
+    if(GeneralSetValue == "Multiple") then
+        GeneralDropdown:SetText(L["Multiple values"])
+    else
+        if(GeneralSetValue == nil) then GeneralSetValue = "None"; end
+        GeneralDropdown:SetValue(GeneralSetValue)
+    end
+    frame:AddChild(GeneralDropdown)
 
     --Render dropboxes
     local currentWeekAfixHash = SwitchSwitch:GetCurrentMythicPlusAfixHash()

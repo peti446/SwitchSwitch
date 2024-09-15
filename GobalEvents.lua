@@ -85,8 +85,9 @@ function SwitchSwitch:SWITCHSWITCH_BOSS_DETECTED(event_name, instanceID, difficu
 
         -- If we are in mythic/mythic+ we want to see the week specific data
         local mythicPlusProfileId = self:GetMythicPlusProfileSuggestion(instanceID)
-        if(difficultyID == self.PreMythicPlusDificulty and mythicPlusProfileId ~= nil) then
-            suggestedProfileId = mythicPlusProfileId
+        local mythicPlusGeneralProfileId = self:GetMythicPlusProfileSuggestion(instanceID, -1)
+        if(difficultyID == self.PreMythicPlusDificulty and (mythicPlusProfileId ~= nil or mythicPlusGeneralProfileId ~= nil)) then
+            suggestedProfileId = mythicPlusProfileId or mythicPlusGeneralProfileId
         end
     end
 
