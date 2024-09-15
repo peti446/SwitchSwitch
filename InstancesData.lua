@@ -169,90 +169,90 @@ SwitchSwitch.InstancesBossData["The War Within"] = {
                     ["zoneID"] = 2292,
                     ["jurnalIndex"] = 1,
                     ["encounterID"] = 2607,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
                 [214502] = { -- The bloodbound horror
                     ["requieres"] = {215657},
                     ["zoneID"] = 2291,
                     ["jurnalIndex"] = 2,
                     ["encounterID"] = 2611,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
                 [214503] = { -- Sikran
                     ["requieres"] = {214502},
                     ["zoneID"] = 2293,
                     ["jurnalIndex"] = 3,
                     ["encounterID"] = 2599,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
                 [224552] = { -- Rasha'nan
                     ["requieres"] = {214503},
                     ["zoneID"] = 2292,
                     ["jurnalIndex"] = 4,
                     ["encounterID"] = 2609,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
                 [214506] = { -- Broodtwister Ovi'nax
                     ["requieres"] = {224552},
                     ["zoneID"] = 2294,
                     ["jurnalIndex"] = 5,
                     ["encounterID"] = 2612,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
                 [218425] = { -- Nexus-Princess Ky'veza
                     ["requieres"] = {224552},
                     ["zoneID"] = 2294,
                     ["jurnalIndex"] = 6,
                     ["encounterID"] = 2601,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
                 [223779] = { -- The sIlken Court
                     ["requieres"] = {218425, 214506},
                     ["zoneID"] = 2294,
                     ["jurnalIndex"] = 7,
                     ["encounterID"] = 2608,
-                    ["otherBossID"] = {219878}, 
+                    ["otherBossID"] = {219878},
                 },
                 [219778] = { -- Queen Ansurek
                     ["requieres"] = {223779},
                     ["zoneID"] = 2295,
                     ["jurnalIndex"] = 8,
                     ["encounterID"] = 2602,
-                    ["otherBossID"] = {}, 
+                    ["otherBossID"] = {},
                 },
             }
         },
     },
     [2] = {
-        [1271] = { 
+        [1271] = {
             ["instanceID"] = 2660,
             ["difficulties"] = {1,2,23},
         }, -- Ara-Kara
-        [1274] = { 
+        [1274] = {
             ["instanceID"] = 2669,
             ["difficulties"] = {1,2,23},
         }, -- City of Threads
-        [1270] = { 
+        [1270] = {
             ["instanceID"] = 2662,
             ["difficulties"] = {1,2,23},
         }, -- The Dawnbreaker
-        [1268] = { 
+        [1268] = {
             ["instanceID"] = 2648,
             ["difficulties"] = {1,2,23},
         }, -- The Rookery
-        [1267] = { 
+        [1267] = {
             ["instanceID"] = 2649,
             ["difficulties"] = {1,2,23},
         }, -- Priory of the Sacred Flame
-        [1210] = { 
+        [1210] = {
             ["instanceID"] = 2651,
             ["difficulties"] = {1,2,23},
         }, -- Darkflame Cleft
-        [1269] = { 
+        [1269] = {
             ["instanceID"] = 2652,
             ["difficulties"] = {1,2,23},
         }, -- The Stonevault
-        [1272] = { 
+        [1272] = {
             ["instanceID"] = 2661,
             ["difficulties"] = {1,2,23},
         }, -- Cinderbrew Meadery
