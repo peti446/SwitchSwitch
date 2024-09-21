@@ -1,4 +1,4 @@
-## Interface: 100200
+## Interface: 110002
 ## Title: SwitchSwitch
 ## Author: Geloch (Sanguino - EU Horde)
 ## Version: @project-version@
