@@ -139,7 +139,7 @@ function BossDetection:OnTooltipSetUnit(tooltip, data)
 end
 
 function BossDetection:WALK_IN_DATA_UPDATE()
-    local _, current_instanceType, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+    local _, current_instanceType, current_difficultyID, _, _, _, _, _current_instanceID, _, _ = GetInstanceInfo()
     if(select(1, IsInInstance())) then
         for i, k in ipairs(ActiveDetection.types) do
             if(k.difficultyID == nil and k.type == current_instanceType) then
