@@ -24,6 +24,12 @@ local function OnDropDownGroupSelectedForType(frame, _, group)
     if(group == "None") then
         group = nil
     end
+
+    if(ContentType == 208) then
+        SwitchSwitch:SetProfilesSuggestionInstanceData("scenario", {[208] = group})
+        SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("scenario", group ~= nil, 208)
+    end
+
     for JurnalInstanceID, instanceData in pairs(SwitchSwitch.InstancesBossData[Expansion][ContentType]) do
         if(SwitchSwitch:table_has_value(SwitchSwitch.InstancesBossData[Expansion][ContentType][JurnalInstanceID]["difficulties"], DifficultyID)) then
             local savedSuggestions = SwitchSwitch:GetProfilesSuggestionInstanceData(instanceData.instanceID)
@@ -184,6 +190,9 @@ local function DrawMythicPlusSection(frame, season, instancesIDs, validProfilesL
     local mythicPlusWeekData = SwitchSwitch.MythicPlusAffixes[season] or {}
 
     local function BuildMythicPlusTitle(week, affix1, affix2, affix3)
+        if(season >= 13) then
+            return L["Week"] .. " " .. tostring(week) .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1))   ..")";
+        end
         return L["Week"] .. " " .. tostring(week) .. " (" .. select(1, C_ChallengeMode.GetAffixInfo(affix1)) .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix2))  .. "/" .. select(1, C_ChallengeMode.GetAffixInfo(affix3))   ..")";
     end
 
@@ -382,7 +391,31 @@ local function OnGroupSelected(frame, _, group)
             hasMythicplus = hasMythicplus or instanceData["hasMythic+"] == true
         end
 
-        if(next(difficulties, nil) ~= nil) then
+        if(ContentType == 208) then
+            scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
+            local label = AceGUI:Create("Label")
+            label:SetFullWidth(true)
+            label:SetText(L["Will suggest a talent build when entering the delve"])
+            scroll:AddChild(label)
+
+            local dropDown = AceGUI:Create("Dropdown")
+            dropDown:SetLabel(L["Delves General"])
+            dropDown:SetUserData("Expansion", Expansion)
+            dropDown:SetUserData("ContentType", ContentType)
+            dropDown.alignoffset = 15
+            dropDown:SetList(validProfilesList)
+
+
+            local setValue = (SwitchSwitch:GetProfilesSuggestionInstanceData("scenario") or {})[208]
+            if(setValue == nil) then
+                setValue = "None"
+            end
+
+            dropDown:SetValue(setValue)
+            dropDown:SetCallback("OnValueChanged", OnDropDownGroupSelectedForType)
+            scroll:AddChild(dropDown)
+
+        elseif(next(difficulties, nil) ~= nil) then
             -- Set up per dificulty dropdowns
             scroll:AddChild(TalentsSuggestionPage:CreateHeader(L["On Enter Instance"]))
             local label = AceGUI:Create("Label")
@@ -536,12 +569,12 @@ function TalentsSuggestionPage:SetTreeData()
 
     -- Actually set
     treeGroup:SetTree(treeData)
-    CurrentSelectedPath = CurrentSelectedPath or "Dragonflight\0011\0011207"
+    CurrentSelectedPath = CurrentSelectedPath or "The War Within\0011\0011207"
     local treeStatus = {
         groups= {
             ["Mythic+"] = true,
-            ["Dragonflight"] = true,
-            ["Dragonflight\0011"] = true,
+            ["The War Within"] = true,
+            ["The War Within\0011"] = true,
             ["PVP"] = true
         },
         selected = CurrentSelectedPath

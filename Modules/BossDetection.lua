@@ -22,12 +22,14 @@ end
 
 function BossDetection:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:RegisterEvent("WALK_IN_DATA_UPDATE")
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, InternalCallToTooltip)
 end
 
 function BossDetection:OnDisable()
     self:UnregisterEvent("PLAYER_STARTED_MOVING")
     self:UnregisterEvent("PLAYER_STOPPED_MOVING")
+    self:UnregisterEvent("WALK_IN_DATA_UPDATE")
     self:UnregisterBucket("BOSS_KILL")
     self:CancelAllTimers()
 end
@@ -36,14 +38,20 @@ function BossDetection:RegisterInstance(InstanceID, data)
     InstancesData[InstanceID] = data
 end
 
-function BossDetection:SetDetectingInstanceTypeEnabled(typeString, enabled)
+function BossDetection:SetDetectingInstanceTypeEnabled(typeString, enabled, difficultyID)
     if(enabled) then
         if(not SwitchSwitch:table_has_value(ActiveDetection.types, typeString)) then
-            table.insert(ActiveDetection.types, typeString)
+            table.insert(ActiveDetection.types, {
+                ["type"] = typeString,
+                ["difficultyID"] = difficultyID
+            })
             SwitchSwitch:DebugPrint("Registered instance type: " .. tostring(typeString))
         end
     else
-        SwitchSwitch:table_remove_value(ActiveDetection.types, typeString)
+        SwitchSwitch:table_remove_value(ActiveDetection.types, {
+            ["type"] = typeString,
+            ["difficultyID"] = difficultyID
+        })
         SwitchSwitch:DebugPrint("De-registered instance type: " .. tostring(typeString))
     end
 end
@@ -130,12 +138,33 @@ function BossDetection:OnTooltipSetUnit(tooltip, data)
     end
 end
 
+function BossDetection:WALK_IN_DATA_UPDATE()
+    local _, current_instanceType, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+    if(select(1, IsInInstance())) then
+        for i, k in ipairs(ActiveDetection.types) do
+            if(k.difficultyID == nil and k.type == current_instanceType) then
+                self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
+                break;
+            elseif(k.type == current_instanceType and k.difficultyID == current_difficultyID) then
+                self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
+                break;
+            end
+        end
+    end
+end
+
 function BossDetection:PLAYER_ENTERING_WORLD()
     local _, current_instanceType, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
     if(select(1, IsInInstance())) then
 
-        if(SwitchSwitch:table_has_value(ActiveDetection.types, current_instanceType)) then
-            self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType)
+        for i, k in ipairs(ActiveDetection.types) do
+            if(k.difficultyID == nil and k.type == current_instanceType) then
+                self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
+                break;
+            elseif(k.type == current_instanceType and k.difficultyID == current_difficultyID) then
+                self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
+                break;
+            end
         end
 
         local shouldDetectBosses = false

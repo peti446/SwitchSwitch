@@ -134,7 +134,8 @@ function SwitchSwitch:OnEnable()
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("pvp", data["all"] ~= nil)
     data = SwitchSwitch:GetProfilesSuggestionInstanceData("arena")
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("arena", data["all"] ~= nil)
-
+    data = SwitchSwitch:GetProfilesSuggestionInstanceData("scenario") or {}
+    SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("scenario", data[208] ~= nil, 208)
     -- Lets refresh all the UIS
     SwitchSwitch:RefreshCurrentConfigID()
 end

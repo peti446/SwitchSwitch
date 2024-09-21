@@ -56,11 +56,11 @@ function SwitchSwitch:TRAIT_CONFIG_UPDATED(_eventName, configID)
 end
 
 
-function SwitchSwitch:SWITCHSWITCH_INSTANCE_TYPE_DETECTED(event_name, contentType)
+function SwitchSwitch:SWITCHSWITCH_INSTANCE_TYPE_DETECTED(event_name, contentType, difficultyID)
     local allSuggestionsForInstance = self:GetProfilesSuggestionInstanceData(contentType)
     local suggestedProfileId = nil
     if(allSuggestionsForInstance ~= nil) then
-        suggestedProfileId = allSuggestionsForInstance["all"]
+        suggestedProfileId = allSuggestionsForInstance[difficultyID] or allSuggestionsForInstance["all"]
     end
 
     if(suggestedProfileId ~= nil and suggestedProfileId ~= self.CurrentActiveTalentsConfigID) then

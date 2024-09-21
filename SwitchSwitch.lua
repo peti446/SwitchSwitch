@@ -481,6 +481,22 @@ end
 -----------------------------------------------------------------------------------------------------------------------------------------
 
 function SwitchSwitch:GetCurrentMythicPlusAfixHash()
+    -- TODO: Maybe we store all affixes
+    local ValidIds = {}
+    for i,k in ipairs(self.MythicPlusAffixes[self:GetCurrentMythicPlusSeason()] or {}) do
+        ValidIds[k] = true;
+    end
+
+    if(self:GetCurrentMythicPlusSeason() >= 13) then
+        for i, k in ipairs(C_MythicPlus.GetCurrentAffixes() or {}) do
+            if (ValidIds[k.id] ~= nil) then
+                return k.id;
+            end
+        end
+        return 0;
+    end
+
+    -- Old Mythic + affixes caluclation
     local ids = {}
     for i, k in ipairs(C_MythicPlus.GetCurrentAffixes() or {}) do
         table.insert(ids, k.id)

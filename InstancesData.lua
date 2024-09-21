@@ -7,7 +7,8 @@ SwitchSwitch.ContentTypeStrings =
     [2] = L["Dungeons"],
     [3] = L["Scenarios"],
     [20] = L["Arenas"],
-    [21] = L["Battlegrounds"]
+    [21] = L["Battlegrounds"],
+    [208] = L["Delves"]
 }
 
 SwitchSwitch.InstanceTypeToContentID =
@@ -17,6 +18,7 @@ SwitchSwitch.InstanceTypeToContentID =
     ["scenario"] = 3,
     ["arena"] = 20,
     ["pvp"] = 21,
+    ["Delves"] = 208
 }
 
 SwitchSwitch.DificultyStrings =
@@ -76,7 +78,10 @@ SwitchSwitch.MythicPlusDungeons = {
 SwitchSwitch.MythicPlusAffixes = {
     -- Season 1 TWW
     [13] = {
-
+        [1] = 148;
+        [2] = 158;
+        [3] = 159;
+        [4] = 160;
     },
     -- Season 4 Dragonflight
     [12] = {
@@ -257,6 +262,7 @@ SwitchSwitch.InstancesBossData["The War Within"] = {
             ["difficulties"] = {1,2,23},
         }, -- Cinderbrew Meadery
     },
+    [208] = {}
 }
 SwitchSwitch.InstancesBossData["Dragonflight"] = {
     -- Raids
