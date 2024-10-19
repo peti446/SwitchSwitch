@@ -83,6 +83,8 @@ function SwitchSwitch:RegisterMyticPlusDungeonsDetection()
         detectionModule:RegisterInstance(instanceID, {})
         if(self:GetMythicPlusProfileSuggestion(instanceID) ~= nil) then
             detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)
+        elseif(self:GetMythicPlusProfileSuggestion(instanceID, -1) ~= nil) then
+            detectionModule:SetDetectionForInstanceEnabled(instanceID, self.PreMythicPlusDificulty, true)
         end
     end
 end
