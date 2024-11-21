@@ -21,7 +21,14 @@ end
 
 function Commands:LoadProfileCMD(...)
 	SwitchSwitch:DebugPrint("Changing talents to: " .. ...)
-	SwitchSwitch:ActivateTalentProfile(string.join(" ", tostringall(...)))
+	local name = SwitchSwitch:ToLower(CreateAtlasMarkup("gmchat-icon-blizz", 16, 16) .. string.join(" ", tostringall(...)));
+	local profiles = self:GetProfiles();
+	for k,v in pairs(profiles) do
+		if(SwitchSwitch:ToLower(v.name) == name) then
+			SwitchSwitch:ActivateTalentProfile(k);
+			break;
+		end
+	end
 end
 
 
