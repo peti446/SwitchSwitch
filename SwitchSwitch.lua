@@ -548,25 +548,13 @@ function SwitchSwitch:GetSelectedLoadoutConfigID()
     local selectionID = C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
 
     if(selectionID == nil) then
-        selectionID = ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
+        selectionID = PlayerSpellsFrame.TalentsFrame.LoadSystem:GetSelectionID()
     end
     if(C_ClassTalents.GetStarterBuildActive()) then
         selectionID = nil
     end
 
     return selectionID
---    if(not ClassTalentFrame or not ClassTalentFrame.TalentsTab or not ClassTalentFrame.TalentsTab.LoadoutDropDown or not ClassTalentFrame.TalentsTab.LoadoutDropDown.GetSelectionID) then
---        self:DebugPrint("Class TalentFrame is not valid returning last selected config id")
---        local lastSelected = PlayerUtil.GetCurrentSpecID() and C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
---        return lastSelected or nil;
---    end
---
---    local selectionID = ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
---    if(C_ClassTalents.GetStarterBuildActive()) then
---        selectionID = nil
---    end
---
---    return selectionID;
 end
 
 local function GetCurrentTalentsInfoList()

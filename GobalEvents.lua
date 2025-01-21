@@ -36,9 +36,9 @@ function SwitchSwitch:TRAIT_CONFIG_UPDATED(_eventName, configID)
             C_ClassTalents.UpdateLastSelectedSavedConfigID(SwitchSwitch:GetCurrentSpec(), pendingProfileID);
             local _ = ClassTalentFrame
                 and ClassTalentFrame.TalentsTab
-                and ClassTalentFrame.TalentsTab.LoadoutDropDown
-                and ClassTalentFrame.TalentsTab.LoadoutDropDown.SetSelectionID
-                and ClassTalentFrame.TalentsTab.LoadoutDropDown:SetSelectionID(pendingProfileID)
+                and PlayerSpellsFrame.TalentsFrame.LoadSystem
+                and PlayerSpellsFrame.TalentsFrame.LoadSystem.SetSelectionID
+                and PlayerSpellsFrame.TalentsFrame.LoadSystem:SetSelectionID(pendingProfileID)
 
             if(not InCombatLockdown() and ClassTalentFrame and ClassTalentFrame:IsShown()) then
                 HideUIPanel(ClassTalentFrame);
