@@ -1,10 +1,12 @@
-## Interface: 110002
+## Interface: 110100
 ## Title: SwitchSwitch
 ## Author: Geloch (Sanguino - EU Horde)
 ## Version: @project-version@
 ## Notes: Allows you to creater talents profiles and switch between them quickly and automaticly.
 ## LoadOnDemand: 0
 ## SavedVariables: SwitchSwitchDB
+## IconTexture: Interface\Icons\INV_Artifact_Tome02
+## Category: Talents
 ## X-Curse-Project-ID: 299998
 ## X-WoWI-ID: 26115
 
