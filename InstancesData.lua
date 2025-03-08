@@ -38,6 +38,16 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
+    [14] = {
+        [1272] = 2661, -- Cinderbrew Meadery
+        [1210] = 2651, -- Darkflame Cleft
+        [1267] = 2649, -- Priory of the Sacred Flame
+        [1268] = 2648, -- The Rookery
+        [1298] = 2773, -- Operation: Floodgate
+        [1187] = 2293, -- Theather of Pain
+        [1178] = 2097, -- Operation: Mechagon
+        [1012] = 1594, -- The Motherlode!!
+    },
     -- Season 1 TWW
     [13] = {
         [1271] = 2660, -- Ara-Jara
@@ -76,6 +86,13 @@ SwitchSwitch.MythicPlusDungeons = {
 -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
 -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
+    -- Season 2 TWW
+    [14] = {
+        [1] = 148;
+        [2] = 158;
+        [3] = 162;
+        [4] = 160;
+    },
     -- Season 1 TWW
     [13] = {
         [1] = 148;
@@ -227,6 +244,68 @@ SwitchSwitch.InstancesBossData["The War Within"] = {
                 },
             }
         },
+        [1296] = { -- Liberation of Undermine
+            ["instanceID"] = 2769,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+                [225821] = { -- Vexie and the Geargrinders
+                    ["requieres"] = {},
+                    ["zoneID"] = 2406,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2639,
+                    ["otherBossID"] = {},
+                },
+                [229181] = { -- Cauldron of Carnage
+                    ["requieres"] = {},
+                    ["zoneID"] = 2406,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2640,
+                    ["otherBossID"] = {},
+                },
+                [228652] = { -- Rik Reverb
+                    ["requieres"] = {},
+                    ["zoneID"] = 2406,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2641,
+                    ["otherBossID"] = {},
+                },
+                [230322] = { -- Stix Bunkjunker
+                    ["requieres"] = {},
+                    ["zoneID"] = 2406,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2642,
+                    ["otherBossID"] = {},
+                },
+                [230583] = { -- Sprocketmonger Lockenstock
+                    ["requieres"] = {},
+                    ["zoneID"] = 2406,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2653,
+                    ["otherBossID"] = {},
+                },
+                [228458] = { -- The One-Armed Bandit
+                    ["requieres"] = {},
+                    ["zoneID"] = 2408,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2644,
+                    ["otherBossID"] = {},
+                },
+                [229953] = { -- Mug'Zee, Heads of Security
+                    ["requieres"] = {},
+                    ["zoneID"] = 2411,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2645,
+                    ["otherBossID"] = {},
+                },
+                [241526] = { -- Chrome King Gallywix
+                    ["requieres"] = {},
+                    ["zoneID"] = 2409,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2646,
+                    ["otherBossID"] = {},
+                },
+            }
+        }
     },
     [2] = {
         [1271] = {
@@ -261,6 +340,10 @@ SwitchSwitch.InstancesBossData["The War Within"] = {
             ["instanceID"] = 2661,
             ["difficulties"] = {1,2,23},
         }, -- Cinderbrew Meadery
+        [1298] = {
+            ["instanceID"] = 2773,
+            ["difficulties"] = {1,2,23},
+        }, -- Operation: Floodgate
     },
     [208] = {}
 }
