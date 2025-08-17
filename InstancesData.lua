@@ -38,6 +38,15 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
+    [15] = {
+        [1271] = 2660, -- Ara-Kara
+        [1270] = 2662, -- The Dawnbreaker
+        [1267] = 2649, -- Priory of the Sacred Flame
+        [1298] = 2773, -- Operation: Floodgate
+        [1303] = 2830, -- Eco-Dome Al'dani
+        [1185] = 2287, -- Halls of atonement
+        [1194] = 2441, -- Tazavesh The Veiled Market
+    },
     [14] = {
         [1272] = 2661, -- Cinderbrew Meadery
         [1210] = 2651, -- Darkflame Cleft
@@ -86,6 +95,13 @@ SwitchSwitch.MythicPlusDungeons = {
 -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
 -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
+    -- Season 3 TWW
+    [15] = {
+        [1] = 148;
+        [2] = 158;
+        [3] = 162;
+        [4] = 160;
+    },
     -- Season 2 TWW
     [14] = {
         [1] = 148;
@@ -305,6 +321,68 @@ SwitchSwitch.InstancesBossData["The War Within"] = {
                     ["otherBossID"] = {},
                 },
             }
+        },
+        [1302] = { -- Manaforge Omega
+            ["instanceID"] = 2810,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {
+                [233814] = { -- Plexus Sentinel
+                    ["requieres"] = {},
+                    ["zoneID"] = 2460,
+                    ["jurnalIndex"] = 1,
+                    ["encounterID"] = 2684,
+                    ["otherBossID"] = {},
+                },
+                [233816] = { -- Soulbinder Naazindhri
+                    ["requieres"] = {},
+                    ["zoneID"] = 2461,
+                    ["jurnalIndex"] = 3,
+                    ["encounterID"] = 2685,
+                    ["otherBossID"] = {},
+                },
+                [233815] = { -- Loom'ithar
+                    ["requieres"] = {},
+                    ["zoneID"] = 2462,
+                    ["jurnalIndex"] = 2,
+                    ["encounterID"] = 2686,
+                    ["otherBossID"] = {},
+                },
+                [247989] = { -- Forgeweaver Araz
+                    ["requieres"] = {},
+                    ["zoneID"] = 2464,
+                    ["jurnalIndex"] = 4,
+                    ["encounterID"] = 2687,
+                    ["otherBossID"] = {},
+                },
+                [237660] = { -- The Soul Hunters
+                    ["requieres"] = {},
+                    ["zoneID"] = 2465,
+                    ["jurnalIndex"] = 5,
+                    ["encounterID"] = 2688,
+                    ["otherBossID"] = {237661, 237662},
+                },
+                [237763] = { -- Nexus-King Salhadaar
+                    ["requieres"] = {},
+                    ["zoneID"] = 2466,
+                    ["jurnalIndex"] = 7,
+                    ["encounterID"] = 2690,
+                    ["otherBossID"] = {},
+                },
+                [241517] = { -- Dimensius, the All-Devouring
+                    ["requieres"] = {},
+                    ["zoneID"] = 2467,
+                    ["jurnalIndex"] = 8,
+                    ["encounterID"] = 2691,
+                    ["otherBossID"] = {},
+                },
+                [237861] = { -- Fractillus
+                    ["requieres"] = {},
+                    ["zoneID"] = 2465,
+                    ["jurnalIndex"] = 6,
+                    ["encounterID"] = 2747,
+                    ["otherBossID"] = {},
+                },
+            }
         }
     },
     [2] = {
@@ -344,6 +422,10 @@ SwitchSwitch.InstancesBossData["The War Within"] = {
             ["instanceID"] = 2773,
             ["difficulties"] = {1,2,23},
         }, -- Operation: Floodgate
+        [1303] = {
+            ["instanceID"] = 2830,
+            ["difficulties"] = {1,2,23},
+        }, -- Eco-Dome Al'dani
     },
     [208] = {}
 }
@@ -841,7 +923,7 @@ SwitchSwitch.InstancesBossData["Shadowlands"] = {
     [2] = { -- Dungeons
         [1194] = { -- Tazavesh the Veiled Market
             ["instanceID"] = 2441,
-            ["difficulties"] = {23},
+            ["difficulties"] = {2, 23},
         },
         [1188] = { -- Da other Side
             ["instanceID"] = 2291,
