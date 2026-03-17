@@ -547,7 +547,7 @@ end
 function SwitchSwitch:GetSelectedLoadoutConfigID()
     local selectionID = C_ClassTalents.GetLastSelectedSavedConfigID(PlayerUtil.GetCurrentSpecID())
 
-    if(selectionID == nil) then
+    if(selectionID == nil and PlayerSpellsFrame ~= nil) then
         selectionID = PlayerSpellsFrame.TalentsFrame.LoadSystem:GetSelectionID()
     end
     if(C_ClassTalents.GetStarterBuildActive()) then

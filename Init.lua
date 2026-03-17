@@ -104,7 +104,10 @@ function SwitchSwitch:OnEnable()
     --Load the UI if not currently loaded
     if(not C_AddOns.IsAddOnLoaded("Blizzard_ClassTalentUI")) then
         C_AddOns.LoadAddOn("Blizzard_ClassTalentUI")
-    end
+    else
+	    -- Lets refresh all the UIS
+		SwitchSwitch:RefreshCurrentConfigID()
+	end
 
     -- Enable Boss detection and register instances
     self:RegisterMessage("SWITCHSWITCH_BOSS_DETECTED")
@@ -138,8 +141,6 @@ function SwitchSwitch:OnEnable()
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("arena", data["all"] ~= nil)
     data = SwitchSwitch:GetProfilesSuggestionInstanceData("scenario") or {}
     SwitchSwitch:GetModule("BossDetection"):SetDetectingInstanceTypeEnabled("scenario", data[208] ~= nil, 208)
-    -- Lets refresh all the UIS
-    SwitchSwitch:RefreshCurrentConfigID()
 end
 
 function SwitchSwitch:OnDisable()

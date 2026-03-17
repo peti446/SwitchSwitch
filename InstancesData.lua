@@ -38,6 +38,16 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
+	[16] = {
+		[1299] = 2805, -- Windrunner Spire
+		[1300] = 2811, -- Magisters' Terrace
+		[1315] = 2874, -- Maisara Caverns
+		[1316] = 2815, -- Nexus-Point Xenas
+		[1201] = 2526, -- 	Algeth'ar Academy
+		[945] = 1753, -- The seat of the Triumvirate
+		[476] = 1209, -- Skyreach
+		[278] = 658, -- Pit of Saron
+	},
     [15] = {
         [1271] = 2660, -- Ara-Kara
         [1270] = 2662, -- The Dawnbreaker
@@ -95,6 +105,13 @@ SwitchSwitch.MythicPlusDungeons = {
 -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
 -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
+	-- Season 1 Midnight
+	[16] = {
+	    [1] = 148;
+        [2] = 158;
+        [3] = 162;
+        [4] = 160;
+	},
     -- Season 3 TWW
     [15] = {
         [1] = 148;
@@ -195,6 +212,60 @@ SwitchSwitch.MythicPlusAffixes = {
 -- To obtain bosses data look at https://wago.tools/db2/JournalEncounter?page=1, the UiMapID is the zone, ID is encounterid, jurnalIndex is OrderIndex
 -- To obtain duneons data look at https://wago.tools/db2/Map?filter[ExpansionID]=10&filter[InstanceType]=1&page=1&sort[Directory]=asc ID is the instanceID
 -- The boss entry ID is the boss npc ID wich is what we search for in the tooltip
+SwitchSwitch.InstancesBossData["Midnight"] = {
+	[1] = {
+		[1307] = { -- The voidspire
+			["instanceID"] = 2912,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {}
+		},
+		[1308] = { -- March on Quel'danas
+			["instanceID"] = 2913,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {}
+		},
+		[1314] = { -- The Dreamrift
+			["instanceID"] = 2939,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {}
+		}
+	},
+	[2] = {
+		[1299] = { -- Windrunner Spire
+			["instanceID"] = 2805,
+            ["difficulties"] = {1,2,23},
+		},
+		[1300] = { -- Magisters' Terrace
+			["instanceID"] = 2811,
+            ["difficulties"] = {1,2,23},
+		},
+		[1304] = { -- Murder Row
+			["instanceID"] = 2813,
+            ["difficulties"] = {1,2,23},
+		},
+		[1311] = { -- Den of nalorakk
+			["instanceID"] = 2825,
+            ["difficulties"] = {1,2,23},
+		},
+		[1309] = { -- The Blinding Vale
+			["instanceID"] = 2859,
+            ["difficulties"] = {1,2,23},
+		},
+		[1315] = { -- Maisara Caverns
+			["instanceID"] = 2874,
+            ["difficulties"] = {1,2,23},
+		},
+		[1316] = { -- Nexus-Point Xenas
+			["instanceID"] = 2815,
+            ["difficulties"] = {1,2,23},
+		},
+		[1313] = { -- Voidscar Arena
+			["instanceID"] = 2823,
+            ["difficulties"] = {1,2,23},
+		},
+	},
+	[208] = {}
+}
 SwitchSwitch.InstancesBossData["The War Within"] = {
     -- Raids
     [1] = {
