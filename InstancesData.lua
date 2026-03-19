@@ -38,7 +38,7 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
-	[16] = {
+	[17] = {
 		[1299] = 2805, -- Windrunner Spire
 		[1300] = 2811, -- Magisters' Terrace
 		[1315] = 2874, -- Maisara Caverns
@@ -106,7 +106,7 @@ SwitchSwitch.MythicPlusDungeons = {
 -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
 	-- Season 1 Midnight
-	[16] = {
+	[17] = {
 	    [1] = 148;
         [2] = 158;
         [3] = 162;
