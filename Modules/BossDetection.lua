@@ -168,7 +168,7 @@ end
 function BossDetection:PLAYER_ENTERING_WORLD()
     local _, current_instanceType, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
     if(select(1, IsInInstance())) then
-        
+
         for i, k in ipairs(ActiveDetection.types) do
             if(k.difficultyID == nil and k.type == current_instanceType) then
                 self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
