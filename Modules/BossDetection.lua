@@ -22,15 +22,16 @@ end
 
 function BossDetection:OnEnable()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
-    self:RegisterEvent("WALK_IN_DATA_UPDATE")
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, InternalCallToTooltip)
+    self:RegisterEvent("PLAYER_TARGET_CHANGED")
 end
 
 function BossDetection:OnDisable()
     self:UnregisterEvent("PLAYER_STARTED_MOVING")
     self:UnregisterEvent("PLAYER_STOPPED_MOVING")
-    self:UnregisterEvent("WALK_IN_DATA_UPDATE")
     self:UnregisterBucket("BOSS_KILL")
+    self:UnregisterEvent("UPDATE_INSTANCE_INFO")
+    self:UnregisterEvent("PLAYER_TARGET_CHANGED")
     self:CancelAllTimers()
 end
 
@@ -115,12 +116,8 @@ function BossDetection:SetDetectionForBossEnabled(BossID, InstanceID, enabled)
     end
 end
 
-function BossDetection:OnTooltipSetUnit(tooltip, data)
-    if(UnitAffectingCombat("player") or UnitIsDeadOrGhost("player") or tooltip ~= GameTooltip) then
-        return
-    end
-
-    local npcType,_,_,_,_,npcID = strsplit("-", data.guid)
+local function PerformUnitDetection(guid)
+    local npcType,_,_,_,_,npcID = strsplit("-", guid)
     if(not npcID) then
         return
     end
@@ -138,25 +135,40 @@ function BossDetection:OnTooltipSetUnit(tooltip, data)
     end
 end
 
-function BossDetection:WALK_IN_DATA_UPDATE()
-    local _, current_instanceType, current_difficultyID, _, _, _, _, _current_instanceID, _, _ = GetInstanceInfo()
-    if(select(1, IsInInstance())) then
-        for i, k in ipairs(ActiveDetection.types) do
-            if(k.difficultyID == nil and k.type == current_instanceType) then
-                self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
-                break;
-            elseif(k.type == current_instanceType and k.difficultyID == current_difficultyID) then
-                self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
-                break;
-            end
+function BossDetection:PLAYER_TARGET_CHANGED()
+    SwitchSwitch:DebugPrint("Target changed")
+    local guid = UnitGUID("target")
+    if(not guid or issecretvalue(guid)) then
+        if(not guid) then
+            SwitchSwitch:DebugPrint("No target")
+        else
+            SwitchSwitch:DebugPrint("Target is secret")
         end
+        return
     end
+
+    PerformUnitDetection(guid)
+end
+
+function BossDetection:OnTooltipSetUnit(tooltip, data)
+    if(issecretvalue(tooltip) or issecretvalue(data.guid)) then
+        if (data.id) then
+            SwitchSwitch:DebugPrint("Tooltip set for unit with id: " .. tostring(data.id))
+        end
+        return
+    end
+
+    if(UnitAffectingCombat("player") or UnitIsDeadOrGhost("player") or tooltip ~= GameTooltip) then
+        return
+    end
+
+    PerformUnitDetection(data.guid)
 end
 
 function BossDetection:PLAYER_ENTERING_WORLD()
     local _, current_instanceType, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
     if(select(1, IsInInstance())) then
-
+        
         for i, k in ipairs(ActiveDetection.types) do
             if(k.difficultyID == nil and k.type == current_instanceType) then
                 self:SendMessage("SWITCHSWITCH_INSTANCE_TYPE_DETECTED", current_instanceType, current_difficultyID)
@@ -170,12 +182,15 @@ function BossDetection:PLAYER_ENTERING_WORLD()
         local shouldDetectBosses = false
         for detecteableID, data in pairs(ActiveDetection.instances) do
             if(detecteableID == current_instanceID) then
-                self.awaitingMovement = next(data["difficulites"] or {},nil) ~= nil
+                local ShouldWaitInstanceInfoUpdate = next(data["difficulites"] or {},nil) ~= nil
                 self.awaitingBossDetection =  next(data["bossIDs"] or {}, nil) ~= nil
-                if(self.awaitingMovement or self.awaitingBossDetection) then
+                if(ShouldWaitInstanceInfoUpdate or self.awaitingBossDetection) then
                     shouldDetectBosses = true
                     CurrentInstanceData = InstancesData[detecteableID] or {}
-                    SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID .. " Waiting Movement to start suggestion if neceesary")
+                    if(ShouldWaitInstanceInfoUpdate) then
+                        self:RegisterEvent("UPDATE_INSTANCE_INFO")
+                    end
+                    SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID)
                     break
                 end
             end
@@ -184,6 +199,7 @@ function BossDetection:PLAYER_ENTERING_WORLD()
         if(not shouldDetectBosses) then
             self:UnregisterEvent("PLAYER_STARTED_MOVING")
             self:UnregisterEvent("PLAYER_STOPPED_MOVING")
+            self:UnregisterEvent("UPDATE_INSTANCE_INFO")
             self:UnregisterBucket("BOSS_KILL")
             -- Need to call it maually to make sure we are stoping timers
             self:PLAYER_STOPPED_MOVING()
@@ -200,9 +216,23 @@ function BossDetection:PLAYER_ENTERING_WORLD()
         -- We are not in instance so lets disable any checking
         self:UnregisterEvent("PLAYER_STARTED_MOVING")
         self:UnregisterEvent("PLAYER_STOPPED_MOVING")
+        self:UnregisterEvent("UPDATE_INSTANCE_INFO")
         self:UnregisterBucket("BOSS_KILL")
         -- Need to call it maually to make sure we are stoping timers
         self:PLAYER_STOPPED_MOVING()
+    end
+end
+
+function BossDetection:UPDATE_INSTANCE_INFO()
+    self:UnregisterEvent("UPDATE_INSTANCE_INFO")
+
+    if(select(1, IsInInstance())) then
+        local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
+        local instanceDetectionData = ActiveDetection.instances[current_instanceID] or {}
+        if(SwitchSwitch:table_has_value(instanceDetectionData["difficulites"] or {}, current_difficultyID) or SwitchSwitch:table_has_value(instanceDetectionData["difficulites"] or {}, -1)) then
+            self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, nil)
+            SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID)
+        end
     end
 end
 
@@ -212,16 +242,6 @@ function BossDetection:PLAYER_STARTED_MOVING()
     if(self.NeedsBossKillUpdate == true) then
         self:BOSS_KILL()
         self.NeedsBossKillUpdate = false
-    end
-
-    if(self.awaitingMovement) then
-        local _, _, current_difficultyID, _, _, _, _, current_instanceID, _, _ = GetInstanceInfo()
-        local instanceDetectionData = ActiveDetection.instances[current_instanceID] or {}
-        if(SwitchSwitch:table_has_value(instanceDetectionData["difficulites"] or {}, current_difficultyID) or SwitchSwitch:table_has_value(instanceDetectionData["difficulites"] or {}, -1)) then
-            self.awaitingMovement = false
-            self:SendMessage("SWITCHSWITCH_BOSS_DETECTED", current_instanceID, current_difficultyID, nil)
-            SwitchSwitch:DebugPrint("---- Detected Instance:" .. current_instanceID .. ", " .. current_difficultyID )
-        end
     end
 
     if(self.awaitingBossDetection) then
