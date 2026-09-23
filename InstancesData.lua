@@ -38,6 +38,16 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 
 -- Format is: JournalID -> InstancID
 SwitchSwitch.MythicPlusDungeons = {
+    [18] = {
+        [1322] = 2993, -- Altar of Fangs
+		[1311] = 2825, -- Den of Nalorak
+		[1304] = 2813, -- Murder Row
+		[1309] = 2859, -- The blinding Vale
+		[1313] = 2923, -- Voidscar Arenay
+		[1041] = 2762, -- Kings Rest
+		[1202] = 2521, -- Ruby Life Pools
+		[1030] = 1877, -- Temple of Sethraliss
+    },
 	[17] = {
 		[1299] = 2805, -- Windrunner Spire
 		[1300] = 2811, -- Magisters' Terrace
@@ -105,6 +115,13 @@ SwitchSwitch.MythicPlusDungeons = {
 -- To retrive then affix info C_ChallengeMode.GetAffixInfo(ID)
 -- Also normaly good to check is wowhead they tend to have a table of affixes that gets updated. For Season 3 https://www.wowhead.com/guides/season-3-shadowlands-mythic-plus-updates-item-levels
 SwitchSwitch.MythicPlusAffixes = {
+    -- Season 2 Midnight
+    [18] = {
+	    [1] = 148;
+        [2] = 158;
+        [3] = 162;
+        [4] = 160;
+	},
 	-- Season 1 Midnight
 	[17] = {
 	    [1] = 148;
@@ -214,6 +231,11 @@ SwitchSwitch.MythicPlusAffixes = {
 -- The boss entry ID is the boss npc ID wich is what we search for in the tooltip
 SwitchSwitch.InstancesBossData["Midnight"] = {
 	[1] = {
+        [1320] = { -- The Venomous Abyss
+        	["instanceID"] = 3004,
+            ["difficulties"] = {14,15,16},
+            ["bossData"] = {}
+        },
 		[1307] = { -- The voidspire
 			["instanceID"] = 2912,
             ["difficulties"] = {14,15,16},
@@ -231,6 +253,10 @@ SwitchSwitch.InstancesBossData["Midnight"] = {
 		}
 	},
 	[2] = {
+        [1322] = {
+            ["instanceID"] = 3993,
+            ["difficulties"] = {1,2,23},
+        },
 		[1299] = { -- Windrunner Spire
 			["instanceID"] = 2805,
             ["difficulties"] = {1,2,23},
