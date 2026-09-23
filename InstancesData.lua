@@ -40,24 +40,24 @@ SwitchSwitch.DefaultMythicPlusSeason = 12
 SwitchSwitch.MythicPlusDungeons = {
     [18] = {
         [1322] = 2993, -- Altar of Fangs
-		[1311] = 2825, -- Den of Nalorak
-		[1304] = 2813, -- Murder Row
-		[1309] = 2859, -- The blinding Vale
-		[1313] = 2923, -- Voidscar Arenay
-		[1041] = 2762, -- Kings Rest
-		[1202] = 2521, -- Ruby Life Pools
-		[1030] = 1877, -- Temple of Sethraliss
+        [1311] = 2825, -- Den of Nalorak
+        [1304] = 2813, -- Murder Row
+        [1309] = 2859, -- The blinding Vale
+        [1313] = 2923, -- Voidscar Arenay
+        [1041] = 2762, -- Kings Rest
+        [1202] = 2521, -- Ruby Life Pools
+        [1030] = 1877, -- Temple of Sethraliss
     },
-	[17] = {
-		[1299] = 2805, -- Windrunner Spire
-		[1300] = 2811, -- Magisters' Terrace
-		[1315] = 2874, -- Maisara Caverns
-		[1316] = 2815, -- Nexus-Point Xenas
-		[1201] = 2526, -- 	Algeth'ar Academy
-		[945] = 1753, -- The seat of the Triumvirate
-		[476] = 1209, -- Skyreach
-		[278] = 658, -- Pit of Saron
-	},
+    [17] = {
+        [1299] = 2805, -- Windrunner Spire
+        [1300] = 2811, -- Magisters' Terrace
+        [1315] = 2874, -- Maisara Caverns
+        [1316] = 2815, -- Nexus-Point Xenas
+        [1201] = 2526, -- Algeth'ar Academy
+        [945] = 1753, -- The seat of the Triumvirate
+        [476] = 1209, -- Skyreach
+        [278] = 658, -- Pit of Saron
+    },
     [15] = {
         [1271] = 2660, -- Ara-Kara
         [1270] = 2662, -- The Dawnbreaker
@@ -117,18 +117,18 @@ SwitchSwitch.MythicPlusDungeons = {
 SwitchSwitch.MythicPlusAffixes = {
     -- Season 2 Midnight
     [18] = {
-	    [1] = 148;
+        [1] = 148;
         [2] = 158;
         [3] = 162;
         [4] = 160;
-	},
-	-- Season 1 Midnight
-	[17] = {
-	    [1] = 148;
+    },
+    -- Season 1 Midnight
+    [17] = {
+        [1] = 148;
         [2] = 158;
         [3] = 162;
         [4] = 160;
-	},
+    },
     -- Season 3 TWW
     [15] = {
         [1] = 148;
@@ -230,67 +230,67 @@ SwitchSwitch.MythicPlusAffixes = {
 -- To obtain duneons data look at https://wago.tools/db2/Map?filter[ExpansionID]=10&filter[InstanceType]=1&page=1&sort[Directory]=asc ID is the instanceID
 -- The boss entry ID is the boss npc ID wich is what we search for in the tooltip
 SwitchSwitch.InstancesBossData["Midnight"] = {
-	[1] = {
+    [1] = {
         [1320] = { -- The Venomous Abyss
-        	["instanceID"] = 3004,
+            ["instanceID"] = 3004,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {}
         },
-		[1307] = { -- The voidspire
-			["instanceID"] = 2912,
+        [1307] = { -- The voidspire
+            ["instanceID"] = 2912,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {}
-		},
-		[1308] = { -- March on Quel'danas
-			["instanceID"] = 2913,
+        },
+        [1308] = { -- March on Quel'danas
+            ["instanceID"] = 2913,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {}
-		},
-		[1314] = { -- The Dreamrift
-			["instanceID"] = 2939,
+        },
+        [1314] = { -- The Dreamrift
+            ["instanceID"] = 2939,
             ["difficulties"] = {14,15,16},
             ["bossData"] = {}
-		}
-	},
-	[2] = {
+                }
+        },
+        [2] = {
         [1322] = {
             ["instanceID"] = 3993,
             ["difficulties"] = {1,2,23},
         },
-		[1299] = { -- Windrunner Spire
-			["instanceID"] = 2805,
+        [1299] = { -- Windrunner Spire
+            ["instanceID"] = 2805,
             ["difficulties"] = {1,2,23},
-		},
-		[1300] = { -- Magisters' Terrace
-			["instanceID"] = 2811,
+        },
+        [1300] = { -- Magisters' Terrace
+            ["instanceID"] = 2811,
             ["difficulties"] = {1,2,23},
-		},
-		[1304] = { -- Murder Row
-			["instanceID"] = 2813,
+        },
+        [1304] = { -- Murder Row
+            ["instanceID"] = 2813,
             ["difficulties"] = {1,2,23},
-		},
-		[1311] = { -- Den of nalorakk
-			["instanceID"] = 2825,
+        },
+        [1311] = { -- Den of nalorakk
+            ["instanceID"] = 2825,
             ["difficulties"] = {1,2,23},
-		},
-		[1309] = { -- The Blinding Vale
-			["instanceID"] = 2859,
+        },
+        [1309] = { -- The Blinding Vale
+            ["instanceID"] = 2859,
             ["difficulties"] = {1,2,23},
-		},
-		[1315] = { -- Maisara Caverns
-			["instanceID"] = 2874,
+        },
+        [1315] = { -- Maisara Caverns
+            ["instanceID"] = 2874,
             ["difficulties"] = {1,2,23},
-		},
-		[1316] = { -- Nexus-Point Xenas
-			["instanceID"] = 2815,
+        },
+        [1316] = { -- Nexus-Point Xenas
+            ["instanceID"] = 2815,
             ["difficulties"] = {1,2,23},
-		},
-		[1313] = { -- Voidscar Arena
-			["instanceID"] = 2823,
+        },
+        [1313] = { -- Voidscar Arena
+            ["instanceID"] = 2823,
             ["difficulties"] = {1,2,23},
-		},
-	},
-	[208] = {}
+                },
+        },
+        [208] = {}
 }
 SwitchSwitch.InstancesBossData["The War Within"] = {
     -- Raids
